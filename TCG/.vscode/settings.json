@@ -1,0 +1,9 @@
+{
+    "editor.quickSuggestions": {
+        "strings": "on"
+    },
+    "editor.suggest.snippetsPreventQuickSuggestions": true,
+    "editor.inlineSuggest.suppressSuggestions": true,
+    "editor.quickSuggestionsDelay": 5,
+    "editor.snippetSuggestions": "top"
+}
