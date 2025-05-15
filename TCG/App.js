@@ -1,10 +1,10 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NavigationContainer ,useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Search , X,} from "react-native-feather";
+import { Search, X } from "react-native-feather";
 import {
   SafeAreaView,
   TouchableOpacity,
@@ -14,48 +14,58 @@ import {
   Modal,
   Pressable,
   Image,
+  FlatList,
 } from "react-native";
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 
+export const IP = "http://192.168.1.12:3000";
+
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
-  const [isLoading,setIsloading] = useState(true);
-  const [event,setEvent] = useState({});
+  const [isLoading, setIsloading] = useState(true);
+  const [event, setEvent] = useState({});
 
   const fetchEvent = async () => {
-    console.log('start')
+        setIsloading(true);
+    console.log("start");
     try {
-     const allEvent = await fetch('http://192.168.1.8:3000/api/events');
-     console.log("fetch - Status:", allEvent.status); // Log HTTP Status Code
-
-     if (!allEvent.ok) {
-       console.error("Fetch Error:", allEvent.status, allEvent.statusText);
-       // จัดการ Error ตามต้องการ เช่น แสดงข้อความผิดพลาดให้ผู้ใช้
-       return;
-     }
-
-     console.log("Parsing JSON...");
-     const event = await allEvent.json();
-     console.log("Event Data:", event);
-     // setIsloading(false);
-   } catch (error) {
-     console.error("Fetch Error (Catch):", error);
-     // จัดการ Error ที่เกิดจากการ Fetch หรือการ Parse JSON
-   }
+      const Efetch = await fetch(IP + "/api/events")
+      const Edata = await Efetch.json();
+      setIsloading(false);
+      setEvent(Edata);
+      console.log(Edata);
+    } catch (error) {
+      console.error("Fetch Error (Catch):", error);
+    }
   };
-  
+
+  // const EItem = ({event}) => {
+  //   <TouchableOpacity
+  //     onPress={() => { console.log("pressed")}}
+  //   >
+  //     <View>
+  //       <text>{event.UserName}</text>
+  //       <text>{event.EventName}</text>
+  //       <text>{event.Address}</text>
+  //     </View>
+  //   </TouchableOpacity>
+  // };
 
   useEffect(() => {
-    fetchEvent()
-  },[isLoading])
+    fetchEvent();
+  }, [isLoading]);
 
   return (
     <SafeAreaView style={styles.container}>
       {/* แท็บบนสุด */}
       <View style={styles.TopTab}>
-        <TouchableOpacity onPress={() => { navigation.navigate('Login')} }>
-          <Text style={styles.RightTab} >เข้าสู่ระบบ</Text>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("Login");
+          }}
+        >
+          <Text style={styles.RightTab}>เข้าสู่ระบบ</Text>
         </TouchableOpacity>
       </View>
 
@@ -77,9 +87,15 @@ const Home = ({ navigation }) => {
           <Search size={5} justifyContent="center" margin={5} />
         </View>
         {/* แท็บกิจกรรม */}
-          <View style={styles.Event}>
-
-          </View>
+        <View style={styles.Event}>
+          {/* <FlatList 
+          data={event}
+          renderItem={({ EItem }) => <EItem
+          UserName={EItem.UserName} 
+            />
+          }
+          /> */}
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -88,32 +104,42 @@ const Home = ({ navigation }) => {
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home" >
-        <Stack.Screen name="Home" component={Home} options={{ headerShown: false }}/>
-        <Stack.Screen name="Login" component={Login} options={
-          { headerTitle:'',
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen
+          name="Home"
+          component={Home}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{
+            headerTitle: "",
             headerLeft: () => {
               const navigation = useNavigation();
               return (
-              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-                <X margin={10} color='#176B87' />
-              </TouchableOpacity>
-            );
-            }
-          }
-        } />
-         <Stack.Screen name="Regis" component={Register} options={
-          { headerTitle:'',
+                <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+                  <X margin={10} color="#176B87" />
+                </TouchableOpacity>
+              );
+            },
+          }}
+        />
+        <Stack.Screen
+          name="Regis"
+          component={Register}
+          options={{
+            headerTitle: "",
             headerLeft: () => {
               const navigation = useNavigation();
               return (
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <X margin={10} color='#176B87' />
-              </TouchableOpacity>
-            );
-            }
-          }
-        } />
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                  <X margin={10} color="#176B87" />
+                </TouchableOpacity>
+              );
+            },
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -186,7 +212,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#D3D9E3",
     borderRadius: 10,
-    margin:13,
+    margin: 13,
     justifyContent: "center",
     alignItems: "center",
   },

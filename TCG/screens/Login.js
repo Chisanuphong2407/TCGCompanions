@@ -16,14 +16,15 @@ import {
   Pressable,
   Image,
 } from "react-native";
+import { IP } from "../App";
 
-export const Login = ({ navigation }) => {
+export const Login = ({ navigation}) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
+  // console.log(IP);
   const handleLogin = async () => {
     try{
-    const FetchLogin = await fetch('http://192.168.1.8:3000/api/login',{
+    const FetchLogin = await fetch(IP + '/api/login',{
       method: 'POST',
       headers: {
         'Content-Type' : 'application/json'

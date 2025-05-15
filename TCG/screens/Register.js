@@ -47,7 +47,7 @@ export const Register = ({ navigation }) => {
     } else {
       try {
         console.log("start");
-        const response = await fetch("http://192.168.1.8:3000/api/register", {
+        const response = await fetch(IP + "/api/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
+
 //Profile ไว้ query register
 const conn = mysql
   .createConnection({
@@ -100,7 +101,7 @@ app.get('/api/events', async (req,res) => {
   try{
     console.log("start");
     const [result] = await conn.query(
-      "SELECT * from event"
+      "SELECT event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID"
     );
     console.log(result);
     return res.json(result);
