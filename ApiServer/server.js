@@ -58,7 +58,6 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-
 app.post('/api/login', async (req,res) => {
   //สร้าง token
   const genToken = (payload) => {
@@ -101,11 +100,24 @@ app.get('/api/events', async (req,res) => {
   try{
     console.log("start");
     const [result] = await conn.query(
-      "SELECT event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID"
+      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID"
     );
     console.log(result);
     return res.json(result);
   }catch (error) {
+    console.log(error);
+  }
+});
+
+app.post('/api/edetails', async (req,res) => {
+  try {
+    console.log("start");
+    const [details] = await conn.query(
+      'SELECT event.Status, event.Fighter,event.Condition,event.Rule,event.Time,event.Amount,event.CloseDate,event.MoreDetail,event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID WHERE event.EventID = ?',[req.body.EventID]
+    );
+    console.log(details);
+    return res.json(details);
+  } catch (error) {
     console.log(error);
   }
 });

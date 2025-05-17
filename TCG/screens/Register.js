@@ -3,7 +3,6 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { User, Lock } from "react-native-feather";
 import {
   SafeAreaView,
   TouchableOpacity,

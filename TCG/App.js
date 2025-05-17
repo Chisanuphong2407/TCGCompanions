@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Search, X } from "react-native-feather";
+import { Search, X, MapPin } from "react-native-feather";
 import {
   SafeAreaView,
   TouchableOpacity,
@@ -18,14 +18,16 @@ import {
 } from "react-native";
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
+import { Eventdetails } from "./screens/Eventdetails";
 
-export const IP = "http://192.168.1.12:3000";
+export const IP = "http://192.168.1.9:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
   const [isLoading, setIsloading] = useState(true);
-  const [event, setEvent] = useState({});
-
+  const [event, setEvent] = useState([]);
+  
+  //query event ออกมา
   const fetchEvent = async () => {
         setIsloading(true);
     console.log("start");
@@ -34,23 +36,30 @@ const Home = ({ navigation }) => {
       const Edata = await Efetch.json();
       setIsloading(false);
       setEvent(Edata);
-      console.log(Edata);
+      console.log(event);
     } catch (error) {
       console.error("Fetch Error (Catch):", error);
     }
   };
 
-  // const EItem = ({event}) => {
-  //   <TouchableOpacity
-  //     onPress={() => { console.log("pressed")}}
-  //   >
-  //     <View>
-  //       <text>{event.UserName}</text>
-  //       <text>{event.EventName}</text>
-  //       <text>{event.Address}</text>
-  //     </View>
-  //   </TouchableOpacity>
-  // };
+  //สร้าง item ไว้แสดงกิจกรรม
+  const Item = ({EventID,UserName, EventName, Address}) => (
+    <TouchableOpacity
+      onPress={() => {
+        // console.log(EventID);
+        navigation.navigate("Eventdetails",EventID);
+      }}
+    >
+      <View style={styles.item} >
+        <Text style={styles.title} >{UserName}</Text>
+        <Text style={styles.EventName} >{EventName}</Text>
+        <View style={styles.Address} >
+          <MapPin size={0.1} />
+          <Text style={styles.Addresstext} >{Address}</Text>
+        </View>
+      </View>
+      </TouchableOpacity>
+  );
 
   useEffect(() => {
     fetchEvent();
@@ -88,13 +97,17 @@ const Home = ({ navigation }) => {
         </View>
         {/* แท็บกิจกรรม */}
         <View style={styles.Event}>
-          {/* <FlatList 
+          {/* <Text>test</Text> */}
+          <FlatList
           data={event}
-          renderItem={({ EItem }) => <EItem
-          UserName={EItem.UserName} 
-            />
-          }
-          /> */}
+          renderItem={({item}) => <Item 
+          EventID={item.EventID}
+          UserName={item.UserName}
+          EventName={item.EventName}
+          Address={item.Address}
+          />}
+          keyExtractor={item => item.EventID}
+          />
         </View>
       </View>
     </SafeAreaView>
@@ -140,6 +153,7 @@ const App = () => {
             },
           }}
         />
+        <Stack.Screen name="Eventdetails" component={Eventdetails} options={{headerTitle: ''}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -151,7 +165,7 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 40,
     flex: 1,
-    backgroundColor: "#EEF5FF",
+    backgroundColor: "#F7FAFF",
     alignItems: "Top",
     justifyContent: "Top",
   },
@@ -210,12 +224,34 @@ const styles = StyleSheet.create({
   },
   Event: {
     flex: 1,
-    backgroundColor: "#D3D9E3",
     borderRadius: 10,
     margin: 13,
     justifyContent: "center",
-    alignItems: "center",
   },
+  item: {
+    backgroundColor: '#EEF5FF',
+    borderColor: '#86B6F6',
+    borderWidth:1,
+    padding: 10,
+    borderRadius: 5
+  },
+  title: {
+    fontSize: 14,
+    opacity: 0.6
+  },
+  EventName: {
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
+  Address: {
+    flexDirection: 'row',
+    marginTop: 3
+  },
+  Addresstext: {
+    fontSize: 10,
+    paddingLeft: 5,
+    alignSelf: "center",
+  }
 });
 
 export default App;
