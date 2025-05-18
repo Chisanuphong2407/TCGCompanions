@@ -27,24 +27,31 @@ const Home = ({ navigation }) => {
   const [isLoading, setIsloading] = useState(true);
   const [event, setEvent] = useState([]);
   const [isVisiblelogin, setIsvisiblelogin] = useState(true);
+  const [isVisiblelogout, setIsvisiblelogout] = useState(false);
+  const [modal, setModal] = useState(false);
 
   //verify token
   const verify = async () => {
     try {
-      const token = await AsyncStorage.getItem('@accessToken');
+      const token = await AsyncStorage.getItem("@accessToken");
       console.log(token);
       const vef = await fetch(IP + "/api/profile/", {
         method: "GET",
         headers: {
-          'Authorization' : `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      if (token !== undefined ){
-        setIsvisiblelogin(!isVisiblelogin);
+      const passvef = await vef.json();
+      console.log(passvef);
+      if (token === null) {
+        setIsvisiblelogin(true);
+        setIsvisiblelogout(false);
+      }else{
+        setIsvisiblelogin(false);
+        setIsvisiblelogout(true);
       }
-      console.log(vef.status);
     } catch (error) {
-      console.log (error);
+      console.log(error);
     }
   };
 
@@ -89,17 +96,45 @@ const Home = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       {/* แท็บบนสุด */}
-      <View style={styles.TopTab}>
-        {/*log out*/}
-        <TouchableOpacity 
-        onPress={() => {
-          // <Modal></Modal>
-          // AsyncStorage.removeItem('@accessToken');
-          // setIsloading(true);
-        }}
+      <View>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modal}
+          onRequestClose={() => {
+            setModal(!modal);
+          }}
         >
-          <LogOut marginLeft={15} size={15} color={'white'} />
-        </TouchableOpacity>
+          <View style={styles.centered}>
+            <View style={styles.logoutModal}>
+              <Text style={styles.modaltext}>ออกจากระบบ ?</Text>
+              <View style={styles.modalmenu}>
+                <Pressable
+                  onPress={() => {
+                    setModal(!modal);
+                    // console.log("pressห")
+                  }}
+                >
+                  <Text style={styles.modalbut}>ยกเลิก</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    AsyncStorage.removeItem("@accessToken");
+                    setIsloading(true);
+                    setModal(!modal);
+                    navigation.navigate("Login");
+                    // console.log("pressห")
+                  }}
+                >
+                  <Text style={styles.modalbut}>ตกลง</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
+
+      <View style={styles.TopTab}>
         {/* log in */}
         <TouchableOpacity
           onPress={() => {
@@ -107,11 +142,22 @@ const Home = ({ navigation }) => {
           }}
         >
           {isVisiblelogin ? 
-          <Text style={styles.RightTab}>เข้าสู่ระบบ</Text> 
-          : 
-          <User color={'white'} marginRight={15} size={15} />
+            <Text style={styles.RightTab}>เข้าสู่ระบบ</Text>
+           : 
+            <User color={"white"} marginRight={15} size={20} />
           }
         </TouchableOpacity>
+        {/*log out*/}
+        {isVisiblelogout && (
+          <TouchableOpacity
+            onPress={() => {
+              setModal(true);
+            }}
+          >
+            <LogOut marginLeft={15} size={20} color={"white"} />
+          </TouchableOpacity>
+        )}
+        
       </View>
 
       {/* แท็บเมนู */}
@@ -133,7 +179,6 @@ const Home = ({ navigation }) => {
         </View>
         {/* แท็บกิจกรรม */}
         <View style={styles.Event}>
-          {/* <Text>test</Text> */}
           <FlatList
             data={event}
             renderItem={({ item }) => (
@@ -208,15 +253,14 @@ const styles = StyleSheet.create({
     marginTop: 40,
     flex: 1,
     backgroundColor: "#F7FAFF",
-    alignItems: "Top",
-    justifyContent: "Top",
+    justifyContent: "center",
   },
   TopTab: {
     flex: 0.1,
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     backgroundColor: "#86B6F6",
     justifyContent: "space-between",
-    alignItems: 'center'
+    alignItems: "center",
   },
   RightTab: {
     fontSize: 17,
@@ -295,6 +339,48 @@ const styles = StyleSheet.create({
     fontSize: 10,
     paddingLeft: 5,
     alignSelf: "center",
+  },
+  logoutModal: {
+    width: 250,
+    height: 250,
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: "center",
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modaltext: {
+    fontSize: 20,
+    fontWeight: "black",
+    margin: 30,
+  },
+  modalmenu: {
+    fontSize: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  modalbut: {
+    margin: 10,
+    backgroundColor: "#176B87",
+    padding: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
+    borderRadius: 10,
+    color: "white",
   },
 });
 
