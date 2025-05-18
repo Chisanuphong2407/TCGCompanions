@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Search, X, MapPin } from "react-native-feather";
+import { Search, X, MapPin, LogOut, User } from "react-native-feather";
 import {
   SafeAreaView,
   TouchableOpacity,
@@ -20,45 +20,66 @@ import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
 
-export const IP = "http://192.168.1.9:3000";
+export const IP = "http://192.168.1.8:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
   const [isLoading, setIsloading] = useState(true);
   const [event, setEvent] = useState([]);
-  
+  const [isVisiblelogin, setIsvisiblelogin] = useState(true);
+
+  //verify token
+  const verify = async () => {
+    try {
+      const token = await AsyncStorage.getItem('@accessToken');
+      console.log(token);
+      const vef = await fetch(IP + "/api/profile/", {
+        method: "GET",
+        headers: {
+          'Authorization' : `Bearer ${token}`
+        }
+      });
+      if (token !== undefined ){
+        setIsvisiblelogin(!isVisiblelogin);
+      }
+      console.log(vef.status);
+    } catch (error) {
+      console.log (error);
+    }
+  };
+
   //query event ออกมา
   const fetchEvent = async () => {
-        setIsloading(true);
     console.log("start");
     try {
-      const Efetch = await fetch(IP + "/api/events")
+      const Efetch = await fetch(IP + "/api/events");
       const Edata = await Efetch.json();
       setIsloading(false);
       setEvent(Edata);
-      console.log(event);
+      // console.log(event);
+      verify();
     } catch (error) {
       console.error("Fetch Error (Catch):", error);
     }
   };
 
   //สร้าง item ไว้แสดงกิจกรรม
-  const Item = ({EventID,UserName, EventName, Address}) => (
+  const Item = ({ EventID, UserName, EventName, Address }) => (
     <TouchableOpacity
       onPress={() => {
         // console.log(EventID);
-        navigation.navigate("Eventdetails",EventID);
+        navigation.navigate("Eventdetails", EventID);
       }}
     >
-      <View style={styles.item} >
-        <Text style={styles.title} >{UserName}</Text>
-        <Text style={styles.EventName} >{EventName}</Text>
-        <View style={styles.Address} >
+      <View style={styles.item}>
+        <Text style={styles.title}>{UserName}</Text>
+        <Text style={styles.EventName}>{EventName}</Text>
+        <View style={styles.Address}>
           <MapPin size={0.1} />
-          <Text style={styles.Addresstext} >{Address}</Text>
+          <Text style={styles.Addresstext}>{Address}</Text>
         </View>
       </View>
-      </TouchableOpacity>
+    </TouchableOpacity>
   );
 
   useEffect(() => {
@@ -69,12 +90,27 @@ const Home = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       {/* แท็บบนสุด */}
       <View style={styles.TopTab}>
+        {/*log out*/}
+        <TouchableOpacity 
+        onPress={() => {
+          // <Modal></Modal>
+          // AsyncStorage.removeItem('@accessToken');
+          // setIsloading(true);
+        }}
+        >
+          <LogOut marginLeft={15} size={15} color={'white'} />
+        </TouchableOpacity>
+        {/* log in */}
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("Login");
           }}
         >
-          <Text style={styles.RightTab}>เข้าสู่ระบบ</Text>
+          {isVisiblelogin ? 
+          <Text style={styles.RightTab}>เข้าสู่ระบบ</Text> 
+          : 
+          <User color={'white'} marginRight={15} size={15} />
+          }
         </TouchableOpacity>
       </View>
 
@@ -99,14 +135,16 @@ const Home = ({ navigation }) => {
         <View style={styles.Event}>
           {/* <Text>test</Text> */}
           <FlatList
-          data={event}
-          renderItem={({item}) => <Item 
-          EventID={item.EventID}
-          UserName={item.UserName}
-          EventName={item.EventName}
-          Address={item.Address}
-          />}
-          keyExtractor={item => item.EventID}
+            data={event}
+            renderItem={({ item }) => (
+              <Item
+                EventID={item.EventID}
+                UserName={item.UserName}
+                EventName={item.EventName}
+                Address={item.Address}
+              />
+            )}
+            keyExtractor={(item) => item.EventID}
           />
         </View>
       </View>
@@ -153,7 +191,11 @@ const App = () => {
             },
           }}
         />
-        <Stack.Screen name="Eventdetails" component={Eventdetails} options={{headerTitle: ''}}/>
+        <Stack.Screen
+          name="Eventdetails"
+          component={Eventdetails}
+          options={{ headerTitle: "" }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -171,8 +213,10 @@ const styles = StyleSheet.create({
   },
   TopTab: {
     flex: 0.1,
+    flexDirection: 'row',
     backgroundColor: "#86B6F6",
-    justifyContent: "center",
+    justifyContent: "space-between",
+    alignItems: 'center'
   },
   RightTab: {
     fontSize: 17,
@@ -229,29 +273,29 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   item: {
-    backgroundColor: '#EEF5FF',
-    borderColor: '#86B6F6',
-    borderWidth:1,
+    backgroundColor: "#EEF5FF",
+    borderColor: "#86B6F6",
+    borderWidth: 1,
     padding: 10,
-    borderRadius: 5
+    borderRadius: 5,
   },
   title: {
     fontSize: 14,
-    opacity: 0.6
+    opacity: 0.6,
   },
   EventName: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 20,
   },
   Address: {
-    flexDirection: 'row',
-    marginTop: 3
+    flexDirection: "row",
+    marginTop: 3,
   },
   Addresstext: {
     fontSize: 10,
     paddingLeft: 5,
     alignSelf: "center",
-  }
+  },
 });
 
 export default App;

@@ -43,8 +43,8 @@ export const Eventdetails = ({ navigation, route }) => {
       });
       const responseData = await data.json();
       setItem(responseData);
-      setIsloading(false);
       console.log(item);
+      setIsloading(false);
     } catch (error) {
       console.log(error);
     }
@@ -76,7 +76,7 @@ export const Eventdetails = ({ navigation, route }) => {
       </View>
       <View style={styles.head}>
         <Text style={styles.header}>จำนวนที่เปิดรับ:</Text>
-        <Text style={styles.content}>{item[0] && item[0].Amount}</Text>
+        <Text style={styles.content}>{item[0] && item[0].Amount} คน</Text>
       </View>
       <View style={styles.head}>
         <Text style={styles.header}>สถานที่จัด:</Text>
