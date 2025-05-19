@@ -19,8 +19,9 @@ import {
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
+import { Profile } from "./screens/myProfile";
 
-export const IP = "http://192.168.1.8:3000";
+export const IP = "http://192.168.1.11:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -50,6 +51,7 @@ const Home = ({ navigation }) => {
         setIsvisiblelogin(false);
         setIsvisiblelogout(true);
       }
+      return passvef;
     } catch (error) {
       console.log(error);
     }
@@ -88,6 +90,15 @@ const Home = ({ navigation }) => {
       </View>
     </TouchableOpacity>
   );
+
+  const handlelogout = () => {
+    const passvef = verify();
+    if (isVisiblelogin) {
+      navigation.navigate('Login');
+    }else {
+      navigation.navigate("Profile",passvef);
+    }
+  }
 
   useEffect(() => {
     fetchEvent();
@@ -137,9 +148,7 @@ const Home = ({ navigation }) => {
       <View style={styles.TopTab}>
         {/* log in */}
         <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("Login");
-          }}
+          onPress={handlelogout}
         >
           {isVisiblelogin ? 
             <Text style={styles.RightTab}>เข้าสู่ระบบ</Text>
@@ -239,6 +248,11 @@ const App = () => {
         <Stack.Screen
           name="Eventdetails"
           component={Eventdetails}
+          options={{ headerTitle: "" }}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
           options={{ headerTitle: "" }}
         />
       </Stack.Navigator>
