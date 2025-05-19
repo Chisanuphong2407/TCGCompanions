@@ -20,7 +20,7 @@ import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
 
-export const IP = "http://192.168.1.8:3000";
+export const IP = "http://192.168.1.11:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -46,7 +46,7 @@ const Home = ({ navigation }) => {
       if (token === null) {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
-      }else{
+      } else {
         setIsvisiblelogin(false);
         setIsvisiblelogout(true);
       }
@@ -68,6 +68,29 @@ const Home = ({ navigation }) => {
     } catch (error) {
       console.error("Fetch Error (Catch):", error);
     }
+  };
+
+  const onSearch = async () => {
+    try {
+      // console.log(search);
+      if (!search) {
+        Alert.alert(null,'กรอกข้อมูลให้ครบถ้วน'
+        )
+      }
+      const event = await fetch(IP + "/api/search/" + search, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log(event);
+    const result = await event.json();
+    console.log(result);
+    setEvent(result);
+    } catch (error) {
+      console.log(error);
+    }
+    
   };
 
   //สร้าง item ไว้แสดงกิจกรรม
@@ -141,11 +164,11 @@ const Home = ({ navigation }) => {
             navigation.navigate("Login");
           }}
         >
-          {isVisiblelogin ? 
+          {isVisiblelogin ? (
             <Text style={styles.RightTab}>เข้าสู่ระบบ</Text>
-           : 
+          ) : (
             <User color={"white"} marginRight={15} size={20} />
-          }
+          )}
         </TouchableOpacity>
         {/*log out*/}
         {isVisiblelogout && (
@@ -157,7 +180,6 @@ const Home = ({ navigation }) => {
             <LogOut marginLeft={15} size={20} color={"white"} />
           </TouchableOpacity>
         )}
-        
       </View>
 
       {/* แท็บเมนู */}
@@ -175,7 +197,13 @@ const Home = ({ navigation }) => {
             value={search}
             onChangeText={setSearch}
           />
-          <Search size={5} justifyContent="center" margin={5} />
+          <Pressable
+            onPress={() => {
+              onSearch();
+            }}
+          >
+            <Search size={5} justifyContent="center" margin={5} />
+          </Pressable>
         </View>
         {/* แท็บกิจกรรม */}
         <View style={styles.Event}>
@@ -187,9 +215,12 @@ const Home = ({ navigation }) => {
                 UserName={item.UserName}
                 EventName={item.EventName}
                 Address={item.Address}
+                MoreDetail={item.MoreDetail}
               />
             )}
             keyExtractor={(item) => item.EventID}
+            refreshing={isLoading}
+            onRefresh={() => setIsloading(true)}
           />
         </View>
       </View>
@@ -257,7 +288,7 @@ const styles = StyleSheet.create({
   },
   TopTab: {
     flex: 0.1,
-    flexDirection: 'row-reverse',
+    flexDirection: "row-reverse",
     backgroundColor: "#86B6F6",
     justifyContent: "space-between",
     alignItems: "center",
@@ -322,6 +353,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     borderRadius: 5,
+    marginBottom: 15,
   },
   title: {
     fontSize: 14,

@@ -24,6 +24,10 @@ export const Login = ({ navigation}) => {
   // console.log(IP);
   const handleLogin = async () => {
     try{
+      if (!username || !password) {
+        Alert.alert('ไม่สำเร็จ','กรุณากรอกข้อมูลให้ครบ');
+        return false;
+      }
     const FetchLogin = await fetch(IP + '/api/login',{
       method: 'POST',
       headers: {
