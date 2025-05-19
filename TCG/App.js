@@ -72,6 +72,35 @@ const Home = ({ navigation }) => {
     }
   };
 
+  const onSearch = async () => {
+    try {
+      // console.log(search);
+      if (!search) {
+        Alert.alert(null, "กรอกข้อมูลให้ครบถ้วน");
+      }
+      const event = await fetch(IP + "/api/search/" + search, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(event);
+      const result = await event.json();
+      console.log(result);
+      setEvent(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handlelogout = () => {
+    const passvef = verify();
+    if (isVisiblelogin) {
+      navigation.navigate("Login");
+    } else {
+      navigation.navigate("Profile");
+    }
+  };
   //สร้าง item ไว้แสดงกิจกรรม
   const Item = ({ EventID, UserName, EventName, Address }) => (
     <TouchableOpacity
@@ -90,15 +119,6 @@ const Home = ({ navigation }) => {
       </View>
     </TouchableOpacity>
   );
-
-  const handlelogout = () => {
-    const passvef = verify();
-    if (isVisiblelogin) {
-      navigation.navigate('Login');
-    }else {
-      navigation.navigate("Profile",passvef);
-    }
-  }
 
   useEffect(() => {
     fetchEvent();
