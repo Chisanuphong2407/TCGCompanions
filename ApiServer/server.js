@@ -119,7 +119,7 @@ app.get("/api/events", async (req, res) => {
   try {
     // console.log("Event");
     const [result] = await conn.query(
-      "SELECT event.EventID ,event.EventName ,event.Address,event.MoreDetail, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID"
+      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID"
     );
     // console.log(result);
     return res.json(result);
@@ -140,16 +140,6 @@ app.post("/api/edetails", async (req, res) => {
   } catch (error) {
     console.log(error);
   }
-});
-
-app.get("/api/search/:eventname" , async (req,res) => {
-  const name = req.params.eventname;
-  console.log(name);
-  const [query] = await conn.query(
-    'SELECT event.EventID ,event.EventName ,event.Address,event.MoreDetail, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID WHERE event.EventName = ?',[name]
-  );
-  console.log(query);
-  return res.json(query) ;
 });
 
 app.listen(3000, function () {
