@@ -19,6 +19,7 @@ import {
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
+import { myProfile } from "./screens/myProfile";
 
 export const IP = "http://192.168.1.11:3000";
 
@@ -93,6 +94,14 @@ const Home = ({ navigation }) => {
     
   };
 
+  const handleProfile = () => {
+    const passvef = verify();
+    if (isVisiblelogin) {
+      navigation.navigate("Login");
+    }else {
+      navigation.navigate('myProfile');
+    }
+  };
   //สร้าง item ไว้แสดงกิจกรรม
   const Item = ({ EventID, UserName, EventName, Address }) => (
     <TouchableOpacity
@@ -160,9 +169,7 @@ const Home = ({ navigation }) => {
       <View style={styles.TopTab}>
         {/* log in */}
         <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("Login");
-          }}
+          onPress={handleProfile}
         >
           {isVisiblelogin ? (
             <Text style={styles.RightTab}>เข้าสู่ระบบ</Text>
@@ -270,6 +277,11 @@ const App = () => {
         <Stack.Screen
           name="Eventdetails"
           component={Eventdetails}
+          options={{ headerTitle: "" }}
+        />
+        <Stack.Screen
+          name="myProfile"
+          component={myProfile}
           options={{ headerTitle: "" }}
         />
       </Stack.Navigator>
