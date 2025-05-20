@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState } from "react";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { User, Lock } from "react-native-feather";
+import { User, Lock ,Eye,EyeOff} from "react-native-feather";
 import {
 
   SafeAreaView,
@@ -21,6 +21,7 @@ import { IP } from "../App";
 export const Login = ({ navigation}) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [secure,setSecure] = useState(true);
   // console.log(IP);
   const handleLogin = async () => {
     try{
@@ -53,6 +54,9 @@ export const Login = ({ navigation}) => {
     };
   };
 
+  const setEye = () => {
+    setSecure(!secure);
+  }
   return (
     <View style={styles.LoginScreen}>
       <View style={styles.LoginPro}>
@@ -63,7 +67,7 @@ export const Login = ({ navigation}) => {
       </View>
       <View style={styles.inputBox}>
         <View style={styles.Box}>
-          <User size={1} margin={5} />
+          <User size={1} margin={10} />
           <TextInput
             placeholder="Username"
             value={username}
@@ -71,13 +75,24 @@ export const Login = ({ navigation}) => {
           />
         </View>
         <View style={styles.Box}>
-          <Lock size={1} margin={5} />
+          <Lock size={1} margin={10} />
           <TextInput
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
-            secureTextEntry={true}
+            secureTextEntry={secure}
+            style={styles.password}
           />
+          {secure ?
+          <Pressable onPress={setEye}>
+            <Eye size={1} margin={10} alignSelf={'center'}/>
+          </Pressable>
+          :
+          <Pressable onPress={setEye}>
+            <EyeOff size={1} margin={10}/>
+          </Pressable>
+        }
+          
         </View>
       </View>
       <View style={styles.LogBut}>
@@ -124,6 +139,7 @@ export const styles = StyleSheet.create({
     marginRight: 30,
   },
   Box: {
+    flex: 1,
     borderRadius: 25,
     padding: 5,
     paddingLeft: 10,
@@ -147,4 +163,7 @@ export const styles = StyleSheet.create({
     paddingRight: 18,
     borderRadius: 30,
   },
+  password: {
+    flex: 1,
+  }
 });

@@ -121,7 +121,7 @@ const Home = ({ navigation }) => {
         <Text style={styles.title}>{UserName}</Text>
         <Text style={styles.EventName}>{EventName}</Text>
         <View style={styles.Address}>
-          <MapPin size={0.1} />
+          <MapPin size={0.1} opacity={0.25}/>
           <Text style={styles.Addresstext}>{Address}</Text>
         </View>
       </View>
