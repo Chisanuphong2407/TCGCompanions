@@ -21,7 +21,7 @@ import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
 import { myProfile } from "./screens/myProfile";
 
-export const IP = "http://192.168.1.11:3000";
+export const IP = "http://192.168.1.6:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -47,7 +47,7 @@ const Home = ({ navigation }) => {
       if (token === null) {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
-      }else{
+      } else {
         setIsvisiblelogin(false);
         setIsvisiblelogout(true);
       }
@@ -97,8 +97,8 @@ const Home = ({ navigation }) => {
     const passvef = verify();
     if (isVisiblelogin) {
       navigation.navigate("Login");
-    }else {
-      navigation.navigate('myProfile');
+    } else {
+      navigation.navigate("myProfile", passvef);
     }
   };
   //สร้าง item ไว้แสดงกิจกรรม
@@ -167,14 +167,12 @@ const Home = ({ navigation }) => {
 
       <View style={styles.TopTab}>
         {/* log in */}
-        <TouchableOpacity
-          onPress={handleProfile}
-        >
-          {isVisiblelogin ? 
+        <TouchableOpacity onPress={handleProfile}>
+          {isVisiblelogin ? (
             <Text style={styles.RightTab}>เข้าสู่ระบบ</Text>
-           : 
+          ) : (
             <User color={"white"} marginRight={15} size={20} />
-          }
+          )}
         </TouchableOpacity>
         {/*log out*/}
         {isVisiblelogout && (
@@ -186,7 +184,6 @@ const Home = ({ navigation }) => {
             <LogOut marginLeft={15} size={20} color={"white"} />
           </TouchableOpacity>
         )}
-        
       </View>
 
       {/* แท็บเมนู */}
@@ -204,7 +201,9 @@ const Home = ({ navigation }) => {
             value={search}
             onChangeText={setSearch}
           />
-          <Search size={5} justifyContent="center" margin={5} />
+          <Pressable onPress={onSearch}>
+            <Search size={5} justifyContent="center" margin={5} />
+          </Pressable>
         </View>
         {/* แท็บกิจกรรม */}
         <View style={styles.Event}>
@@ -291,7 +290,7 @@ const styles = StyleSheet.create({
   },
   TopTab: {
     flex: 0.1,
-    flexDirection: 'row-reverse',
+    flexDirection: "row-reverse",
     backgroundColor: "#86B6F6",
     justifyContent: "space-between",
     alignItems: "center",

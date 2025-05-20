@@ -142,6 +142,19 @@ app.post("/api/edetails", async (req, res) => {
   }
 });
 
+app.get('/api/search/:eventname' ,async (req,res) => {
+  try {
+    const name = req.params.eventname;
+    // console.log(name);
+  const [result] = await conn.query("SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID WHERE event.EventName = ?",[name])
+
+  // console.log(result);
+  return res.status(200).json(result);
+  } catch (error) {
+    return res.status(401);
+  }
+  
+});
 app.listen(3000, function () {
   console.log("CORS-enabled web server listening on port 3000");
 });

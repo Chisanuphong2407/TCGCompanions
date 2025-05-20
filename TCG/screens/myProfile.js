@@ -17,7 +17,7 @@ import {
   FlatList,
 } from "react-native";
 
-export const Profile = ({navigation,route}) => {
+export const myProfile = ({navigation,route}) => {
   const name = route.params;
   // console.log(name);
   return (
