@@ -17,7 +17,8 @@ const conn = mysql
 
 const app = express();
 
-const secrKey = crypto.randomBytes(32).toString("hex");
+// const secrKey = crypto.randomBytes(32).toString("hex");
+const secrKey = 'hahaha';
 
 // Middleware
 app.use(cors());
@@ -69,7 +70,7 @@ app.post("/api/login", async (req, res) => {
     const expiresIn = "1h";
     const token = jwt.sign(payload, secrKey, { expiresIn });
     console.log(secrKey);
-    return res.json(token);
+    return res.status(200).json(token);
   };
 
   console.log(req.body);
@@ -94,7 +95,7 @@ app.post("/api/login", async (req, res) => {
       console.log("login");
       console.log(payload.username);
     } else {
-      return res.json("รหัสไม่ถูกต้อง");
+      return res.status(401).json("รหัสไม่ถูกต้อง");
     }
   } catch (error) {
     console.log(error);
@@ -151,10 +152,22 @@ app.get('/api/search/:eventname' ,async (req,res) => {
   // console.log(result);
   return res.status(200).json(result);
   } catch (error) {
-    return res.status(401);
+    return res.status(400);
   }
   
 });
+
+app.get("/api/getprofile/:accname" , async (req,res) => {
+  try {
+    const pname = req.params.accname;
+    const [profile] = await conn.query("SELECT * FROM `user` WHERE `UserName`= ?",[pname])
+    console.log(profile);
+    return res.status(200).json(profile);
+  } catch (error) {
+    return res.status(400);
+  }
+});
+
 app.listen(3000, function () {
   console.log("CORS-enabled web server listening on port 3000");
 });

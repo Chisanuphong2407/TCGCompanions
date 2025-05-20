@@ -84,7 +84,7 @@ export const Eventdetails = ({ navigation, route }) => {
       </View>
       <View style={styles.head}>
         <Text style={styles.header}>รายละเอียดอื่นๆ:</Text>
-        <Text style={styles.content}>{item[0] && item[0].MoreSetail}</Text>
+        <Text style={styles.content}>{item[0] && item[0].MoreDetail}</Text>
       </View>
     </ScrollView>
   );

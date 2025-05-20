@@ -4,7 +4,14 @@ import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Search, X, MapPin, LogOut, User } from "react-native-feather";
+import {
+  Search,
+  X,
+  MapPin,
+  LogOut,
+  User,
+  ArrowLeft,
+} from "react-native-feather";
 import {
   SafeAreaView,
   TouchableOpacity,
@@ -19,7 +26,7 @@ import {
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
-import { myProfile } from "./screens/myProfile";
+import { MyProfile } from "./screens/MyProfile";
 
 export const IP = "http://192.168.1.6:3000";
 
@@ -43,7 +50,7 @@ const Home = ({ navigation }) => {
         },
       });
       const passvef = await vef.json();
-      console.log(passvef);
+      console.log("vef", passvef);
       if (token === null) {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
@@ -98,7 +105,8 @@ const Home = ({ navigation }) => {
     if (isVisiblelogin) {
       navigation.navigate("Login");
     } else {
-      navigation.navigate("myProfile", passvef);
+      console.log("passvef", passvef[0]);
+      navigation.navigate("MyProfile", passvef);
     }
   };
   //สร้าง item ไว้แสดงกิจกรรม
@@ -218,6 +226,8 @@ const Home = ({ navigation }) => {
               />
             )}
             keyExtractor={(item) => item.EventID}
+            refreshing={isLoading}
+            onRefresh={() => setIsloading(true)}
           />
         </View>
       </View>
@@ -247,6 +257,7 @@ const App = () => {
                 </TouchableOpacity>
               );
             },
+            headerBackVisible: false,
           }}
         />
         <Stack.Screen
@@ -254,6 +265,7 @@ const App = () => {
           component={Register}
           options={{
             headerTitle: "",
+            headerBackVisible: false,
             headerLeft: () => {
               const navigation = useNavigation();
               return (
@@ -270,9 +282,37 @@ const App = () => {
           options={{ headerTitle: "" }}
         />
         <Stack.Screen
-          name="myProfile"
-          component={myProfile}
-          options={{ headerTitle: "" }}
+          name="MyProfile"
+          component={MyProfile}
+          options={{
+            headerTitle: "",
+            headerBackVisible: false,
+            headerLeft: () => {
+              const navigation = useNavigation();
+              return (
+                <TouchableOpacity 
+                onPress={() => 
+                    Alert.alert('ละทิ้งการเปลี่ยนแปลง','หากยืนยัน การเปลี่ยนแปลงนี้จะหายไป',
+                      [{
+                        text: 'ยืนยัน',
+                        style: 'default',
+                        onPress: () => {
+                          navigation.goBack();
+                        }
+                      },
+                      {
+                        text: 'ยกเลิก',
+                        style: 'cancel'
+                      },
+                    ]
+                    )
+                }
+                >
+                  <X size={5} />
+                </TouchableOpacity>
+              );
+            },
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -355,6 +395,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     borderRadius: 5,
+    marginBottom: 5,
   },
   title: {
     fontSize: 14,
