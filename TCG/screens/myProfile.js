@@ -26,6 +26,7 @@ export const MyProfile = ({ navigation, route }) => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [user, setUser] = useState("");
+  const [id, setId] = useState("");
 
   const getprofile = async () => {
     try {
@@ -44,10 +45,61 @@ export const MyProfile = ({ navigation, route }) => {
       setLastname(result[0].LastName);
       setPhone(result[0].PhoneNumber);
       setUser(result[0].UserName);
-      // console.log('det',result[0].Email);
+      setId(result[0].UserID);
+      console.log("det", result[0].UserID);
       setIsloading(false);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleEdit = async () => {
+    if (!user || !email || !fname || !phone || !lastname) {
+      Alert.alert("ไม่สำเร็จ", "กรุณากรอกข้อมูลให้ครบถ้วน", [
+        {
+          text: "ตกลง",
+        },
+      ]);
+      return;
+    } else {
+      try {
+        console.log("start");
+        const response = await fetch(IP + "/api/updateprofile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: fname,
+            lastname: lastname,
+            email: email,
+            phone: phone,
+            user: user,
+          }),
+        });
+        console.log("request");
+        const data = await response.json();
+        console.log(data);
+
+        if (response.ok) {
+          Alert.alert(
+            "สำเร็จ",
+            "แก้ไขเสร็จสิ้น",
+            [
+              {
+                text: "ตกลง",
+              },
+            ],
+            navigation.navigate("Home")
+          );
+          console.log("update successful:", data);
+        } else {
+          Alert.alert("แก้ไขไม่สำเร็จ");
+        }
+      } catch (error) {
+        Alert.alert("Error", "There was a network error.");
+        console.error("update error:", error);
+      }
     }
   };
 
@@ -90,6 +142,11 @@ export const MyProfile = ({ navigation, route }) => {
         value={user}
         onChangeText={setUser}
       />
+      <View style={styles.RGBut}>
+        <TouchableOpacity onPress={handleEdit}>
+          <Text style={styles.RGText}>แก้ไขข้อมูล</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

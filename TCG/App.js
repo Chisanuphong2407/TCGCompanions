@@ -28,7 +28,7 @@ import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
 import { MyProfile } from "./screens/MyProfile";
 
-export const IP = "http://192.168.1.6:3000";
+export const IP = "http://192.168.1.9:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");

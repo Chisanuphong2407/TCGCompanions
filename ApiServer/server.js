@@ -168,6 +168,39 @@ app.get("/api/getprofile/:accname" , async (req,res) => {
   }
 });
 
+app.put("/api/updateprofile" , async (req,res) => {
+  try {
+    console.log("Start");
+    const [existuser] = await conn.query(
+      "SELECT * FROM `user` WHERE `UserName`= ? OR `Email` = ?",
+      [req.body.name, req.body.email]
+    );
+    console.log(existuser[0].Email);
+    if (existuser[0].Email !== req.body.email && existuser.length > 0 ) {
+      const errormessage = "username หรือ email นี้มีผู้ใช้งานแล้ว";
+      return res.status(409).json(errormessage);
+    } else {
+      await conn.query(
+        "UPDATE `user` SET `FirstName` = ?, `LastName`= ?, `PhoneNumber` = ?, `UserName` = ?, `Email` = ? WHERE UserID = ?" ,
+        [
+          req.body.name,
+          req.body.lastname,
+          req.body.phone,
+          req.body.user,
+          req.body.email,
+          req.body.id
+        ]
+      );
+      // const unhash = await bcrypt.compare(req.body.password, hashedPassword);
+      // console.log(unhash);
+      return res.status(201).json({ message: "แก้ไขสำเร็จ" });
+    }
+  } catch (err) {
+    console.error("เกิดข้อผิดพลาดในการแก้ไข:", err);
+    return res.status(500).json({ error: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์" });
+  }
+});
+
 app.listen(3000, function () {
   console.log("CORS-enabled web server listening on port 3000");
 });
