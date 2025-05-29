@@ -26,9 +26,9 @@ import {
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
-import { MyProfile,RePassword } from "./screens/MyProfile";
+import { MyProfile, RePassword } from "./screens/MyProfile";
 
-export const IP = "http://192.168.1.7:3000";
+export const IP = "http://192.168.1.3:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -37,6 +37,9 @@ const Home = ({ navigation }) => {
   const [isVisiblelogin, setIsvisiblelogin] = useState(true);
   const [isVisiblelogout, setIsvisiblelogout] = useState(false);
   const [modal, setModal] = useState(false);
+  const [pMenu, setPmenu] = useState(styles.Menu);
+  const [myMenu, setMymenu] = useState(styles.CMenu);
+  const [cMenu, setCmenu] = useState(styles.CMenu);
 
   //verify token
   const verify = async () => {
@@ -54,6 +57,11 @@ const Home = ({ navigation }) => {
       if (token === null) {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
+      }
+      if (passvef.message === "jwt expired") {
+        setIsvisiblelogin(true);
+        setIsvisiblelogout(false);
+        AsyncStorage.removeItem("@accessToken");
       } else {
         setIsvisiblelogin(false);
         setIsvisiblelogout(true);
@@ -121,13 +129,28 @@ const Home = ({ navigation }) => {
         <Text style={styles.title}>{UserName}</Text>
         <Text style={styles.EventName}>{EventName}</Text>
         <View style={styles.Address}>
-          <MapPin size={0.1} opacity={0.25}/>
+          <MapPin size={0.1} opacity={0.25} />
           <Text style={styles.Addresstext}>{Address}</Text>
         </View>
       </View>
     </TouchableOpacity>
   );
 
+  const setP = () => {
+    setPmenu(styles.Menu);
+    setMymenu(styles.CMenu);
+    setCmenu(styles.CMenu);
+  };
+  const setMy = () => {
+    setPmenu(styles.CMenu);
+    setMymenu(styles.Menu);
+    setCmenu(styles.CMenu);
+  };
+  const setC = () => {
+    setPmenu(styles.CMenu);
+    setMymenu(styles.CMenu);
+    setCmenu(styles.Menu);
+  };
   useEffect(() => {
     fetchEvent();
   }, [isLoading]);
@@ -196,10 +219,17 @@ const Home = ({ navigation }) => {
 
       {/* แท็บเมนู */}
       <View style={styles.MenuTab}>
-        <TouchableOpacity>
-          <Text style={styles.Menu}>กิจกรรมทั่วไป</Text>
+        <TouchableOpacity onPress={setP}>
+          <Text style={pMenu}>กิจกรรมทั่วไป</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={setMy}>
+          <Text style={myMenu}>กิจกรรมของฉัน</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={setC}>
+          <Text style={cMenu}>กิจกรรมที่สร้าง</Text>
         </TouchableOpacity>
       </View>
+
       <View style={styles.Content}>
         {/* แท็บค้นหา */}
         <View style={styles.Search}>
@@ -290,23 +320,26 @@ const App = () => {
             headerLeft: () => {
               const navigation = useNavigation();
               return (
-                <TouchableOpacity 
-                onPress={() => 
-                    Alert.alert('ละทิ้งการเปลี่ยนแปลง','หากยืนยัน การเปลี่ยนแปลงนี้จะหายไป',
-                      [{
-                        text: 'ยืนยัน',
-                        style: 'default',
-                        onPress: () => {
-                          navigation.goBack();
-                        }
-                      },
-                      {
-                        text: 'ยกเลิก',
-                        style: 'cancel'
-                      },
-                    ]
+                <TouchableOpacity
+                  onPress={() =>
+                    Alert.alert(
+                      "ละทิ้งการเปลี่ยนแปลง",
+                      "หากยืนยัน การเปลี่ยนแปลงนี้จะหายไป",
+                      [
+                        {
+                          text: "ยืนยัน",
+                          style: "default",
+                          onPress: () => {
+                            navigation.goBack();
+                          },
+                        },
+                        {
+                          text: "ยกเลิก",
+                          style: "cancel",
+                        },
+                      ]
                     )
-                }
+                  }
                 >
                   <X size={5} />
                 </TouchableOpacity>
@@ -315,9 +348,9 @@ const App = () => {
           }}
         />
         <Stack.Screen
-        name="RePassword"
-        component={RePassword}
-        options={{headerTitle: ''}}
+          name="RePassword"
+          component={RePassword}
+          options={{ headerTitle: "" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -350,7 +383,7 @@ const styles = StyleSheet.create({
   MenuTab: {
     flex: 0.1,
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
     marginLeft: 10,
     marginRight: 10,
@@ -361,6 +394,16 @@ const styles = StyleSheet.create({
     color: "black",
     margin: 10,
     backgroundColor: "#86B6F6",
+    padding: 10,
+    borderRadius: 5,
+    borderColor: "#176B87",
+    borderWidth: 1,
+  },
+  CMenu: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "black",
+    margin: 10,
     padding: 10,
     borderRadius: 5,
     borderColor: "#176B87",
