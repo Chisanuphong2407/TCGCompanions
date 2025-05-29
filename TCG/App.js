@@ -47,7 +47,7 @@ const Home = ({ navigation }) => {
   const verify = async () => {
     try {
       const token = await AsyncStorage.getItem("@accessToken");
-      console.log(token);
+      // console.log(token);
       const vef = await fetch(IP + "/api/profile/", {
         method: "GET",
         headers: {
@@ -55,7 +55,7 @@ const Home = ({ navigation }) => {
         },
       });
       const passvef = await vef.json();
-      console.log("vef", passvef);
+      // console.log("vef", passvef);
       if (token === null) {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
@@ -69,6 +69,7 @@ const Home = ({ navigation }) => {
         setIsmyMenu(false);
         setIscmenu(false);
       }
+      AsyncStorage.setItem("@vef",passvef);
       return passvef;
     } catch (error) {
       console.log(error);
@@ -92,9 +93,18 @@ const Home = ({ navigation }) => {
 
   const fetchCEvent = async() => {
     try {
-      await verify();
-      console.log('pass',passvef);
-      // const Cfetch = await fetch(IP + '/api/fetchcreateevent/' + passvef)
+      const vef = await AsyncStorage.getItem('@vef');
+      console.log('vef',vef);
+      const Cfetch = await fetch(IP + '/api/fetchcreateevent/' + vef,{
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(Cfetch[0]);
+      const Cdata = await Cfetch.json();
+      setEvent(Cdata);
+      console.log(Cdata);
     } catch (error) {
       
     }
