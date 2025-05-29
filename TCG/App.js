@@ -26,9 +26,9 @@ import {
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
-import { MyProfile } from "./screens/MyProfile";
+import { MyProfile,RePassword } from "./screens/MyProfile";
 
-export const IP = "http://192.168.1.9:3000";
+export const IP = "http://192.168.1.7:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -313,6 +313,11 @@ const App = () => {
               );
             },
           }}
+        />
+        <Stack.Screen
+        name="RePassword"
+        component={RePassword}
+        options={{headerTitle: ''}}
         />
       </Stack.Navigator>
     </NavigationContainer>

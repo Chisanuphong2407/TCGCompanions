@@ -18,7 +18,7 @@ const conn = mysql
 const app = express();
 
 // const secrKey = crypto.randomBytes(32).toString("hex");
-const secrKey = 'hahaha';
+const secrKey = "hahaha";
 
 // Middleware
 app.use(cors());
@@ -105,11 +105,11 @@ app.post("/api/login", async (req, res) => {
 
 app.get("/api/profile/", async (req, res, next) => {
   try {
-    const authHeader = await req.headers["authorization"]
-    console.log({ token: authHeader });
-    const authToken = authHeader.split(' ')[1];
-    console.log(authToken);
-    const user = await jwt.verify(authToken,secrKey)
+    const authHeader = await req.headers["authorization"];
+    // console.log({ token: authHeader });
+    const authToken = authHeader.split(" ")[1];
+    // console.log(authToken);
+    const user = await jwt.verify(authToken, secrKey);
     return res.json(user.username);
   } catch (error) {
     return res.json(error);
@@ -143,52 +143,59 @@ app.post("/api/edetails", async (req, res) => {
   }
 });
 
-app.get('/api/search/:eventname' ,async (req,res) => {
+app.get("/api/search/:eventname", async (req, res) => {
   try {
     const name = req.params.eventname;
     // console.log(name);
-  const [result] = await conn.query("SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID WHERE event.EventName = ?",[name])
+    const [result] = await conn.query(
+      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID WHERE event.EventName = ?",
+      [name]
+    );
 
-  // console.log(result);
-  return res.status(200).json(result);
+    // console.log(result);
+    return res.status(200).json(result);
   } catch (error) {
     return res.status(400);
   }
-  
 });
 
-app.get("/api/getprofile/:accname" , async (req,res) => {
+app.get("/api/getprofile/:accname", async (req, res) => {
   try {
     const pname = req.params.accname;
-    const [profile] = await conn.query("SELECT * FROM `user` WHERE `UserName`= ?",[pname])
-    console.log(profile);
+    const [profile] = await conn.query(
+      "SELECT * FROM `user` WHERE `UserName`= ?",
+      [pname]
+    );
+    // console.log(profile);
     return res.status(200).json(profile);
   } catch (error) {
     return res.status(400);
   }
 });
 
-app.put("/api/updateprofile" , async (req,res) => {
+app.put("/api/updateprofile", async (req, res) => {
   try {
     console.log("Start");
     const [existuser] = await conn.query(
       "SELECT * FROM `user` WHERE `UserName`= ? OR `Email` = ?",
       [req.body.name, req.body.email]
     );
-    console.log(existuser[0].Email);
-    if (existuser[0].Email !== req.body.email && existuser.length > 0 ) {
+    // console.log(existuser[0].Email);
+    console.log(req.body.email);
+    console.log(existuser.length);
+    if (existuser.length > 0) {
       const errormessage = "username หรือ email นี้มีผู้ใช้งานแล้ว";
       return res.status(409).json(errormessage);
     } else {
       await conn.query(
-        "UPDATE `user` SET `FirstName` = ?, `LastName`= ?, `PhoneNumber` = ?, `UserName` = ?, `Email` = ? WHERE UserID = ?" ,
+        "UPDATE `user` SET `FirstName` = ?, `LastName`= ?, `PhoneNumber` = ?, `UserName` = ?, `Email` = ? WHERE UserID = ?",
         [
           req.body.name,
           req.body.lastname,
           req.body.phone,
           req.body.user,
           req.body.email,
-          req.body.id
+          req.body.id,
         ]
       );
       // const unhash = await bcrypt.compare(req.body.password, hashedPassword);
@@ -201,6 +208,43 @@ app.put("/api/updateprofile" , async (req,res) => {
   }
 });
 
+app.put("/api/changepass", async (req, res) => {
+  try {
+    console.log("change");
+    const Newpass = req.body.Npass;
+    const id = req.body.id;
+    const Opass = req.body.Opass;
+    const [checkQ] = await conn.query(
+      "SELECT `Password` FROM `user` WHERE `UserID` = ?",
+      [id]
+    );
+    const Opasscheck = await bcrypt.compare(Opass,checkQ[0].Password);
+    console.log(Opass);
+    console.log(checkQ.length);
+    if( checkQ.length > 0 && !Opasscheck) {
+      console.log(Opasscheck);
+      return res.json({message: "รหัสผ่านเดิมไม่ถูกต้อง"});
+    }else {
+      const passcheck = await bcrypt.compare(Newpass,checkQ[0].Password);
+    console.log(passcheck);
+    if (checkQ.length > 0 && passcheck) {
+      return res.json({ message: "ท่านกรอกรหัสผ่านเดิม" });
+    } else {
+      const salt = await bcrypt.genSalt(10);
+
+      const hashedPassword = await bcrypt.hash(Newpass, salt);
+      await conn.query("UPDATE `user` SET `Password` = ? WHERE UserID = ?", [
+        hashedPassword,
+        id,
+      ]);
+    }
+    return res.status(201).json({ message: "เปลี่ยนรหัสผ่านสำเร็จ" });
+    }
+    
+  } catch (error) {
+    return res.json(error);
+  }
+});
 app.listen(3000, function () {
   console.log("CORS-enabled web server listening on port 3000");
 });
