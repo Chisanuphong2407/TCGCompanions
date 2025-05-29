@@ -40,6 +40,8 @@ const Home = ({ navigation }) => {
   const [pMenu, setPmenu] = useState(styles.Menu);
   const [myMenu, setMymenu] = useState(styles.CMenu);
   const [cMenu, setCmenu] = useState(styles.CMenu);
+  const [ismyMenu,setIsmyMenu] = useState(true);
+  const [iscmenu,setIscmenu] = useState(true);
 
   //verify token
   const verify = async () => {
@@ -57,14 +59,15 @@ const Home = ({ navigation }) => {
       if (token === null) {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
-      }
-      if (passvef.message === "jwt expired") {
+      }else if (passvef.message === "jwt expired") {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
         AsyncStorage.removeItem("@accessToken");
       } else {
         setIsvisiblelogin(false);
         setIsvisiblelogout(true);
+        setIsmyMenu(false);
+        setIscmenu(false);
       }
       return passvef;
     } catch (error) {
@@ -222,10 +225,10 @@ const Home = ({ navigation }) => {
         <TouchableOpacity onPress={setP}>
           <Text style={pMenu}>กิจกรรมทั่วไป</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={setMy}>
+        <TouchableOpacity onPress={setMy} disabled={ismyMenu}>
           <Text style={myMenu}>กิจกรรมของฉัน</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={setC}>
+        <TouchableOpacity onPress={setC} disabled={iscmenu}>
           <Text style={cMenu}>กิจกรรมที่สร้าง</Text>
         </TouchableOpacity>
       </View>
@@ -403,6 +406,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "bold",
     color: "black",
+    backgroundColor: '#D3D9E3',
     margin: 10,
     padding: 10,
     borderRadius: 5,
