@@ -129,6 +129,18 @@ app.get("/api/events", async (req, res) => {
   }
 });
 
+app.get('/api/fetchcreateevent/:owner', async (req,res) => {
+  try {
+    const owner = req.params.owner;
+    console.log(owner);
+    const [result] = await conn.query('SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName FROM `event` INNER JOIN USER ON user.UserID = EVENT.UserID WHERE user.UserName = ?',[owner]);
+    console.log(result);
+    return res.status(201).json(result);
+  } catch (error) {
+    return res.json(error);
+  }
+});
+
 app.post("/api/edetails", async (req, res) => {
   try {
     console.log("start");

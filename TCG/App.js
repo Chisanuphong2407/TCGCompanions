@@ -90,6 +90,16 @@ const Home = ({ navigation }) => {
     }
   };
 
+  const fetchCEvent = async() => {
+    try {
+      await verify();
+      console.log('pass',passvef);
+      // const Cfetch = await fetch(IP + '/api/fetchcreateevent/' + passvef)
+    } catch (error) {
+      
+    }
+  };
+
   const onSearch = async () => {
     try {
       // console.log(search);
@@ -154,6 +164,7 @@ const Home = ({ navigation }) => {
     setMymenu(styles.CMenu);
     setCmenu(styles.Menu);
   };
+
   useEffect(() => {
     fetchEvent();
   }, [isLoading]);
@@ -222,13 +233,19 @@ const Home = ({ navigation }) => {
 
       {/* แท็บเมนู */}
       <View style={styles.MenuTab}>
-        <TouchableOpacity onPress={setP}>
+        <TouchableOpacity onPress={() => {
+          setP(); 
+          fetchEvent();
+          }}>
           <Text style={pMenu}>กิจกรรมทั่วไป</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={setMy} disabled={ismyMenu}>
           <Text style={myMenu}>กิจกรรมของฉัน</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={setC} disabled={iscmenu}>
+        <TouchableOpacity onPress={() => {
+          setC();
+          fetchCEvent();
+        }} disabled={iscmenu}>
           <Text style={cMenu}>กิจกรรมที่สร้าง</Text>
         </TouchableOpacity>
       </View>
