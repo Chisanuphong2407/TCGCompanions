@@ -40,8 +40,9 @@ const Home = ({ navigation }) => {
   const [pMenu, setPmenu] = useState(styles.Menu);
   const [myMenu, setMymenu] = useState(styles.CMenu);
   const [cMenu, setCmenu] = useState(styles.CMenu);
-  const [ismyMenu,setIsmyMenu] = useState(true);
-  const [iscmenu,setIscmenu] = useState(true);
+  const [ismyMenu, setIsmyMenu] = useState(true);
+  const [iscmenu, setIscmenu] = useState(true);
+  const [isCreateEvent, setIsCreate] = useState(true);
 
   //verify token
   const verify = async () => {
@@ -59,7 +60,7 @@ const Home = ({ navigation }) => {
       if (token === null) {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
-      }else if (passvef.message === "jwt expired") {
+      } else if (passvef.message === "jwt expired") {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
         AsyncStorage.removeItem("@accessToken");
@@ -69,7 +70,7 @@ const Home = ({ navigation }) => {
         setIsmyMenu(false);
         setIscmenu(false);
       }
-      AsyncStorage.setItem("@vef",passvef);
+      AsyncStorage.setItem("@vef", passvef);
       return passvef;
     } catch (error) {
       console.log(error);
@@ -91,23 +92,26 @@ const Home = ({ navigation }) => {
     }
   };
 
-  const fetchCEvent = async() => {
+  const fetchCEvent = async () => {
     try {
-      const vef = await AsyncStorage.getItem('@vef');
-      console.log('vef',vef);
-      const Cfetch = await fetch(IP + '/api/fetchcreateevent/' + vef,{
+      const vef = await AsyncStorage.getItem("@vef");
+      console.log("vef", vef);
+      const Cfetch = await fetch(IP + "/api/fetchcreateevent/" + vef, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       });
-      console.log(Cfetch[0]);
+      // console.log(Cfetch[0]);
       const Cdata = await Cfetch.json();
+      if(!Cdata) {
+        setIsCreate(false);
+      }else{
+        setIsCreate(true);
+      }
       setEvent(Cdata);
       console.log(Cdata);
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   };
 
   const onSearch = async () => {
@@ -243,19 +247,24 @@ const Home = ({ navigation }) => {
 
       {/* แท็บเมนู */}
       <View style={styles.MenuTab}>
-        <TouchableOpacity onPress={() => {
-          setP(); 
-          fetchEvent();
-          }}>
+        <TouchableOpacity
+          onPress={() => {
+            setP();
+            fetchEvent();
+          }}
+        >
           <Text style={pMenu}>กิจกรรมทั่วไป</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={setMy} disabled={ismyMenu}>
           <Text style={myMenu}>กิจกรรมของฉัน</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {
-          setC();
-          fetchCEvent();
-        }} disabled={iscmenu}>
+        <TouchableOpacity
+          onPress={() => {
+            setC();
+            fetchCEvent();
+          }}
+          disabled={iscmenu}
+        >
           <Text style={cMenu}>กิจกรรมที่สร้าง</Text>
         </TouchableOpacity>
       </View>
@@ -289,7 +298,12 @@ const Home = ({ navigation }) => {
             refreshing={isLoading}
             onRefresh={() => setIsloading(true)}
           />
-        </View>
+        </View> 
+        {!isCreateEvent && 
+        <TouchableOpacity>
+          <Text style={styles.create}>สร้างกิจกรรมใหม่</Text>
+        </TouchableOpacity> 
+        }
       </View>
     </SafeAreaView>
   );
@@ -433,7 +447,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "bold",
     color: "black",
-    backgroundColor: '#D3D9E3',
+    backgroundColor: "#D3D9E3",
     margin: 10,
     padding: 10,
     borderRadius: 5,
@@ -535,6 +549,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     color: "white",
   },
+  create: {
+    position: 'absolute',
+    right:20,
+    bottom: 20
+  }
 });
 
 export default App;
