@@ -104,15 +104,15 @@ const Home = ({ navigation }) => {
           "Content-Type": "application/json",
         },
       });
-      // console.log(Cfetch[0]);
       const Cdata = await Cfetch.json();
-      if (!Cdata) {
+      // console.log(Cdata.length);
+      if (Cdata.length > 0) {
         setIsCreate(false);
       } else {
         setIsCreate(true);
       }
       setEvent(Cdata);
-      console.log(Cdata);
+      // console.log(Cdata);
     } catch (error) {}
   };
 
@@ -309,10 +309,10 @@ const Home = ({ navigation }) => {
         {isCreateEvent && (
           <TouchableOpacity
             onPress={() => {
-            // console.log("press")
-            navigation.navigate("CreateEvent");
+              // console.log("press")
+              navigation.navigate("CreateEvent");
             }}
-            style={{position: 'absolute', right: 30,bottom: 50}}
+            style={{ position: "absolute", right: 30, bottom: 50 }}
           >
             <Plus
               height={60}
@@ -328,7 +328,6 @@ const Home = ({ navigation }) => {
           </TouchableOpacity>
         )}
       </View>
-      
     </SafeAreaView>
   );
 };

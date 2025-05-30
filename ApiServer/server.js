@@ -257,6 +257,35 @@ app.put("/api/changepass", async (req, res) => {
     return res.json(error);
   }
 });
+
+app.post("/api/createevent", async(req,res) => {
+  try {
+    console.log('start create');
+    const [user] = await conn.query("SELECT `UserID` FROM `user` WHERE `UserName`= ?",[req.body.Username]);
+    console.log(user[0].UserID);
+    const UserID = user[0].UserID
+    // return res.json(UserID);
+    const table = await conn.query("INSERT INTO `fightertable`(`Fighter`) VALUES (Null)");
+    console.log(table[0].insertId);
+    const fightertable = table[0].insertId
+
+    const create = await conn.query("INSERT INTO `event`(`UserID`, `Fighter`, `EventName`, `Condition`, `Rule`, `Time`, `Amount`, `Address`, `CloseDate`, `MoreDetail`, `Status`) VALUES (?,?,?,?,'swiss',?,?,?,?,?,0)",[
+      UserID,
+      fightertable,
+      req.body.eventname,
+      req.body.condition,
+      req.body.time,
+      req.body.amount,
+      req.body.address,
+      req.body.closedate,
+      req.body.moredetail,
+    ]);
+    return res.json(create);
+  } catch (error) {
+    return res.json(error);
+  }
+});
+
 app.listen(3000, function () {
   console.log("CORS-enabled web server listening on port 3000");
 });

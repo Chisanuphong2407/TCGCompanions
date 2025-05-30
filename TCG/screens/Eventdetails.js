@@ -72,7 +72,7 @@ export const Eventdetails = ({ navigation, route }) => {
       </View>
       <View style={styles.head}>
         <Text style={styles.header}>เวลาในการแข่งขันแต่ละรอบ:</Text>
-        <Text style={styles.content}>{item[0] && item[0].Time}</Text>
+        <Text style={styles.content}>{item[0] && item[0].Time} นาที</Text>
       </View>
       <View style={styles.head}>
         <Text style={styles.header}>จำนวนที่เปิดรับ:</Text>
