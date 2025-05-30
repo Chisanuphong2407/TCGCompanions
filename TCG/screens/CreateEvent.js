@@ -25,6 +25,7 @@ import {
   FlatList,
 } from "react-native";
 import { IP } from "../App";
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export const CreateEvent = () => {
   const [Ename, setEname] = useState("");
@@ -34,6 +35,10 @@ export const CreateEvent = () => {
   const [address, setAddress] = useState("");
   const [closedate, setClosedate] = useState("");
   const [moredetail, setMoredetail] = useState("");
+
+  const handleCreate = async() => {
+
+  };
 
   return (
     <View style={styles.background}>
@@ -104,7 +109,7 @@ export const CreateEvent = () => {
           </View>
         </View>
         <TouchableOpacity
-        // onPress={}
+        onPress={handleCreate}
         >
           <Text style ={styles.submit}>สร้างกิจกรรม</Text>
         </TouchableOpacity>
