@@ -11,7 +11,7 @@ import {
   LogOut,
   User,
   ArrowLeft,
-  Plus
+  Plus,
 } from "react-native-feather";
 import {
   SafeAreaView,
@@ -28,6 +28,7 @@ import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
 import { MyProfile, RePassword } from "./screens/MyProfile";
+import { CreateEvent } from "./screens/CreateEvent";
 
 export const IP = "http://192.168.1.11:3000";
 
@@ -105,9 +106,9 @@ const Home = ({ navigation }) => {
       });
       // console.log(Cfetch[0]);
       const Cdata = await Cfetch.json();
-      if(!Cdata) {
+      if (!Cdata) {
         setIsCreate(false);
-      }else{
+      } else {
         setIsCreate(true);
       }
       setEvent(Cdata);
@@ -265,7 +266,7 @@ const Home = ({ navigation }) => {
           onPress={() => {
             setC();
             fetchCEvent();
-            if (!event){
+            if (!event) {
               setIsCreate(true);
             }
           }}
@@ -304,13 +305,30 @@ const Home = ({ navigation }) => {
             refreshing={isLoading}
             onRefresh={() => setIsloading(true)}
           />
-        </View> 
-        {isCreateEvent && 
-        <TouchableOpacity>
-          <Plus height={60} width={60} color={'#fff'} position={'absolute'} right={25} bottom={40} strokeWidth={2} style={{backgroundColor: '#86B6F6', borderRadius: 50, padding: 10}}/>
-        </TouchableOpacity> 
-        }
+        </View>
+        {isCreateEvent && (
+          <TouchableOpacity
+            onPress={() => {
+            // console.log("press")
+            navigation.navigate("CreateEvent");
+            }}
+            style={{position: 'absolute', right: 30,bottom: 50}}
+          >
+            <Plus
+              height={60}
+              width={60}
+              color={"#fff"}
+              strokeWidth={2}
+              style={{
+                backgroundColor: "#86B6F6",
+                borderRadius: 50,
+                padding: 10,
+              }}
+            />
+          </TouchableOpacity>
+        )}
       </View>
+      
     </SafeAreaView>
   );
 };
@@ -400,6 +418,11 @@ const App = () => {
         <Stack.Screen
           name="RePassword"
           component={RePassword}
+          options={{ headerTitle: "" }}
+        />
+        <Stack.Screen
+          name="CreateEvent"
+          component={CreateEvent}
           options={{ headerTitle: "" }}
         />
       </Stack.Navigator>
@@ -556,10 +579,10 @@ const styles = StyleSheet.create({
     color: "white",
   },
   create: {
-    position: 'absolute',
-    right:20,
-    bottom: 20
-  }
+    position: "absolute",
+    right: 20,
+    bottom: 20,
+  },
 });
 
 export default App;
