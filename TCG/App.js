@@ -11,6 +11,7 @@ import {
   LogOut,
   User,
   ArrowLeft,
+  Plus
 } from "react-native-feather";
 import {
   SafeAreaView,
@@ -28,7 +29,7 @@ import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
 import { MyProfile, RePassword } from "./screens/MyProfile";
 
-export const IP = "http://192.168.1.3:3000";
+export const IP = "http://192.168.1.11:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -42,7 +43,7 @@ const Home = ({ navigation }) => {
   const [cMenu, setCmenu] = useState(styles.CMenu);
   const [ismyMenu, setIsmyMenu] = useState(true);
   const [iscmenu, setIscmenu] = useState(true);
-  const [isCreateEvent, setIsCreate] = useState(true);
+  const [isCreateEvent, setIsCreate] = useState(false);
 
   //verify token
   const verify = async () => {
@@ -167,11 +168,13 @@ const Home = ({ navigation }) => {
     setPmenu(styles.Menu);
     setMymenu(styles.CMenu);
     setCmenu(styles.CMenu);
+    setIsCreate(false);
   };
   const setMy = () => {
     setPmenu(styles.CMenu);
     setMymenu(styles.Menu);
     setCmenu(styles.CMenu);
+    setIsCreate(false);
   };
   const setC = () => {
     setPmenu(styles.CMenu);
@@ -230,7 +233,7 @@ const Home = ({ navigation }) => {
           {isVisiblelogin ? (
             <Text style={styles.RightTab}>เข้าสู่ระบบ</Text>
           ) : (
-            <User color={"white"} marginRight={15} size={20} />
+            <User color={"white"} marginRight={15} />
           )}
         </TouchableOpacity>
         {/*log out*/}
@@ -240,7 +243,7 @@ const Home = ({ navigation }) => {
               setModal(true);
             }}
           >
-            <LogOut marginLeft={15} size={20} color={"white"} />
+            <LogOut marginLeft={15} color={"white"} />
           </TouchableOpacity>
         )}
       </View>
@@ -262,6 +265,9 @@ const Home = ({ navigation }) => {
           onPress={() => {
             setC();
             fetchCEvent();
+            if (!event){
+              setIsCreate(true);
+            }
           }}
           disabled={iscmenu}
         >
@@ -279,7 +285,7 @@ const Home = ({ navigation }) => {
             onChangeText={setSearch}
           />
           <Pressable onPress={onSearch}>
-            <Search size={5} justifyContent="center" margin={5} />
+            <Search justifyContent="center" margin={5} />
           </Pressable>
         </View>
         {/* แท็บกิจกรรม */}
@@ -299,9 +305,9 @@ const Home = ({ navigation }) => {
             onRefresh={() => setIsloading(true)}
           />
         </View> 
-        {!isCreateEvent && 
+        {isCreateEvent && 
         <TouchableOpacity>
-          <Text style={styles.create}>สร้างกิจกรรมใหม่</Text>
+          <Plus height={60} width={60} color={'#fff'} position={'absolute'} right={25} bottom={40} strokeWidth={2} style={{backgroundColor: '#86B6F6', borderRadius: 50, padding: 10}}/>
         </TouchableOpacity> 
         }
       </View>
