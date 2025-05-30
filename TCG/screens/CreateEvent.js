@@ -103,6 +103,11 @@ export const CreateEvent = () => {
             />
           </View>
         </View>
+        <TouchableOpacity
+        // onPress={}
+        >
+          <Text style ={styles.submit}>สร้างกิจกรรม</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -137,6 +142,7 @@ const styles = StyleSheet.create({
     minHeight: 45,
     paddingLeft: 10,
     marginBottom: 20,
+    fontSize: 15
   },
     inputBoxDetail: {
     borderWidth: 1,
@@ -146,7 +152,8 @@ const styles = StyleSheet.create({
     minHeight: 100,
     paddingLeft: 10,
     marginBottom: 20,
-    textAlignVertical: 'top'
+    textAlignVertical: 'top',
+    fontSize: 15
   },
   inputBoxTime: {
     borderWidth: 1,
@@ -157,6 +164,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     maxWidth: 70,
     textAlign: "center",
+    fontSize: 15
   },
   inputBoxswiss: {
     borderWidth: 1,
@@ -167,10 +175,21 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     paddingLeft: 10,
     marginBottom: 20,
+    fontSize: 15
   },
   topic: {
     fontWeight: "bold",
     fontSize: 20,
     marginBottom: 10,
   },
+  submit: {
+    backgroundColor: "#176B87",
+    color: "white",
+    borderRadius: 30,
+    padding: 15,
+    marginBottom: 10,
+    alignSelf: "center",
+    fontSize: 20,
+    fontWeight: 'bold'
+  }
 });
