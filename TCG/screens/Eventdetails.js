@@ -22,6 +22,7 @@ export const Eventdetails = ({ navigation, route }) => {
   const [isLoading, setIsloading] = useState(true);
   const [item, setItem] = useState([]);
   const [status, setStatus] = useState();
+  const [statusStyle,setStatusstyle] = useState();
   // console.log(ID);
 
   const fetchDetail = async () => {
@@ -29,8 +30,10 @@ export const Eventdetails = ({ navigation, route }) => {
       // console.log(item[0] && item[0].Status);
       if (item[0] && item[0].Status === 0) {
         setStatus("เปิดรับสมัคร");
+        setStatusstyle(styles.status0);
       } else {
         setStatus("ปิดรับสมัคร");
+        setStatusstyle(styles.status1);
       }
       const data = await fetch(IP + "/api/edetails", {
         method: "POST",
@@ -57,7 +60,7 @@ export const Eventdetails = ({ navigation, route }) => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.Eventname}>{item[0] && item[0].EventName}</Text>
-      <Text style={styles.status0}>{status}</Text>
+      <Text style={statusStyle}>{status}</Text>
       <View style={styles.owner}>
         <Text style={styles.ownerName}>ผู้จัด:</Text>
         <Text style={styles.ownerName}>{item[0] && item[0].UserName}</Text>
@@ -103,6 +106,17 @@ export const styles = StyleSheet.create({
   status0: {
     justifyContent: "flex-start",
     backgroundColor: "#3EC404",
+    padding: 5,
+    paddingLeft: 15,
+    width: 150,
+    marginLeft: -20,
+    fontSize: 20,
+    color: "white",
+    marginTop: 20,
+  },
+  status1: {
+    justifyContent: "flex-start",
+    backgroundColor: "#C40424",
     padding: 5,
     paddingLeft: 15,
     width: 150,

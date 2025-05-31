@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     borderRadius: 5,
-    marginBottom: 5,
+    marginBottom: 10,
   },
   title: {
     fontSize: 14,

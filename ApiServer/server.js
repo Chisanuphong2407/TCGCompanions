@@ -23,9 +23,6 @@ const secrKey = "hahaha";
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(async(req,res,next) => {
-  await conn.query("UPDATE `event` SET `Status` = 1 WHERE `CloseDate` <= CURRENT_DATE  ")
-})
 
 // const authen = () => {
 
@@ -290,5 +287,6 @@ app.post("/api/createevent", async(req,res) => {
 });
 
 app.listen(3000, function () {
+  conn.query("UPDATE `event` SET `Status` = 1 WHERE `CloseDate` <= CURRENT_DATE  ")
   console.log("CORS-enabled web server listening on port 3000");
 });
