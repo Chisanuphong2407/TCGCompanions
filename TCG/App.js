@@ -113,6 +113,7 @@ const Home = ({ navigation }) => {
         setIsCreate(true);
       }
       setEvent(Cdata);
+      setIsloading(false);
       // console.log(Cdata);
     } catch (error) {}
   };
@@ -185,7 +186,11 @@ const Home = ({ navigation }) => {
   };
 
   useEffect(() => {
-    fetchEvent();
+    if(pMenu === styles.Menu){
+          fetchEvent();
+    }else if (cMenu === styles.Menu){
+      fetchCEvent();
+    }
   }, [isLoading]);
 
   return (
