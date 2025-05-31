@@ -57,7 +57,7 @@ export const Eventdetails = ({ navigation, route }) => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.Eventname}>{item[0] && item[0].EventName}</Text>
-      <Text style={styles.status1}>{status}</Text>
+      <Text style={styles.status0}>{status}</Text>
       <View style={styles.owner}>
         <Text style={styles.ownerName}>ผู้จัด:</Text>
         <Text style={styles.ownerName}>{item[0] && item[0].UserName}</Text>
@@ -100,7 +100,7 @@ export const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: "bold",
   },
-  status1: {
+  status0: {
     justifyContent: "flex-start",
     backgroundColor: "#3EC404",
     padding: 5,

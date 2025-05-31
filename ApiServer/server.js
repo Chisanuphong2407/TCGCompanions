@@ -23,6 +23,9 @@ const secrKey = "hahaha";
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(async(req,res,next) => {
+  await conn.query("UPDATE `event` SET `Status` = 1 WHERE `CloseDate` <= CURRENT_DATE  ")
+})
 
 // const authen = () => {
 

@@ -30,7 +30,7 @@ import { Eventdetails } from "./screens/Eventdetails";
 import { MyProfile, RePassword } from "./screens/MyProfile";
 import { CreateEvent } from "./screens/CreateEvent";
 
-export const IP = "http://192.168.1.10:3000";
+export const IP = "http://192.168.1.4:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
