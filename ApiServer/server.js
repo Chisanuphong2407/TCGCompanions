@@ -280,7 +280,7 @@ app.post("/api/createevent", async(req,res) => {
       req.body.closedate,
       req.body.moredetail,
     ]);
-    return res.json(create);
+    return res.status(201).json(create);
   } catch (error) {
     return res.json(error);
   }

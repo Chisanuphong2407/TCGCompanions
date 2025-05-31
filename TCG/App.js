@@ -30,7 +30,7 @@ import { Eventdetails } from "./screens/Eventdetails";
 import { MyProfile, RePassword } from "./screens/MyProfile";
 import { CreateEvent } from "./screens/CreateEvent";
 
-export const IP = "http://192.168.1.11:3000";
+export const IP = "http://192.168.1.10:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -66,6 +66,7 @@ const Home = ({ navigation }) => {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
         AsyncStorage.removeItem("@accessToken");
+        Alert.alert("เซสชันหมดอายุ","โปรดเข้าสู่ระบบใหม่อีกครั้ง");
       } else {
         setIsvisiblelogin(false);
         setIsvisiblelogout(true);

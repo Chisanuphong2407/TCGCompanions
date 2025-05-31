@@ -25,19 +25,102 @@ import {
   FlatList,
 } from "react-native";
 import { IP } from "../App";
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker from "@react-native-community/datetimepicker";
 
-export const CreateEvent = () => {
+export const CreateEvent = ({navigation}) => {
   const [Ename, setEname] = useState("");
   const [condition, setCondition] = useState("");
   const [time, setTime] = useState();
   const [amount, setAmount] = useState("");
   const [address, setAddress] = useState("");
-  const [closedate, setClosedate] = useState("");
   const [moredetail, setMoredetail] = useState("");
+  const [date, setDate] = useState(new Date()); //set Date
+  const [showDatepicker, setShowDatepicker] = useState(false);
+  const [selectText, setSelectText] = useState("เลือกวันปิดรับสมัคร");
 
-  const handleCreate = async() => {
+  const minDate = new Date();
+  minDate.setDate(minDate.getDate() + 1);
+  //onchange handle
+  const onChange = (event, selectedDate) => {
+    console.log("re rendered");
+    const currentDate = selectedDate || date;
+    setDate(currentDate);
 
+    const format = currentDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit", // หรือ "numeric", "short"
+      day: "2-digit",
+    });
+    const [month, day, year] = format.split("/");
+    setSelectText(`${year}-${month}-${day}`);
+    setShowDatepicker(false);
+  };
+
+  const showDatepick = () => {
+    setShowDatepicker(true);
+  };
+
+  const alertcreate = () => {
+    Alert.alert(
+      "ยืนยันการสร้าง",
+      "หลังยืนยัน ท่านยังสามารถแก้ไขกิจกรรมได้ภายหลัง",
+      [
+        {
+          text: "ยกเลิก",
+          style: "cancel",
+        },
+        {
+          text: "ยืนยัน",
+          onPress: handleCreate,
+        },
+      ]
+    );
+  };
+
+  const handleCreate = async () => {
+    try {
+      if (!Ename || !condition || !time || !amount || !address) {
+        Alert.alert("สร้างไม่สำเร็จ", "กรอกข้อมูลให้ครบถ้วน");
+        return false;
+      }
+      const username = await AsyncStorage.getItem("@vef");
+      // console.log(username);
+      const submitevent = await fetch(IP + "/api/createevent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Username: username,
+          eventname: Ename,
+          condition: condition,
+          time: time,
+          amount: amount,
+          address: address,
+          closedate: selectText,
+          moredetail: moredetail,
+        }),
+      });
+      const result = await submitevent.json();
+      console.log(result[0]);
+      if (result[0].affectedRows === 1) {
+        Alert.alert(
+          "สร้างสำเร็จ",
+          "สามารถแก้ไขรายละเอียดได้ที่ กิจกรรมที่ฉันสร้าง > เลือกกิจกรรมที่ต้องการ",
+          [
+            {
+              text: "Ok",
+              onPress: () => {
+                navigation.navigate("Home");
+              },
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   };
 
   return (
@@ -107,11 +190,30 @@ export const CreateEvent = () => {
               onChangeText={setMoredetail}
             />
           </View>
+          <View>
+            <Text style={styles.topic}>วันปิดรับสมัคร :</Text>
+            <TouchableOpacity onPress={showDatepick}>
+              <TextInput
+                style={styles.inputBox}
+                value={selectText}
+                placeholder="เลือกวันปิดรับสมัคร"
+                editable={false}
+              />
+            </TouchableOpacity>
+            {showDatepicker && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date} // ค่าเริ่มต้น
+                mode="date" //'date', 'time', หรือ 'datetime'
+                display="spinner" // 'default', 'spinner', 'calendar', 'clock'
+                onChange={onChange}
+                minimumDate={minDate}
+              />
+            )}
+          </View>
         </View>
-        <TouchableOpacity
-        onPress={handleCreate}
-        >
-          <Text style ={styles.submit}>สร้างกิจกรรม</Text>
+        <TouchableOpacity onPress={alertcreate}>
+          <Text style={styles.submit}>สร้างกิจกรรม</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -147,9 +249,9 @@ const styles = StyleSheet.create({
     minHeight: 45,
     paddingLeft: 10,
     marginBottom: 20,
-    fontSize: 15
+    fontSize: 15,
   },
-    inputBoxDetail: {
+  inputBoxDetail: {
     borderWidth: 1,
     borderRadius: 10,
     borderColor: "#86B6F6",
@@ -157,8 +259,8 @@ const styles = StyleSheet.create({
     minHeight: 100,
     paddingLeft: 10,
     marginBottom: 20,
-    textAlignVertical: 'top',
-    fontSize: 15
+    textAlignVertical: "top",
+    fontSize: 15,
   },
   inputBoxTime: {
     borderWidth: 1,
@@ -169,7 +271,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     maxWidth: 70,
     textAlign: "center",
-    fontSize: 15
+    fontSize: 15,
   },
   inputBoxswiss: {
     borderWidth: 1,
@@ -180,7 +282,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     paddingLeft: 10,
     marginBottom: 20,
-    fontSize: 15
+    fontSize: 15,
   },
   topic: {
     fontWeight: "bold",
@@ -195,6 +297,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignSelf: "center",
     fontSize: 20,
-    fontWeight: 'bold'
-  }
+    fontWeight: "bold",
+  },
 });
