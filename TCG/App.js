@@ -24,13 +24,18 @@ import {
   Image,
   FlatList,
 } from "react-native";
+import {
+  ALERT_TYPE,
+  AlertNotificationRoot,
+  Dialog,
+} from "react-native-alert-notification";
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
 import { MyProfile, RePassword } from "./screens/MyProfile";
 import { CreateEvent } from "./screens/CreateEvent";
 
-export const IP = "http://192.168.1.4:3000";
+export const IP = "http://192.168.1.5:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -66,7 +71,7 @@ const Home = ({ navigation }) => {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
         AsyncStorage.removeItem("@accessToken");
-        Alert.alert("เซสชันหมดอายุ","โปรดเข้าสู่ระบบใหม่อีกครั้ง");
+        Alert.alert("เซสชันหมดอายุ", "โปรดเข้าสู่ระบบใหม่อีกครั้ง");
       } else {
         setIsvisiblelogin(false);
         setIsvisiblelogout(true);
@@ -186,9 +191,9 @@ const Home = ({ navigation }) => {
   };
 
   useEffect(() => {
-    if(pMenu === styles.Menu){
-          fetchEvent();
-    }else if (cMenu === styles.Menu){
+    if (pMenu === styles.Menu) {
+      fetchEvent();
+    } else if (cMenu === styles.Menu) {
       fetchCEvent();
     }
   }, [isLoading]);
@@ -196,44 +201,6 @@ const Home = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       {/* แท็บบนสุด */}
-      <View>
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modal}
-          onRequestClose={() => {
-            setModal(!modal);
-          }}
-        >
-          <View style={styles.centered}>
-            <View style={styles.logoutModal}>
-              <Text style={styles.modaltext}>ออกจากระบบ ?</Text>
-              <View style={styles.modalmenu}>
-                <Pressable
-                  onPress={() => {
-                    setModal(!modal);
-                    // console.log("pressห")
-                  }}
-                >
-                  <Text style={styles.modalbut}>ยกเลิก</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => {
-                    AsyncStorage.removeItem("@accessToken");
-                    setIsloading(true);
-                    setModal(!modal);
-                    navigation.navigate("Login");
-                    // console.log("pressห")
-                  }}
-                >
-                  <Text style={styles.modalbut}>ตกลง</Text>
-                </Pressable>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      </View>
-
       <View style={styles.TopTab}>
         {/* log in */}
         <TouchableOpacity onPress={handleProfile}>
@@ -244,15 +211,28 @@ const Home = ({ navigation }) => {
           )}
         </TouchableOpacity>
         {/*log out*/}
-        {isVisiblelogout && (
+        <AlertNotificationRoot>
+          {isVisiblelogout && (
           <TouchableOpacity
             onPress={() => {
-              setModal(true);
+              console.log('press');
+              Dialog.show({
+                type: ALERT_TYPE.SUCCESS,
+                title: "สำเร็จ!",
+                textBody: "การดำเนินการของคุณสำเร็จแล้ว",
+                button: "ปิด", // หรือ 'OK', 'ตกลง'
+                onPressButton: () => {
+                  console.log("ปุ่มปิดถูกกด");
+                  Dialog.hide(); // ปิด Dialog
+                },
+              });
             }}
           >
             <LogOut marginLeft={15} color={"white"} />
           </TouchableOpacity>
         )}
+        </AlertNotificationRoot>
+        
       </View>
 
       {/* แท็บเมนู */}
