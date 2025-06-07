@@ -50,6 +50,7 @@ const Home = ({ navigation }) => {
   const [ismyMenu, setIsmyMenu] = useState(true);
   const [iscmenu, setIscmenu] = useState(true);
   const [isCreateEvent, setIsCreate] = useState(false);
+  const [user,setUser] = useState();
 
   //verify token
   const verify = async () => {
@@ -71,6 +72,7 @@ const Home = ({ navigation }) => {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
         AsyncStorage.removeItem("@accessToken");
+        AsyncStorage.removeItem("@vef");
         Alert.alert("เซสชันหมดอายุ", "โปรดเข้าสู่ระบบใหม่อีกครั้ง");
       } else {
         setIsvisiblelogin(false);
@@ -93,6 +95,8 @@ const Home = ({ navigation }) => {
       const Edata = await Efetch.json();
       setIsloading(false);
       setEvent(Edata);
+      const vef = await AsyncStorage.getItem("@vef");
+      setUser(vef);
       // console.log(event);
       verify();
     } catch (error) {
@@ -207,14 +211,19 @@ const Home = ({ navigation }) => {
           {isVisiblelogin ? (
             <Text style={styles.RightTab}>เข้าสู่ระบบ</Text>
           ) : (
-            <User color={"white"} marginRight={15} />
+            <View style={{flexDirection: 'row-reverse'}} >
+              <User color={"white"} marginRight={15} />
+              <Text style={styles.RightTab}>{user}</Text>
+            </View>
           )}
         </TouchableOpacity>
         {/*log out*/}
         {isVisiblelogout && (
-          <TouchableOpacity onPress={() => {
-            setModal(!modal);
-          }}>
+          <TouchableOpacity
+            onPress={() => {
+              setModal(!modal);
+            }}
+          >
             <LogOut marginLeft={15} color={"white"} />
           </TouchableOpacity>
         )}

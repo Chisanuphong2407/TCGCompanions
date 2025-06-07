@@ -70,7 +70,7 @@ app.post("/api/login", async (req, res) => {
     const expiresIn = "1h";
     const token = jwt.sign(payload, secrKey, { expiresIn });
     console.log(secrKey);
-    return res.status(200).json(token);
+    return res.status(200).send(token);
   };
 
   console.log(req.body);
@@ -78,6 +78,10 @@ app.post("/api/login", async (req, res) => {
   try {
     //เช็คข้อมูลผู้ใช้งาน
     const [userVef] = await conn.query(query, [req.body.username]);
+        if (userVef.length === 0) {
+      console.log("User not found.");
+      return res.status(401).json({ message: "ชื่อผู้ใช้ไม่ถูกต้อง" }); // หรือ "รหัสไม่ถูกต้อง"
+    }
     const passVef = await bcrypt.compare(
       req.body.password,
       userVef[0].Password
