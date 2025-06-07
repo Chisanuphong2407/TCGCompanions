@@ -35,7 +35,7 @@ import { Eventdetails } from "./screens/Eventdetails";
 import { MyProfile, RePassword } from "./screens/MyProfile";
 import { CreateEvent } from "./screens/CreateEvent";
 
-export const IP = "http://192.168.1.5:3000";
+export const IP = "http://192.168.1.3:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -211,28 +211,48 @@ const Home = ({ navigation }) => {
           )}
         </TouchableOpacity>
         {/*log out*/}
-        <AlertNotificationRoot>
-          {isVisiblelogout && (
-          <TouchableOpacity
-            onPress={() => {
-              console.log('press');
-              Dialog.show({
-                type: ALERT_TYPE.SUCCESS,
-                title: "สำเร็จ!",
-                textBody: "การดำเนินการของคุณสำเร็จแล้ว",
-                button: "ปิด", // หรือ 'OK', 'ตกลง'
-                onPressButton: () => {
-                  console.log("ปุ่มปิดถูกกด");
-                  Dialog.hide(); // ปิด Dialog
-                },
-              });
-            }}
-          >
+        {isVisiblelogout && (
+          <TouchableOpacity onPress={() => {
+            setModal(!modal);
+          }}>
             <LogOut marginLeft={15} color={"white"} />
           </TouchableOpacity>
         )}
-        </AlertNotificationRoot>
-        
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modal}
+          onRequestClose={() => {
+            setModal(!modal);
+          }}
+        >
+          <View style={styles.centered}>
+            <View style={styles.logoutModal}>
+              <Text style={styles.modaltext}>ออกจากระบบ ?</Text>
+              <View style={styles.modalmenu}>
+                <Pressable
+                  onPress={() => {
+                    setModal(!modal);
+                    // console.log("pressห")
+                  }}
+                >
+                  <Text style={styles.modalbut}>ยกเลิก</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    AsyncStorage.removeItem("@accessToken");
+                    setIsloading(true);
+                    setModal(!modal);
+                    navigation.navigate("Login");
+                    // console.log("pressห")
+                  }}
+                >
+                  <Text style={styles.modalbut}>ตกลง</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
 
       {/* แท็บเมนู */}

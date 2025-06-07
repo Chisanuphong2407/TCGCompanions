@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View ,ScrollView} from "react-native";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
@@ -15,6 +15,7 @@ import {
   Image,
   FlatList,
 } from "react-native";
+import { Trash2, Edit2, Users } from "react-native-feather";
 import { IP } from "../App";
 
 export const Eventdetails = ({ navigation, route }) => {
@@ -22,7 +23,10 @@ export const Eventdetails = ({ navigation, route }) => {
   const [isLoading, setIsloading] = useState(true);
   const [item, setItem] = useState([]);
   const [status, setStatus] = useState();
-  const [statusStyle,setStatusstyle] = useState();
+  const [statusStyle, setStatusstyle] = useState();
+  const [isOwner, setIsowner] = useState(false);
+  const owner = item[0] && item[0].UserName;
+  const [account, setAccount] = useState();
   // console.log(ID);
 
   const fetchDetail = async () => {
@@ -46,10 +50,23 @@ export const Eventdetails = ({ navigation, route }) => {
       });
       const responseData = await data.json();
       setItem(responseData);
-      console.log(item);
+      const vef = await AsyncStorage.getItem("@vef");
+      vef ? setAccount(vef.trim()) : (vef = null);
       setIsloading(false);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const availableMenu = async () => {
+    try {
+      if (owner === account) {
+        setIsowner(true);
+      } else {
+        setIsowner(false);
+      }
+    } catch (error) {
+      return error;
     }
   };
 
@@ -57,8 +74,44 @@ export const Eventdetails = ({ navigation, route }) => {
     fetchDetail();
   }, [isLoading]);
 
+  useEffect(() => {
+    availableMenu();
+  }, [item]);
+
   return (
     <ScrollView style={styles.container}>
+      <View style={styles.menu}>
+        {status === "เปิดรับสมัคร" && isOwner &&(
+          <Pressable
+            onPress={() => {
+              console.log("delete");
+            }}
+            style={styles.menubox}
+          >
+            <Trash2 color={"#C40424"} style={styles.menubut} />
+          </Pressable>
+        )}
+        {isOwner && (
+          <View style={styles.menu}>
+            <Pressable
+              onPress={() => {
+                console.log("edit");
+              }}
+              style={styles.menubox}
+            >
+              <Edit2 color={"#176B87"} style={styles.menubut} />
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                console.log("Fighter");
+              }}
+              style={styles.menubox}
+            >
+              <Users color={"#176B87"} style={styles.menubut} />
+            </Pressable>
+          </View>
+        )}
+      </View>
       <Text style={styles.Eventname}>{item[0] && item[0].EventName}</Text>
       <Text style={statusStyle}>{status}</Text>
       <View style={styles.owner}>
@@ -89,6 +142,16 @@ export const Eventdetails = ({ navigation, route }) => {
         <Text style={styles.header}>รายละเอียดอื่นๆ:</Text>
         <Text style={styles.content}>{item[0] && item[0].MoreDetail}</Text>
       </View>
+      {status === "ปิดรับสมัคร" && isOwner && (
+        <Pressable>
+          <Text>เริ่มการแข่งขัน</Text>
+        </Pressable>
+      )}
+      {status === 'เปิดรับสมัคร' && account && !isOwner && (
+        <Pressable>
+          <Text>สมัคร</Text>
+        </Pressable>
+      )}
     </ScrollView>
   );
 };
@@ -134,20 +197,31 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "space-between",
     marginTop: 20,
-    
   },
   ownerName: {
-    fontSize: 17
+    fontSize: 17,
   },
   header: {
     fontSize: 17,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   content: {
     fontSize: 15,
-    marginTop: 5
+    marginTop: 5,
   },
   head: {
-    marginTop: 20
-  }
+    marginTop: 20,
+  },
+  menu: {
+    flexDirection: "row-reverse",
+  },
+  menubut: {
+    maxWidth: 30,
+    maxHeight: 30,
+    minWidth: 25,
+    minHeight: 25,
+  },
+  menubox: {
+    marginHorizontal: 10,
+  },
 });
