@@ -70,6 +70,18 @@ export const Eventdetails = ({ navigation, route }) => {
     }
   };
 
+  const deleteEvent = async() => {
+    console.log('start del');
+    // const deleteEvent = await fetch(IP + "/api/deleteEvent/",ID,{
+    //   method: "GET",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    // });
+    // const result = deleteEvent;
+    // console.log(result);
+  };
+
   useEffect(() => {
     fetchDetail();
   }, [isLoading]);
@@ -85,6 +97,20 @@ export const Eventdetails = ({ navigation, route }) => {
           <Pressable
             onPress={() => {
               console.log("delete");
+              Alert.alert('ยืนยันการลบกิจกรรม','หลังยืนยัน ข้อมูลผู้สมัครก่อนหน้าจะถูกลบไปด้วย',[
+                {
+                  text: 'ยกเลิก',
+                  style: 'cancel'
+                },{
+                  text: 'ตกลง',
+                  onPress: deleteEvent()
+                },
+              ],
+              {
+                cancelable: true,
+              }
+                );
+              
             }}
             style={styles.menubox}
           >

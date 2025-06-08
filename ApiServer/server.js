@@ -70,7 +70,7 @@ app.post("/api/login", async (req, res) => {
     const expiresIn = "1h";
     const token = jwt.sign(payload, secrKey, { expiresIn });
     console.log(secrKey);
-    return res.status(200).send(token);
+    return res.status(200).json(token);
   };
 
   console.log(req.body);
@@ -307,7 +307,7 @@ app.delete("/api/deleteEvent/:EventID",async(req,res) => {
     const [delTable] = await conn.query("DELETE from `fightertable` WHERE Fighter = ?",[table]);
 
     if(delEvent.affectedRows > 0 && delTable.affectedRows > 0) {
-      return res.status(204).send();
+      return res.status(204).send('ลบสำเร็จ');
     }else{
       return res.status(500).json({
         message: 'ลบไม่สำเร็จ',
