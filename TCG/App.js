@@ -31,7 +31,7 @@ import {
 } from "react-native-alert-notification";
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
-import { Eventdetails } from "./screens/Eventdetails";
+import { Eventdetails ,editDetail} from "./screens/Eventdetails";
 import { MyProfile, RePassword } from "./screens/MyProfile";
 import { CreateEvent } from "./screens/CreateEvent";
 
@@ -437,6 +437,11 @@ const App = () => {
         <Stack.Screen
           name="CreateEvent"
           component={CreateEvent}
+          options={{ headerTitle: "" }}
+        />
+        <Stack.Screen
+          name="editDetail"
+          component={editDetail}
           options={{ headerTitle: "" }}
         />
       </Stack.Navigator>

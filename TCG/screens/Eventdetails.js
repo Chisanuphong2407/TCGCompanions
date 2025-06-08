@@ -27,6 +27,15 @@ export const Eventdetails = ({ navigation, route }) => {
   const [isOwner, setIsowner] = useState(false);
   const owner = item[0] && item[0].UserName;
   const [account, setAccount] = useState();
+
+  const [eventName, setEventName] = useState();
+  const [condition, setCondition] = useState();
+  const [rule, setRule] = useState();
+  const [time, setTime] = useState();
+  const [amount, setAmount] = useState();
+  const [address, setAddress] = useState();
+  const [moredetail, setMoredetail] = useState();
+  const [closedate,setClosedate] = useState();
   // console.log(ID);
 
   const fetchDetail = async () => {
@@ -53,6 +62,14 @@ export const Eventdetails = ({ navigation, route }) => {
       const vef = await AsyncStorage.getItem("@vef");
       vef ? setAccount(vef.trim()) : (vef = null);
       setIsloading(false);
+      setEventName(item[0] && item[0].EventName);
+      setCondition(item[0] && item[0].Condition);
+      setRule(item[0] && item[0].Rule);
+      setTime(item[0] && item[0].Time);
+      setAmount(item[0] && item[0].Amount);
+      setAddress(item[0] && item[0].Address);
+      setMoredetail(item[0] && item[0].MoreDetail);
+      setClosedate(item[0] && item[0].CloseDate);
     } catch (error) {
       console.log(error);
     }
@@ -70,8 +87,8 @@ export const Eventdetails = ({ navigation, route }) => {
     }
   };
 
-  const deleteEvent = async() => {
-    console.log('start del');
+  const deleteEvent = async () => {
+    console.log("start del");
     // const deleteEvent = await fetch(IP + "/api/deleteEvent/",ID,{
     //   method: "GET",
     //   headers: {
@@ -93,24 +110,27 @@ export const Eventdetails = ({ navigation, route }) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.menu}>
-        {status === "เปิดรับสมัคร" && isOwner &&(
+        {status === "เปิดรับสมัคร" && isOwner && (
           <Pressable
             onPress={() => {
               console.log("delete");
-              Alert.alert('ยืนยันการลบกิจกรรม','หลังยืนยัน ข้อมูลผู้สมัครก่อนหน้าจะถูกลบไปด้วย',[
+              Alert.alert(
+                "ยืนยันการลบกิจกรรม",
+                "หลังยืนยัน ข้อมูลผู้สมัครก่อนหน้าจะถูกลบไปด้วย",
+                [
+                  {
+                    text: "ยกเลิก",
+                    style: "cancel",
+                  },
+                  {
+                    text: "ตกลง",
+                    onPress: deleteEvent(),
+                  },
+                ],
                 {
-                  text: 'ยกเลิก',
-                  style: 'cancel'
-                },{
-                  text: 'ตกลง',
-                  onPress: deleteEvent()
-                },
-              ],
-              {
-                cancelable: true,
-              }
-                );
-              
+                  cancelable: true,
+                }
+              );
             }}
             style={styles.menubox}
           >
@@ -122,6 +142,16 @@ export const Eventdetails = ({ navigation, route }) => {
             <Pressable
               onPress={() => {
                 console.log("edit");
+                navigation.navigate(
+                  "editDetail",
+                  eventName,
+                  condition,
+                  rule,
+                  time,
+                  amount,
+                  address,
+                  moredetail
+                );
               }}
               style={styles.menubox}
             >
@@ -138,47 +168,59 @@ export const Eventdetails = ({ navigation, route }) => {
           </View>
         )}
       </View>
-      <Text style={styles.Eventname}>{item[0] && item[0].EventName}</Text>
+      <Text style={styles.Eventname}>{eventName}</Text>
       <Text style={statusStyle}>{status}</Text>
       <View style={styles.owner}>
         <Text style={styles.ownerName}>ผู้จัด:</Text>
-        <Text style={styles.ownerName}>{item[0] && item[0].UserName}</Text>
+        <Text style={styles.ownerName}>{owner}</Text>
+      </View>
+      <View style={styles.head}>
+        <Text style={styles.header}>วันปิดรับสมัคร:</Text>
+        <Text style={styles.content}>{closedate}</Text>
       </View>
       <View style={styles.head}>
         <Text style={styles.header}>เงื่อนไขการแข่งขัน:</Text>
-        <Text style={styles.content}>{item[0] && item[0].Condition}</Text>
+        <Text style={styles.content}>{condition}</Text>
       </View>
       <View style={styles.head}>
         <Text style={styles.header}>กติกาการแข่งขัน:</Text>
-        <Text style={styles.content}>{item[0] && item[0].Rule}</Text>
+        <Text style={styles.content}>{rule}</Text>
       </View>
       <View style={styles.head}>
         <Text style={styles.header}>เวลาในการแข่งขันแต่ละรอบ:</Text>
-        <Text style={styles.content}>{item[0] && item[0].Time} นาที</Text>
+        <Text style={styles.content}>{time} นาที</Text>
       </View>
       <View style={styles.head}>
         <Text style={styles.header}>จำนวนที่เปิดรับ:</Text>
-        <Text style={styles.content}>{item[0] && item[0].Amount} คน</Text>
+        <Text style={styles.content}>{amount} คน</Text>
       </View>
       <View style={styles.head}>
         <Text style={styles.header}>สถานที่จัด:</Text>
-        <Text style={styles.content}>{item[0] && item[0].Address}</Text>
+        <Text style={styles.content}>{address}</Text>
       </View>
       <View style={styles.head}>
         <Text style={styles.header}>รายละเอียดอื่นๆ:</Text>
-        <Text style={styles.content}>{item[0] && item[0].MoreDetail}</Text>
+        <Text style={styles.content}>{moredetail}</Text>
       </View>
       {status === "ปิดรับสมัคร" && isOwner && (
         <Pressable>
           <Text>เริ่มการแข่งขัน</Text>
         </Pressable>
       )}
-      {status === 'เปิดรับสมัคร' && account && !isOwner && (
+      {status === "เปิดรับสมัคร" && account && !isOwner && (
         <Pressable>
           <Text>สมัคร</Text>
         </Pressable>
       )}
     </ScrollView>
+  );
+};
+
+export const editDetail = ({ navigation }) => {
+  return (
+    <View>
+      <Text>edit</Text>
+    </View>
   );
 };
 
