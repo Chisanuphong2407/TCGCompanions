@@ -35,7 +35,7 @@ export const Eventdetails = ({ navigation, route }) => {
   const [amount, setAmount] = useState();
   const [address, setAddress] = useState();
   const [moredetail, setMoredetail] = useState();
-  const [closedate,setClosedate] = useState();
+  const [closedate, setClosedate] = useState();
   // console.log(ID);
 
   const fetchDetail = async () => {
@@ -142,16 +142,16 @@ export const Eventdetails = ({ navigation, route }) => {
             <Pressable
               onPress={() => {
                 console.log("edit");
-                navigation.navigate(
-                  "editDetail",
-                  eventName,
-                  condition,
-                  rule,
-                  time,
-                  amount,
-                  address,
-                  moredetail
-                );
+                navigation.navigate("Editdetail", {
+                  eventName: eventName,
+                  condition: condition,
+                  rule: rule,
+                  time: time,
+                  amount: amount,
+                  address: address,
+                  moredetail: moredetail,
+                  closedate: closedate,
+                });
               }}
               style={styles.menubox}
             >
@@ -213,14 +213,6 @@ export const Eventdetails = ({ navigation, route }) => {
         </Pressable>
       )}
     </ScrollView>
-  );
-};
-
-export const editDetail = ({ navigation }) => {
-  return (
-    <View>
-      <Text>edit</Text>
-    </View>
   );
 };
 

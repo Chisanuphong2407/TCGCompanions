@@ -31,9 +31,10 @@ import {
 } from "react-native-alert-notification";
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
-import { Eventdetails ,editDetail} from "./screens/Eventdetails";
+import { Eventdetails } from "./screens/Eventdetails";
 import { MyProfile, RePassword } from "./screens/MyProfile";
 import { CreateEvent } from "./screens/CreateEvent";
+import { Editdetail } from "./screens/Editdetail";
 
 export const IP = "http://192.168.1.3:3000";
 
@@ -440,8 +441,8 @@ const App = () => {
           options={{ headerTitle: "" }}
         />
         <Stack.Screen
-          name="editDetail"
-          component={editDetail}
+          name="Editdetail"
+          component={Editdetail}
           options={{ headerTitle: "" }}
         />
       </Stack.Navigator>
