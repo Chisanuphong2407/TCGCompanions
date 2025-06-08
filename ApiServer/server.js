@@ -290,6 +290,37 @@ app.post("/api/createevent", async(req,res) => {
   }
 });
 
+app.delete("/api/deleteEvent/:EventID",async(req,res) => {
+  try {
+    const ID = req.params.EventID;
+    const [fetchTable] = await conn.query("SELECT `Fighter` FROM `event` WHERE EventID = ?",[ID]);
+    const table = fetchTable[0].Fighter;
+
+    if (fetchTable.length === 0){
+      return res.status(404).json({
+        message: 'Event not found',
+        success: false
+      });
+    }
+
+    const [delEvent] = await conn.query("DELETE from `event` WHERE EventID = ?",[ID]);
+    const [delTable] = await conn.query("DELETE from `fightertable` WHERE Fighter = ?",[table]);
+
+    if(delEvent.affectedRows > 0 && delTable.affectedRows > 0) {
+      return res.status(204).send();
+    }else{
+      return res.status(500).json({
+        message: 'ลบไม่สำเร็จ',
+        success: false
+      })
+    }
+    // console.log();
+  } catch (error) {
+    console.log(error);
+    return res.status(404);
+  }
+});
+
 app.listen(3000, function () {
   conn.query("UPDATE `event` SET `Status` = 1 WHERE `CloseDate` <= CURRENT_DATE  ")
   console.log("CORS-enabled web server listening on port 3000");
