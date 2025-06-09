@@ -78,7 +78,7 @@ app.post("/api/login", async (req, res) => {
   try {
     //เช็คข้อมูลผู้ใช้งาน
     const [userVef] = await conn.query(query, [req.body.username]);
-        if (userVef.length === 0) {
+    if (userVef.length === 0) {
       console.log("User not found.");
       return res.status(401).json({ message: "ชื่อผู้ใช้ไม่ถูกต้อง" }); // หรือ "รหัสไม่ถูกต้อง"
     }
@@ -133,11 +133,14 @@ app.get("/api/events", async (req, res) => {
   }
 });
 
-app.get('/api/fetchcreateevent/:owner', async (req,res) => {
+app.get("/api/fetchcreateevent/:owner", async (req, res) => {
   try {
     const owner = req.params.owner;
     console.log(owner);
-    const [result] = await conn.query('SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName FROM `event` INNER JOIN USER ON user.UserID = EVENT.UserID WHERE user.UserName = ?',[owner]);
+    const [result] = await conn.query(
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName FROM `event` INNER JOIN USER ON user.UserID = EVENT.UserID WHERE user.UserName = ?",
+      [owner]
+    );
     console.log(result);
     return res.status(201).json(result);
   } catch (error) {
@@ -234,85 +237,101 @@ app.put("/api/changepass", async (req, res) => {
       "SELECT `Password` FROM `user` WHERE `UserID` = ?",
       [id]
     );
-    const Opasscheck = await bcrypt.compare(Opass,checkQ[0].Password);
+    const Opasscheck = await bcrypt.compare(Opass, checkQ[0].Password);
     console.log(Opass);
     console.log(checkQ.length);
-    if( checkQ.length > 0 && !Opasscheck) {
+    if (checkQ.length > 0 && !Opasscheck) {
       console.log(Opasscheck);
-      return res.json({message: "รหัสผ่านเดิมไม่ถูกต้อง"});
-    }else {
-      const passcheck = await bcrypt.compare(Newpass,checkQ[0].Password);
-    console.log(passcheck);
-    if (checkQ.length > 0 && passcheck) {
-      return res.json({ message: "ท่านกรอกรหัสผ่านเดิม" });
+      return res.json({ message: "รหัสผ่านเดิมไม่ถูกต้อง" });
     } else {
-      const salt = await bcrypt.genSalt(10);
+      const passcheck = await bcrypt.compare(Newpass, checkQ[0].Password);
+      console.log(passcheck);
+      if (checkQ.length > 0 && passcheck) {
+        return res.json({ message: "ท่านกรอกรหัสผ่านเดิม" });
+      } else {
+        const salt = await bcrypt.genSalt(10);
 
-      const hashedPassword = await bcrypt.hash(Newpass, salt);
-      await conn.query("UPDATE `user` SET `Password` = ? WHERE UserID = ?", [
-        hashedPassword,
-        id,
-      ]);
+        const hashedPassword = await bcrypt.hash(Newpass, salt);
+        await conn.query("UPDATE `user` SET `Password` = ? WHERE UserID = ?", [
+          hashedPassword,
+          id,
+        ]);
+      }
+      return res.status(201).json({ message: "เปลี่ยนรหัสผ่านสำเร็จ" });
     }
-    return res.status(201).json({ message: "เปลี่ยนรหัสผ่านสำเร็จ" });
-    }
-    
   } catch (error) {
     return res.json(error);
   }
 });
 
-app.post("/api/createevent", async(req,res) => {
+app.post("/api/createevent", async (req, res) => {
   try {
-    console.log('start create');
-    const [user] = await conn.query("SELECT `UserID` FROM `user` WHERE `UserName`= ?",[req.body.Username]);
+    console.log("start create");
+    const [user] = await conn.query(
+      "SELECT `UserID` FROM `user` WHERE `UserName`= ?",
+      [req.body.Username]
+    );
     console.log(user[0].UserID);
-    const UserID = user[0].UserID
+    const UserID = user[0].UserID;
     // return res.json(UserID);
-    const table = await conn.query("INSERT INTO `fightertable`(`Fighter`) VALUES (Null)");
+    const table = await conn.query(
+      "INSERT INTO `fightertable`(`Fighter`) VALUES (Null)"
+    );
     console.log(table[0].insertId);
-    const fightertable = table[0].insertId
+    const fightertable = table[0].insertId;
 
-    const create = await conn.query("INSERT INTO `event`(`UserID`, `Fighter`, `EventName`, `Condition`, `Rule`, `Time`, `Amount`, `Address`, `CloseDate`, `MoreDetail`, `Status`) VALUES (?,?,?,?,'swiss',?,?,?,?,?,0)",[
-      UserID,
-      fightertable,
-      req.body.eventname,
-      req.body.condition,
-      req.body.time,
-      req.body.amount,
-      req.body.address,
-      req.body.closedate,
-      req.body.moredetail,
-    ]);
+    const create = await conn.query(
+      "INSERT INTO `event`(`UserID`, `Fighter`, `EventName`, `Condition`, `Rule`, `Time`, `Amount`, `Address`, `CloseDate`, `MoreDetail`, `Status`) VALUES (?,?,?,?,'swiss',?,?,?,?,?,0)",
+      [
+        UserID,
+        fightertable,
+        req.body.eventname,
+        req.body.condition,
+        req.body.time,
+        req.body.amount,
+        req.body.address,
+        req.body.closedate,
+        req.body.moredetail,
+      ]
+    );
     return res.status(201).json(create);
   } catch (error) {
     return res.json(error);
   }
 });
 
-app.delete("/api/deleteEvent/:EventID",async(req,res) => {
+app.delete("/api/deleteEvent/:EventID", async (req, res) => {
   try {
     const ID = req.params.EventID;
-    const [fetchTable] = await conn.query("SELECT `Fighter` FROM `event` WHERE EventID = ?",[ID]);
+    const [fetchTable] = await conn.query(
+      "SELECT `Fighter` FROM `event` WHERE EventID = ?",
+      [ID]
+    );
     const table = fetchTable[0].Fighter;
 
-    if (fetchTable.length === 0){
+    if (fetchTable.length === 0) {
       return res.status(404).json({
-        message: 'Event not found',
-        success: false
+        message: "Event not found",
+        success: false,
       });
     }
 
-    const [delEvent] = await conn.query("DELETE from `event` WHERE EventID = ?",[ID]);
-    const [delTable] = await conn.query("DELETE from `fightertable` WHERE Fighter = ?",[table]);
+    const [delEvent] = await conn.query(
+      "DELETE from `event` WHERE EventID = ?",
+      [ID]
+    );
+    const [delTable] = await conn.query(
+      "DELETE from `fightertable` WHERE Fighter = ?",
+      [table]
+    );
 
-    if(delEvent.affectedRows > 0 && delTable.affectedRows > 0) {
-      return res.status(204).send('ลบสำเร็จ');
-    }else{
+    if (delEvent.affectedRows > 0 && delTable.affectedRows > 0) {
+      return res.status(204).send("ลบสำเร็จ");
+    } else {
       return res.status(500).json({
-        message: 'ลบไม่สำเร็จ',
-        success: false
-      })
+        message: "ลบไม่สำเร็จ",
+        success: false,
+      });
     }
     // console.log();
   } catch (error) {
@@ -321,7 +340,38 @@ app.delete("/api/deleteEvent/:EventID",async(req,res) => {
   }
 });
 
+app.put("/api/editevent", async (req, res) => {
+  try {
+    console.log("start edit");
+    const [user] = await conn.query(
+      "SELECT `UserID` FROM `user` WHERE `UserName`= ?",
+      [req.body.Username]
+    );
+    console.log(user[0].UserID);
+    const UserID = user[0].UserID;
+
+    const update = await conn.query(
+      "UPDATE `event` SET `EventName`= ?,`Condition`= ?,`Time`= ?,`Amount`= ?,`Address`= ?,`CloseDate`= ?,`MoreDetail`= ? WHERE UserID = ?",
+      [
+        req.body.eventname,
+        req.body.condition,
+        req.body.time,
+        req.body.amount,
+        req.body.address,
+        req.body.closedate,
+        req.body.moredetail,
+        UserID,
+      ]
+    );
+    return res.status(201).json(update);
+  } catch (error) {
+    return res.json(error);
+  }
+});
+
 app.listen(3000, function () {
-  conn.query("UPDATE `event` SET `Status` = 1 WHERE `CloseDate` <= CURRENT_DATE  ")
+  conn.query(
+    "UPDATE `event` SET `Status` = 1 WHERE `CloseDate` <= CURRENT_DATE  "
+  );
   console.log("CORS-enabled web server listening on port 3000");
 });

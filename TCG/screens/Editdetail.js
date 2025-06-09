@@ -31,13 +31,12 @@ export const Editdetail = ({navigation,route}) => {
   const [Ename, setEname] = useState(route.params.eventName);
   const [condition, setCondition] = useState(route.params.condition);
   const [time, setTime] = useState(route.params.time);
-  const [amount, setAmount] = useState(String(route.params.amount));
+  const [amount, setAmount] = useState(route.params.amount);
   const [address, setAddress] = useState(route.params.address);
   const [moredetail, setMoredetail] = useState(route.params.moredetail);
   const [date, setDate] = useState(new Date()); //set Date
   const [showDatepicker, setShowDatepicker] = useState(false);
   const [selectText, setSelectText] = useState(route.params.closedate);
-
 
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 1);
@@ -61,9 +60,9 @@ export const Editdetail = ({navigation,route}) => {
     setShowDatepicker(true);
   };
 
-  const alertcreate = () => {
+  const alertedit = () => {
     Alert.alert(
-      "ยืนยันการสร้าง",
+      "ยืนยันการแก้ไข",
       "หลังยืนยัน ท่านยังสามารถแก้ไขกิจกรรมได้ภายหลัง",
       [
         {
@@ -72,21 +71,27 @@ export const Editdetail = ({navigation,route}) => {
         },
         {
           text: "ยืนยัน",
-          onPress: handleCreate,
+          onPress: handleEdit,
         },
       ]
     );
   };
 
-  const handleCreate = async () => {
+  const handleEdit = async () => {
     try {
       if (!Ename || !condition || !time || !amount || !address) {
-        Alert.alert("สร้างไม่สำเร็จ", "กรอกข้อมูลให้ครบถ้วน");
+        Alert.alert("แก้ไขไม่สำเร็จ", "กรอกข้อมูลให้ครบถ้วน");
+        return false;
+      }else if (typeof(time) !== 'number' ) {
+        Alert.alert('แก้ไขไม่สำเร็จ','โปรดกรอกเวลาการแข่งขันให้เป็นตัวเลข');
+        return false;
+      }else if (typeof(amount) !== 'number' ) {
+        Alert.alert('แก้ไขไม่สำเร็จ','โปรดกรอกจำนวนที่เปิดรับให้เป็นตัวเลข');
         return false;
       }
       const username = await AsyncStorage.getItem("@vef");
       // console.log(username);
-      const submitevent = await fetch(IP + "/api/createevent", {
+      const submitevent = await fetch(IP + "/api/editevent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -159,7 +164,7 @@ export const Editdetail = ({navigation,route}) => {
             <TextInput
               style={styles.inputBoxTime}
               placeholder="เวลา"
-              value={time}
+              value={String(time)}
               onChangeText={setTime}
             />
           </View>
@@ -168,7 +173,7 @@ export const Editdetail = ({navigation,route}) => {
             <TextInput
               style={styles.inputBox}
               placeholder="จำนวนที่เปิดรับ"
-              value={amount}
+              value={String(amount)}
               onChangeText={setAmount}
             />
           </View>
@@ -197,7 +202,7 @@ export const Editdetail = ({navigation,route}) => {
               <TextInput
                 style={styles.inputBox}
                 value={selectText}
-                placeholder="เลือกวันปิดรับสมัคร"
+                placeholder=""
                 editable={false}
               />
             </TouchableOpacity>
@@ -213,8 +218,8 @@ export const Editdetail = ({navigation,route}) => {
             )}
           </View>
         </View>
-        <TouchableOpacity onPress={alertcreate}>
-          <Text style={styles.submit}>สร้างกิจกรรม</Text>
+        <TouchableOpacity onPress={alertedit}>
+          <Text style={styles.submit}>แก้ไขกิจกรรม</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
