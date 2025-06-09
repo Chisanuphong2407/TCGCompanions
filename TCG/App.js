@@ -35,7 +35,7 @@ import { Eventdetails } from "./screens/Eventdetails";
 import { MyProfile, RePassword } from "./screens/MyProfile";
 import { CreateEvent } from "./screens/CreateEvent";
 import { Editdetail } from "./screens/Editdetail";
-import { Apply } from './screens/Apply';
+import { apply } from "./screens/apply";
 
 export const IP = "http://192.168.1.5:3000";
 
@@ -70,6 +70,8 @@ const Home = ({ navigation }) => {
       if (token === null) {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
+        AsyncStorage.removeItem("@accessToken");
+        AsyncStorage.removeItem("@vef");
       } else if (passvef.message === "jwt expired") {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
@@ -447,8 +449,8 @@ const App = () => {
           options={{ headerTitle: "" }}
         />
         <Stack.Screen
-          name="Apply"
-          component={Apply}
+          name="apply"
+          component={apply}
           options={{ headerTitle: "" }}
         />
       </Stack.Navigator>

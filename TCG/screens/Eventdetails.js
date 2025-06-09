@@ -26,7 +26,7 @@ export const Eventdetails = ({ navigation, route }) => {
   const [statusStyle, setStatusstyle] = useState();
   const [isOwner, setIsowner] = useState(false);
   const owner = item[0] && item[0].UserName;
-  const [account, setAccount] = useState();
+  const [account, setAccount] = useState(null);
 
   const [eventName, setEventName] = useState();
   const [condition, setCondition] = useState();
@@ -36,7 +36,6 @@ export const Eventdetails = ({ navigation, route }) => {
   const [address, setAddress] = useState();
   const [moredetail, setMoredetail] = useState();
   const [closedate, setClosedate] = useState();
-  // console.log(ID);
 
   const fetchDetail = async () => {
     try {
@@ -60,7 +59,7 @@ export const Eventdetails = ({ navigation, route }) => {
       const responseData = await data.json();
       setItem(responseData);
       const vef = await AsyncStorage.getItem("@vef");
-      vef ? setAccount(vef.trim()) : (vef = null);
+      vef ? setAccount(vef.trim()) : (setAccount(null));
       setIsloading(false);
       setEventName(item[0] && item[0].EventName);
       setCondition(item[0] && item[0].Condition);
@@ -207,9 +206,12 @@ export const Eventdetails = ({ navigation, route }) => {
           <Text>เริ่มการแข่งขัน</Text>
         </Pressable>
       )}
-      {status === "เปิดรับสมัคร" && account && !isOwner && (
+      {status === "เปิดรับสมัคร" && (account !== null) && !isOwner && (
         <View style={styles.apply}>
-          <TouchableOpacity onPress={() => {navigation.navigate("Apply",ID,eventName)}}>
+          <TouchableOpacity onPress={() => {
+            console.log(ID);
+            navigation.navigate("apply",{ID,eventName});
+            }}>
             <Text style={styles.applyText}>สมัคร</Text>
           </TouchableOpacity>
         </View>
