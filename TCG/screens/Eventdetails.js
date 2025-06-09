@@ -208,9 +208,11 @@ export const Eventdetails = ({ navigation, route }) => {
         </Pressable>
       )}
       {status === "เปิดรับสมัคร" && account && !isOwner && (
-        <Pressable>
-          <Text>สมัคร</Text>
-        </Pressable>
+        <View style={styles.apply}>
+          <TouchableOpacity onPress={() => {navigation.navigate("Apply",ID,eventName)}}>
+            <Text style={styles.applyText}>สมัคร</Text>
+          </TouchableOpacity>
+        </View>
       )}
     </ScrollView>
   );
@@ -283,5 +285,17 @@ export const styles = StyleSheet.create({
   },
   menubox: {
     marginHorizontal: 10,
+  },
+  apply: {
+    alignSelf: "flex-end",
+    backgroundColor: "#176B87",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 50,
+    minWidth: 100
+  },
+  applyText: {
+    color: 'white',
+    alignSelf: 'center'
   },
 });

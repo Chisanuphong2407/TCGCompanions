@@ -35,8 +35,9 @@ import { Eventdetails } from "./screens/Eventdetails";
 import { MyProfile, RePassword } from "./screens/MyProfile";
 import { CreateEvent } from "./screens/CreateEvent";
 import { Editdetail } from "./screens/Editdetail";
+import { Apply } from './screens/Apply';
 
-export const IP = "http://192.168.1.9:3000";
+export const IP = "http://192.168.1.5:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -51,7 +52,7 @@ const Home = ({ navigation }) => {
   const [ismyMenu, setIsmyMenu] = useState(true);
   const [iscmenu, setIscmenu] = useState(true);
   const [isCreateEvent, setIsCreate] = useState(false);
-  const [user,setUser] = useState();
+  const [user, setUser] = useState();
 
   //verify token
   const verify = async () => {
@@ -212,7 +213,7 @@ const Home = ({ navigation }) => {
           {isVisiblelogin ? (
             <Text style={styles.RightTab}>เข้าสู่ระบบ</Text>
           ) : (
-            <View style={{flexDirection: 'row-reverse'}} >
+            <View style={{ flexDirection: "row-reverse" }}>
               <User color={"white"} marginRight={15} />
               <Text style={styles.RightTab}>{user}</Text>
             </View>
@@ -443,6 +444,11 @@ const App = () => {
         <Stack.Screen
           name="Editdetail"
           component={Editdetail}
+          options={{ headerTitle: "" }}
+        />
+        <Stack.Screen
+          name="Apply"
+          component={Apply}
           options={{ headerTitle: "" }}
         />
       </Stack.Navigator>

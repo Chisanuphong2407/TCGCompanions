@@ -37,7 +37,9 @@ export const Editdetail = ({navigation,route}) => {
   const [date, setDate] = useState(new Date()); //set Date
   const [showDatepicker, setShowDatepicker] = useState(false);
   const [selectText, setSelectText] = useState(route.params.closedate);
+  const [sendText,setSendtext] = useState();
 
+  // console.log(isNaN(amount));
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 1);
   //onchange handle
@@ -52,7 +54,8 @@ export const Editdetail = ({navigation,route}) => {
       day: "2-digit",
     });
     const [month, day, year] = format.split("/");
-    setSelectText(`${year}-${month}-${day}`);
+    setSelectText(`${day}-${month}-${year}`);
+    setSendtext(`${year}-${month}-${day}`);
     setShowDatepicker(false);
   };
 
@@ -82,17 +85,17 @@ export const Editdetail = ({navigation,route}) => {
       if (!Ename || !condition || !time || !amount || !address) {
         Alert.alert("แก้ไขไม่สำเร็จ", "กรอกข้อมูลให้ครบถ้วน");
         return false;
-      }else if (typeof(time) !== 'number' ) {
-        Alert.alert('แก้ไขไม่สำเร็จ','โปรดกรอกเวลาการแข่งขันให้เป็นตัวเลข');
+      }else if ( isNaN(time) || time < 1) {
+        Alert.alert('แก้ไขไม่สำเร็จ','โปรดกรอกเวลาการแข่งขันให้ถูกต้อง');
         return false;
-      }else if (typeof(amount) !== 'number' ) {
-        Alert.alert('แก้ไขไม่สำเร็จ','โปรดกรอกจำนวนที่เปิดรับให้เป็นตัวเลข');
+      }else if ( isNaN(amount) || amount < 1) {
+        Alert.alert('แก้ไขไม่สำเร็จ','โปรดกรอกจำนวนที่เปิดรับให้ถูกต้อง');
         return false;
       }
       const username = await AsyncStorage.getItem("@vef");
       // console.log(username);
       const submitevent = await fetch(IP + "/api/editevent", {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -103,7 +106,7 @@ export const Editdetail = ({navigation,route}) => {
           time: time,
           amount: amount,
           address: address,
-          closedate: selectText,
+          closedate: sendText,
           moredetail: moredetail,
         }),
       });
@@ -111,7 +114,7 @@ export const Editdetail = ({navigation,route}) => {
       console.log(result[0]);
       if (result[0].affectedRows === 1) {
         Alert.alert(
-          "สร้างสำเร็จ",
+          "แก้ไขสำเร็จ",
           "สามารถแก้ไขรายละเอียดได้ที่ กิจกรรมที่ฉันสร้าง > เลือกกิจกรรมที่ต้องการ",
           [
             {
@@ -165,6 +168,7 @@ export const Editdetail = ({navigation,route}) => {
               style={styles.inputBoxTime}
               placeholder="เวลา"
               value={String(time)}
+              keyboardType="numeric"
               onChangeText={setTime}
             />
           </View>
@@ -174,6 +178,7 @@ export const Editdetail = ({navigation,route}) => {
               style={styles.inputBox}
               placeholder="จำนวนที่เปิดรับ"
               value={String(amount)}
+              keyboardType="numeric"
               onChangeText={setAmount}
             />
           </View>

@@ -152,7 +152,7 @@ app.post("/api/edetails", async (req, res) => {
   try {
     console.log("start");
     const [details] = await conn.query(
-      "SELECT event.Status, event.Fighter,event.Condition,event.Rule,event.Time,event.Amount,CONCAT(DATE_FORMAT(event.CloseDate,'%d-%m'),'-',YEAR(CloseDate)+ 543)  AS CloseDate,event.MoreDetail,event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID WHERE event.EventID = ?",
+      "SELECT event.Status, event.Fighter,event.Condition,event.Rule,event.Time,event.Amount,DATE_FORMAT(event.CloseDate,'%d-%m-%Y')  AS CloseDate,event.MoreDetail,event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID WHERE event.EventID = ?",
       [req.body.EventID]
     );
     console.log(details);
