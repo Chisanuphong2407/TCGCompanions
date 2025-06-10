@@ -21,7 +21,71 @@ import { IP } from "../App";
 export const apply = ({ navigation, route }) => {
   const EventID = route.params.ID;
   const Eventname = route.params.eventName;
-  const [selectNation,setSelectnation] = useState();
+  const [selectNation, setSelectnation] = useState();
+  const [architype, setArchitype] = useState();
+
+  const handleRadiobutton = (value) => {
+    setSelectnation(value);
+
+    switch (value) {
+      case "Dragon Empire":
+        console.log("Dragon Empire selected");
+        break;
+      case "Dark State":
+        console.log("Dark State selected");
+        break;
+      case "Stoicheia":
+        console.log("Stoicheia selected");
+        break;
+      case "Brandt Gate":
+        console.log("Brandt Gate selected");
+        break;
+      case "Keter Sanctuary":
+        console.log("Keter Sanctuary selected");
+        break;
+      case "Lyrical Monasterio":
+        console.log("Lyrical Monasterio selected");
+        break;
+    }
+  };
+
+  const submit = () => {
+    if (!architype || !selectNation) {
+      Alert.alert("สมัครไม่สำเร็จ", "กรุณากรอกข้อมูลให้ครบถ้วน");
+    } else {
+      Alert.alert(
+        "ยืนยันการสมัคร",
+        "หากยืนยัน ท่านจะไม่สามารถแก้ไขรายละเอียดได้อีก",
+        [
+          {
+            text: "ยกเลิก",
+            style: "cancel",
+          },
+          {
+            text: "ยืนยัน",
+            style: "default",
+            onPress: handleSubmit,
+          },
+        ]
+      );
+    }
+  };
+
+  const handleSubmit = () => {
+    Alert.alert(
+      "สมัครสำเร็จ",
+      "ท่านสามารถตรวจสอบตารางการแข่งขันได้ที่ กิจกรรมของฉัน > กิจกรรมที่ท่านสมัคร > ตารางการแข่งขัน",
+      [
+        {
+          text: "ตกลง",
+          onPress: () => {
+            navigation.navigate("Eventdetails", EventID);
+          },
+        },
+      ]
+    );
+    console.log(architype, " ", selectNation);
+  };
 
   return (
     <View style={styles.container}>
@@ -29,7 +93,66 @@ export const apply = ({ navigation, route }) => {
       <View>
         <Text style={styles.header}>{Eventname}</Text>
         <Text style={styles.topic}>เนชั่นที่ใช้ในการแข่งขัน:</Text>
+        <RadioButton.Group
+          onValueChange={handleRadiobutton}
+          value={selectNation}
+        >
+          <TouchableOpacity
+            onPress={() => handleRadiobutton("Dragon Empire")}
+            style={styles.radiobut}
+          >
+            <RadioButton value="Dragon Empire" />
+            <Text style={styles.radiotext}>Dragon Empire</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleRadiobutton("Dark State")}
+            style={styles.radiobut}
+          >
+            <RadioButton value="Dark State" />
+            <Text style={styles.radiotext}>Dark State</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleRadiobutton("Stoicheia")}
+            style={styles.radiobut}
+          >
+            <RadioButton value="Stoicheia" />
+            <Text style={styles.radiotext}>Stoicheia</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleRadiobutton("Brandt Gate")}
+            style={styles.radiobut}
+          >
+            <RadioButton value="Brandt Gate" />
+            <Text style={styles.radiotext}>Brandt Gate</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleRadiobutton("Keter Sanctuary")}
+            style={styles.radiobut}
+          >
+            <RadioButton value="Keter Sanctuary" />
+            <Text style={styles.radiotext}>Keter Sanctuary</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleRadiobutton("Lyrical Monasterio")}
+            style={styles.radiobut}
+          >
+            <RadioButton value="Lyrical Monasterio" />
+            <Text style={styles.radiotext}>Lyrical Monasterio</Text>
+          </TouchableOpacity>
+        </RadioButton.Group>
+        <View>
+          <Text style={styles.topic}>สายที่ใช้ในการแข่งขัน</Text>
+          <TextInput
+            placeholder="กรอกข้อมูลของท่าน"
+            value={architype}
+            onChangeText={setArchitype}
+            style={styles.input}
+          />
+        </View>
       </View>
+      <TouchableOpacity onPress={submit} style={styles.submit}>
+        <Text style={{ color: "white", alignSelf: "center" }}>สมัคร</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -64,9 +187,31 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontWeight: "bold",
     marginBottom: 30,
-    fontSize: 30
+    fontSize: 30,
   },
   topic: {
-    fontSize: 20
-  }
+    fontSize: 20,
+    marginBottom: 5,
+    marginTop: 20,
+  },
+  radiobut: {
+    flexDirection: "row",
+  },
+  radiotext: {
+    fontSize: 16,
+    alignSelf: "center",
+  },
+  input: {
+    borderBottomWidth: 1,
+    borderColor: "#176B87",
+  },
+  submit: {
+    marginVertical: 40,
+    fontSize: 18,
+    backgroundColor: "#176B87",
+    alignSelf: "center",
+    padding: 10,
+    borderRadius: 5,
+    minWidth: 100,
+  },
 });
