@@ -15,19 +15,21 @@ import {
   Pressable,
   Image,
 } from "react-native";
+import { RadioButton } from "react-native-paper";
 import { IP } from "../App";
 
 export const apply = ({ navigation, route }) => {
   const EventID = route.params.ID;
   const Eventname = route.params.eventName;
-  console.log(EventID);
+  const [selectNation,setSelectnation] = useState();
+
   return (
     <View style={styles.container}>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
       <View>
-        <Text>{Eventname}</Text>
+        <Text style={styles.header}>{Eventname}</Text>
+        <Text style={styles.topic}>เนชั่นที่ใช้ในการแข่งขัน:</Text>
       </View>
-      <Text>{EventID}</Text>
     </View>
   );
 };
@@ -54,8 +56,17 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 600,
     height: 600,
-    right: -300,
-    bottom: -100,
+    right: -200,
+    bottom: -200,
     opacity: 0.3,
   },
+  header: {
+    marginTop: 20,
+    fontWeight: "bold",
+    marginBottom: 30,
+    fontSize: 30
+  },
+  topic: {
+    fontSize: 20
+  }
 });

@@ -24,11 +24,6 @@ import {
   Image,
   FlatList,
 } from "react-native";
-import {
-  ALERT_TYPE,
-  AlertNotificationRoot,
-  Dialog,
-} from "react-native-alert-notification";
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
