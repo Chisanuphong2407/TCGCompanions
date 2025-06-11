@@ -155,10 +155,36 @@ app.post("/api/edetails", async (req, res) => {
       "SELECT event.Status, event.Fighter,event.Condition,event.Rule,event.Time,event.Amount,DATE_FORMAT(event.CloseDate,'%d-%m-%Y')  AS CloseDate,event.MoreDetail,event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID WHERE event.EventID = ?",
       [req.body.EventID]
     );
-    console.log(details);
+
     return res.json(details);
   } catch (error) {
     console.log(error);
+  }
+});
+
+app.post("/api/contestants", async (req, res) => {
+  try {
+    const fightertable = req.body.fightertable;
+    const username = req.body.username;
+    if (username) {
+      const [contestants] = await conn.query(
+        "SELECT * FROM `contestants` WHERE FighterTable = ? AND UserName = ?",
+        [fightertable,username]
+      );
+      if(contestants.length > 0){
+        console.log("server",true)
+        return res.status(200).json(true);
+      }
+    } else{
+      
+    }
+      const [contestants] = await conn.query(
+        "SELECT * FROM `contestants` WHERE FighterTable = ?",
+        [fightertable]
+      );
+      return res.status(200).json(contestants);
+  } catch (error) {
+    return res.status(404);
   }
 });
 
@@ -369,27 +395,42 @@ app.put("/api/editevent", async (req, res) => {
   }
 });
 
-app.post("/api/apply",async (req,res) => {
+app.post("/api/apply", async (req, res) => {
   try {
+    const username = req.body.username;
     const architype = req.body.architype;
     const nation = req.body.nation;
-    const EventID = req.body.EventID;
+    // const EventID = req.body.EventID;
     const fighterTable = req.body.table;
+    console.log("apply");
+    let fighterID;
 
-    const [totalFighter] = await conn.query("SELECT * FROM `contestants` WHERE `Fightertable` = ?",[fighterTable]);
-    if(totalFighter.length === 0){
-      const fighterID = 1 ;
-      return res.status(201).json(fighterID);
-    }else{
-      const fighterID = totalFighter.length + 1
-      return res.status(201).json(fighterID);
+    const [totalFighter] = await conn.query(
+      "SELECT * FROM `contestants` WHERE `Fightertable` = ?",
+      [fighterTable]
+    );
+
+    if (totalFighter.length === 0) {
+      fighterID = 1;
+    } else {
+      fighterID = totalFighter.length + 1;
     }
-    // const result = await conn.query("INSERT INTO `contestants`(`Fighter`, `FighterID`, `UserName`, `UserID`, `Nation`, `Archtype`) VALUES (?,?,?,?,?,?)",[
-    //   fighterTable,
 
-    // ]);
+    const [userID] = await conn.query(
+      "SELECT `UserID` FROM `user` WHERE UserName = ?",
+      [username]
+    );
+
+    // return res.json(userID[0].UserID);
+    await conn.query(
+      "INSERT INTO `contestants`(`FighterTable`, `FighterID`, `UserName`, `UserID`, `Nation`, `Archtype`) VALUES (?,?,?,?,?,?)",
+      [fighterTable, fighterID, username, userID[0].UserID, nation, architype]
+    );
+
+    return res.status(201).send({ message: "สมัครสำเร็จ" });
   } catch (error) {
-    
+    console.log(error);
+    return res.status(404).json(error);
   }
 });
 

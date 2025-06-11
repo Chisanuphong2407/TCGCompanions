@@ -21,7 +21,8 @@ import { IP } from "../App";
 export const apply = ({ navigation, route }) => {
   const EventID = route.params.ID;
   const Eventname = route.params.eventName;
-  const table = route.params.table
+  const table = route.params.table;
+  const username = route.params.account;
   const [selectNation, setSelectnation] = useState();
   const [architype, setArchitype] = useState();
 
@@ -72,19 +73,40 @@ export const apply = ({ navigation, route }) => {
     }
   };
 
-  const handleSubmit = () => {
-    Alert.alert(
-      "สมัครสำเร็จ",
-      "ท่านสามารถตรวจสอบตารางการแข่งขันได้ที่ กิจกรรมของฉัน > กิจกรรมที่ท่านสมัคร > ตารางการแข่งขัน",
-      [
-        {
-          text: "ตกลง",
-          onPress: () => {
-            navigation.navigate("Eventdetails", EventID);
+  const handleSubmit = async () => {
+    const result = await fetch(IP + "/api/apply", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        EventID: EventID,
+        table: table,
+        nation: selectNation,
+        architype: architype,
+        username: username,
+      }),
+    });
+
+    const res = await result.json();
+
+    if (res.message === "สมัครสำเร็จ") {
+      Alert.alert(
+        "สมัครสำเร็จ",
+        "ท่านสามารถตรวจสอบตารางการแข่งขันได้ที่ กิจกรรมของฉัน > กิจกรรมที่ท่านสมัคร > ตารางการแข่งขัน",
+        [
+          {
+            text: "ตกลง",
+            onPress: () => {
+              navigation.navigate("Eventdetails", EventID);
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    }else{
+      Alert.alert("สมัครไม่สำเร็จ",String(res));
+    }
+
     console.log(architype, " ", selectNation);
   };
 

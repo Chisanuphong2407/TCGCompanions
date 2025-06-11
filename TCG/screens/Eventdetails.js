@@ -38,9 +38,29 @@ export const Eventdetails = ({ navigation, route }) => {
   const [closedate, setClosedate] = useState();
   const [table,setTable] = useState();
 
+  const [isContestant,setIscontestant] = useState(false);
+
+  const contestantCheck = async() => {
+    try {
+      const check = await fetch(IP + "/api/contestants", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fightertable: table,
+          username: account
+        })
+      });
+      const resultCheck = await check.json();
+      console.log(resultCheck);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const fetchDetail = async () => {
     try {
-      // console.log(item[0] && item[0].Status);
       if (item[0] && item[0].Status === 0) {
         setStatus("เปิดรับสมัคร");
         setStatusstyle(styles.status0);
@@ -102,6 +122,7 @@ export const Eventdetails = ({ navigation, route }) => {
 
   useEffect(() => {
     fetchDetail();
+    contestantCheck();
   }, [isLoading]);
 
   useEffect(() => {
@@ -212,7 +233,7 @@ export const Eventdetails = ({ navigation, route }) => {
         <View style={styles.apply}>
           <TouchableOpacity onPress={() => {
             console.log(ID);
-            navigation.navigate("apply",{ID,eventName,table});
+            navigation.navigate("apply",{ID,eventName,table,account});
             }}>
             <Text style={styles.applyText}>สมัคร</Text>
           </TouchableOpacity>
