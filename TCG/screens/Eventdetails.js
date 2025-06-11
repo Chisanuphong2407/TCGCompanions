@@ -36,6 +36,7 @@ export const Eventdetails = ({ navigation, route }) => {
   const [address, setAddress] = useState();
   const [moredetail, setMoredetail] = useState();
   const [closedate, setClosedate] = useState();
+  const [table,setTable] = useState();
 
   const fetchDetail = async () => {
     try {
@@ -69,6 +70,7 @@ export const Eventdetails = ({ navigation, route }) => {
       setAddress(item[0] && item[0].Address);
       setMoredetail(item[0] && item[0].MoreDetail);
       setClosedate(item[0] && item[0].CloseDate);
+      setTable(item[0] && item[0].Fighter);
     } catch (error) {
       console.log(error);
     }
@@ -210,7 +212,7 @@ export const Eventdetails = ({ navigation, route }) => {
         <View style={styles.apply}>
           <TouchableOpacity onPress={() => {
             console.log(ID);
-            navigation.navigate("apply",{ID,eventName});
+            navigation.navigate("apply",{ID,eventName,table});
             }}>
             <Text style={styles.applyText}>สมัคร</Text>
           </TouchableOpacity>

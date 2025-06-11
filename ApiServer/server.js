@@ -3,7 +3,7 @@ const cors = require("cors");
 const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
+// const crypto = require("crypto");/
 
 //Profile ไว้ query register
 const conn = mysql
@@ -366,6 +366,30 @@ app.put("/api/editevent", async (req, res) => {
     return res.status(201).json(update);
   } catch (error) {
     return res.json(error);
+  }
+});
+
+app.post("/api/apply",async (req,res) => {
+  try {
+    const architype = req.body.architype;
+    const nation = req.body.nation;
+    const EventID = req.body.EventID;
+    const fighterTable = req.body.table;
+
+    const [totalFighter] = await conn.query("SELECT * FROM `contestants` WHERE `Fightertable` = ?",[fighterTable]);
+    if(totalFighter.length === 0){
+      const fighterID = 1 ;
+      return res.status(201).json(fighterID);
+    }else{
+      const fighterID = totalFighter.length + 1
+      return res.status(201).json(fighterID);
+    }
+    // const result = await conn.query("INSERT INTO `contestants`(`Fighter`, `FighterID`, `UserName`, `UserID`, `Nation`, `Archtype`) VALUES (?,?,?,?,?,?)",[
+    //   fighterTable,
+
+    // ]);
+  } catch (error) {
+    
   }
 });
 

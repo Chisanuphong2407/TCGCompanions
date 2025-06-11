@@ -21,6 +21,7 @@ import { IP } from "../App";
 export const apply = ({ navigation, route }) => {
   const EventID = route.params.ID;
   const Eventname = route.params.eventName;
+  const table = route.params.table
   const [selectNation, setSelectnation] = useState();
   const [architype, setArchitype] = useState();
 
