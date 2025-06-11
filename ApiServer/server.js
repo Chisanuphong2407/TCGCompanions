@@ -148,6 +148,23 @@ app.get("/api/fetchcreateevent/:owner", async (req, res) => {
   }
 });
 
+app.get("/api/fetchmyevent/:owner", async (req, res) => {
+  try {
+    const owner = req.params.owner;
+    console.log(owner);
+    const [ID] = await conn.query("SELECT `UserID` FROM `user` WHERE UserName = ?",[owner]);
+
+    const [result] = await conn.query(
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event` INNER JOIN contestants ON contestants.FighterTable = EVENT.Fighter RIGHT JOIN user ON user.UserID = contestants.UserID WHERE contestants.UserID = ?",
+      [ID[0].UserID]
+    );
+    console.log(result);
+    return res.status(201).json(result);
+  } catch (error) {
+    return res.json(error);
+  }
+});
+
 app.post("/api/edetails", async (req, res) => {
   try {
     console.log("start");

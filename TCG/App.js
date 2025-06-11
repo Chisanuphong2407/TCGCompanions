@@ -126,6 +126,24 @@ const Home = ({ navigation }) => {
     } catch (error) {}
   };
 
+  const fetchMyEvent = async () => {
+    try {
+      const vef = await AsyncStorage.getItem("@vef");
+      console.log("vef", vef);
+      const myfetch = await fetch(IP + "/api/fetchmyevent/" + vef, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const mydata = await myfetch.json();
+      // console.log(Cdata.length);
+      setEvent(mydata);
+      setIsloading(false);
+      console.log(mydata);
+    } catch (error) {}
+  };
+
   const onSearch = async () => {
     try {
       // console.log(search);
@@ -198,6 +216,8 @@ const Home = ({ navigation }) => {
       fetchEvent();
     } else if (cMenu === styles.Menu) {
       fetchCEvent();
+    } else if (myMenu === styles.Menu) {
+      fetchMyEvent();
     }
   }, [isLoading]);
 
@@ -273,7 +293,13 @@ const Home = ({ navigation }) => {
         >
           <Text style={pMenu}>กิจกรรมทั่วไป</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={setMy} disabled={ismyMenu}>
+        <TouchableOpacity
+          onPress={() => {
+            setMy();
+            fetchMyEvent();
+          }}
+          disabled={ismyMenu}
+        >
           <Text style={myMenu}>กิจกรรมของฉัน</Text>
         </TouchableOpacity>
         <TouchableOpacity
