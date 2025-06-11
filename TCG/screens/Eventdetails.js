@@ -36,12 +36,13 @@ export const Eventdetails = ({ navigation, route }) => {
   const [address, setAddress] = useState();
   const [moredetail, setMoredetail] = useState();
   const [closedate, setClosedate] = useState();
-  const [table,setTable] = useState();
+  const [table, setTable] = useState();
 
-  const [isContestant,setIscontestant] = useState(false);
+  const [isContestant, setIscontestant] = useState(false);
 
-  const contestantCheck = async() => {
+  const contestantCheck = async () => {
     try {
+      // console.log(table);
       const check = await fetch(IP + "/api/contestants", {
         method: "POST",
         headers: {
@@ -49,15 +50,19 @@ export const Eventdetails = ({ navigation, route }) => {
         },
         body: JSON.stringify({
           fightertable: table,
-          username: account
-        })
+          username: account,
+        }),
       });
       const resultCheck = await check.json();
-      console.log(resultCheck);
+      console.log('check',resultCheck.message === "สมัครแล้ว");
+      if (resultCheck.message == "สมัครแล้ว") {
+        setIscontestant(true);
+      }
+      // console.log(isContestant);
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const fetchDetail = async () => {
     try {
@@ -80,7 +85,7 @@ export const Eventdetails = ({ navigation, route }) => {
       const responseData = await data.json();
       setItem(responseData);
       const vef = await AsyncStorage.getItem("@vef");
-      vef ? setAccount(vef.trim()) : (setAccount(null));
+      vef ? setAccount(vef.trim()) : setAccount(null);
       setIsloading(false);
       setEventName(item[0] && item[0].EventName);
       setCondition(item[0] && item[0].Condition);
@@ -122,8 +127,11 @@ export const Eventdetails = ({ navigation, route }) => {
 
   useEffect(() => {
     fetchDetail();
-    contestantCheck();
   }, [isLoading]);
+
+  useEffect(() => {
+    contestantCheck();
+  }, [table]);
 
   useEffect(() => {
     availableMenu();
@@ -229,12 +237,14 @@ export const Eventdetails = ({ navigation, route }) => {
           <Text>เริ่มการแข่งขัน</Text>
         </Pressable>
       )}
-      {status === "เปิดรับสมัคร" && (account !== null) && !isOwner && (
+      {status === "เปิดรับสมัคร" && account !== null && !isOwner && !isContestant && (
         <View style={styles.apply}>
-          <TouchableOpacity onPress={() => {
-            console.log(ID);
-            navigation.navigate("apply",{ID,eventName,table,account});
-            }}>
+          <TouchableOpacity
+            onPress={() => {
+              console.log(ID);
+              navigation.navigate("apply", { ID, eventName, table, account });
+            }}
+          >
             <Text style={styles.applyText}>สมัคร</Text>
           </TouchableOpacity>
         </View>
@@ -317,10 +327,10 @@ export const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 50,
-    minWidth: 100
+    minWidth: 100,
   },
   applyText: {
-    color: 'white',
-    alignSelf: 'center'
+    color: "white",
+    alignSelf: "center",
   },
 });

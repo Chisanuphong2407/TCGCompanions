@@ -166,17 +166,15 @@ app.post("/api/contestants", async (req, res) => {
   try {
     const fightertable = req.body.fightertable;
     const username = req.body.username;
+    console.log(fightertable);
     if (username) {
       const [contestants] = await conn.query(
         "SELECT * FROM `contestants` WHERE FighterTable = ? AND UserName = ?",
         [fightertable,username]
       );
       if(contestants.length > 0){
-        console.log("server",true)
-        return res.status(200).json(true);
+        return res.status(200).json({message: "สมัครแล้ว"});
       }
-    } else{
-      
     }
       const [contestants] = await conn.query(
         "SELECT * FROM `contestants` WHERE FighterTable = ?",
