@@ -28,6 +28,7 @@ app.use(express.json());
 
 // };
 
+//สมัคร
 app.post("/api/register", async (req, res) => {
   try {
     console.log("Start");
@@ -64,6 +65,7 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
+//เข้าสู่ระบบ
 app.post("/api/login", async (req, res) => {
   //สร้าง token
   const genToken = (payload) => {
@@ -107,6 +109,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+//authorize
 app.get("/api/profile/", async (req, res, next) => {
   try {
     const authHeader = await req.headers["authorization"];
@@ -120,6 +123,7 @@ app.get("/api/profile/", async (req, res, next) => {
   }
 });
 
+//fetch กิจกรรมทั่วไป
 app.get("/api/events", async (req, res) => {
   try {
     // console.log("Event");
@@ -133,6 +137,7 @@ app.get("/api/events", async (req, res) => {
   }
 });
 
+//fetch กิจกรรมที่สร้าง
 app.get("/api/fetchcreateevent/:owner", async (req, res) => {
   try {
     const owner = req.params.owner;
@@ -148,14 +153,14 @@ app.get("/api/fetchcreateevent/:owner", async (req, res) => {
   }
 });
 
-app.get("/api/fetchmyevent/:owner", async (req, res) => {
+//fetch กิจกรรมของฉัน
+app.get("/api/fetchmyevent/:contestant", async (req, res) => {
   try {
-    const owner = req.params.owner;
-    console.log(owner);
-    const [ID] = await conn.query("SELECT `UserID` FROM `user` WHERE UserName = ?",[owner]);
+    const contestant = req.params.contestant;
+    const [ID] = await conn.query("SELECT `UserID` FROM `user` WHERE UserName = ?",[contestant]);
 
     const [result] = await conn.query(
-      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event` INNER JOIN contestants ON contestants.FighterTable = EVENT.Fighter RIGHT JOIN user ON user.UserID = contestants.UserID WHERE contestants.UserID = ?",
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fighter INNER JOIN  user ON user.UserID = event.UserID WHERE contestants.UserID = ?",
       [ID[0].UserID]
     );
     console.log(result);
@@ -165,6 +170,7 @@ app.get("/api/fetchmyevent/:owner", async (req, res) => {
   }
 });
 
+//ข้อมูลกิจกรรม
 app.post("/api/edetails", async (req, res) => {
   try {
     console.log("start");
@@ -179,6 +185,7 @@ app.post("/api/edetails", async (req, res) => {
   }
 });
 
+//เช็คว่าเป็นผู้เข้าแข่งขันหรือไม่
 app.post("/api/contestants", async (req, res) => {
   try {
     const fightertable = req.body.fightertable;
@@ -203,6 +210,7 @@ app.post("/api/contestants", async (req, res) => {
   }
 });
 
+//ค้นหากิจกรรม
 app.get("/api/search/:eventname", async (req, res) => {
   try {
     const name = req.params.eventname;
@@ -219,6 +227,7 @@ app.get("/api/search/:eventname", async (req, res) => {
   }
 });
 
+//get ข้อมูลบัญชี
 app.get("/api/getprofile/:accname", async (req, res) => {
   try {
     const pname = req.params.accname;
@@ -233,6 +242,7 @@ app.get("/api/getprofile/:accname", async (req, res) => {
   }
 });
 
+//update profile
 app.put("/api/updateprofile", async (req, res) => {
   try {
     console.log("Start");
@@ -268,6 +278,7 @@ app.put("/api/updateprofile", async (req, res) => {
   }
 });
 
+//เปลี่ยนรหัสผ่าน
 app.put("/api/changepass", async (req, res) => {
   try {
     console.log("change");
@@ -305,6 +316,7 @@ app.put("/api/changepass", async (req, res) => {
   }
 });
 
+//สร้างกิจกรรม
 app.post("/api/createevent", async (req, res) => {
   try {
     console.log("start create");
@@ -341,6 +353,7 @@ app.post("/api/createevent", async (req, res) => {
   }
 });
 
+//ลบกิจกรรม
 app.delete("/api/deleteEvent/:EventID", async (req, res) => {
   try {
     const ID = req.params.EventID;
@@ -381,6 +394,7 @@ app.delete("/api/deleteEvent/:EventID", async (req, res) => {
   }
 });
 
+//แก้ไขกิจกรรม
 app.put("/api/editevent", async (req, res) => {
   try {
     console.log("start edit");
@@ -410,6 +424,7 @@ app.put("/api/editevent", async (req, res) => {
   }
 });
 
+//สมัครแข่ง
 app.post("/api/apply", async (req, res) => {
   try {
     const username = req.body.username;
@@ -446,6 +461,26 @@ app.post("/api/apply", async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(404).json(error);
+  }
+});
+
+//สละสิทธิ์
+app.delete("/api/waive/table/:fightertable/userID/:username", async (req,res) => {
+  try {
+    const fightertable = req.params.fightertable;
+    const username = req.params.username;
+    console.log(fightertable,username);
+    const [waived] = await conn.query("DELETE FROM `contestants` WHERE `UserName` = ? AND `FighterTable` = ?",[username,fightertable]);
+
+    if(waived.affectedRows > 0){
+      console.log(waived);
+      return res.sendStatus(204)
+    }else{
+      return res.status(400).json({ message: "ไม่พบผู้ใช้หรือตารางที่ต้องการสละสิทธิ์" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json(error);
   }
 });
 

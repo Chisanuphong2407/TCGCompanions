@@ -30,9 +30,9 @@ import { Eventdetails } from "./screens/Eventdetails";
 import { MyProfile, RePassword } from "./screens/MyProfile";
 import { CreateEvent } from "./screens/CreateEvent";
 import { Editdetail } from "./screens/Editdetail";
-import { apply } from "./screens/apply";
+import { Apply } from "./screens/Apply";
 
-export const IP = "http://192.168.1.2:3000";
+export const IP = "http://192.168.1.5:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -114,7 +114,6 @@ const Home = ({ navigation }) => {
         },
       });
       const Cdata = await Cfetch.json();
-      // console.log(Cdata.length);
       if (Cdata.length > 0) {
         setIsCreate(false);
       } else {
@@ -416,7 +415,18 @@ const App = () => {
         <Stack.Screen
           name="Eventdetails"
           component={Eventdetails}
-          options={{ headerTitle: "" }}
+          options={({ navigation }) => ({
+            headerTitle: "",
+            headerLeft: () => {
+              return (
+                <TouchableOpacity onPress={() => {
+                  navigation.navigate("Home");
+                }}>
+                  <ArrowLeft/>
+                </TouchableOpacity>
+              )
+            }
+          })}
         />
         <Stack.Screen
           name="MyProfile"
@@ -470,9 +480,10 @@ const App = () => {
           options={{ headerTitle: "" }}
         />
         <Stack.Screen
-          name="apply"
-          component={apply}
-          options={{ headerTitle: "" }}
+          name="Apply"
+          component={Apply}
+          options={{ headerTitle: ""
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

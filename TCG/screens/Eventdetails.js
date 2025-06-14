@@ -15,7 +15,7 @@ import {
   Image,
   FlatList,
 } from "react-native";
-import { Trash2, Edit2, Users } from "react-native-feather";
+import { Trash2, Edit2, Users, Clock } from "react-native-feather";
 import { IP } from "../App";
 
 export const Eventdetails = ({ navigation, route }) => {
@@ -54,7 +54,6 @@ export const Eventdetails = ({ navigation, route }) => {
         }),
       });
       const resultCheck = await check.json();
-      console.log('check',resultCheck.message === "สมัครแล้ว");
       if (resultCheck.message == "สมัครแล้ว") {
         setIscontestant(true);
       }
@@ -125,6 +124,22 @@ export const Eventdetails = ({ navigation, route }) => {
     // console.log(result);
   };
 
+  const waive = async () => {
+    try {
+      await fetch(`${IP}/api/waive/table/${table}/userID/${account}`,{
+        method: "DELETE",
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      Alert.alert("สละสิทธิ์สำเร็จ","ท่านสามารถสมัครแข่งในกิจกรรมนี้ได้อีกครั้งหากยังไม่ปิดรับสมัคร")
+    } catch (error) {
+      console.log(error);
+      Alert.alert("สละสิทธิ์ไม่สำเร็จ","มีข้อผิดพลาดในการลบ");
+    }
+  };
+
   useEffect(() => {
     fetchDetail();
   }, [isLoading]);
@@ -154,7 +169,7 @@ export const Eventdetails = ({ navigation, route }) => {
                   },
                   {
                     text: "ตกลง",
-                    onPress: deleteEvent(),
+                    onPress: () => deleteEvent(),
                   },
                 ],
                 {
@@ -197,9 +212,27 @@ export const Eventdetails = ({ navigation, route }) => {
             </Pressable>
           </View>
         )}
+        {isContestant && !isOwner && (
+          <View style={styles.menu}>
+            <Pressable style={styles.menubox}>
+              <Clock color={"#176B87"} style={styles.menubut} />
+            </Pressable>
+            <Pressable style={styles.menubox}>
+              <Users color={"#176B87"} style={styles.menubut} />
+            </Pressable>
+          </View>
+        )}
       </View>
       <Text style={styles.Eventname}>{eventName}</Text>
-      <Text style={statusStyle}>{status}</Text>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Text style={statusStyle}>{status}</Text>
+        {isContestant && (
+          <TouchableOpacity style={styles.schedule}>
+            <Text style={styles.scheduleText}>ตารางการแข่งขัน</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
       <View style={styles.owner}>
         <Text style={styles.ownerName}>ผู้จัด:</Text>
         <Text style={styles.ownerName}>{owner}</Text>
@@ -237,15 +270,46 @@ export const Eventdetails = ({ navigation, route }) => {
           <Text>เริ่มการแข่งขัน</Text>
         </Pressable>
       )}
-      {status === "เปิดรับสมัคร" && account !== null && !isOwner && !isContestant && (
-        <View style={styles.apply}>
+      {status === "เปิดรับสมัคร" &&
+        account !== null &&
+        !isOwner &&
+        !isContestant && (
+          <View style={styles.apply}>
+            <TouchableOpacity
+              onPress={() => {
+                console.log(ID);
+                navigation.navigate("Apply", { ID, eventName, table, account });
+              }}
+            >
+              <Text style={styles.applyText}>สมัคร</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      {isContestant && (
+        <View style={styles.waive}>
           <TouchableOpacity
             onPress={() => {
-              console.log(ID);
-              navigation.navigate("apply", { ID, eventName, table, account });
+              console.log("สละสิทธิ์");
+              Alert.alert(
+                "ยืนยันการสละสิทธิ์",
+                "หลังยืนยัน ข้อมูลการสมัครของคุณจะถูกลบ",
+                [
+                  {
+                    text: "ยกเลิก",
+                    style: "cancel",
+                  },
+                  {
+                    text: "ตกลง",
+                    onPress: () => waive(),
+                  },
+                ],
+                {
+                  cancelable: true,
+                }
+              );
             }}
           >
-            <Text style={styles.applyText}>สมัคร</Text>
+            <Text style={styles.waiveText}>สละสิทธิ์</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -330,6 +394,30 @@ export const styles = StyleSheet.create({
     minWidth: 100,
   },
   applyText: {
+    color: "white",
+    alignSelf: "center",
+  },
+  schedule: {
+    maxWidth: 80,
+    minHeight: 30,
+    backgroundColor: "#176B87",
+    borderRadius: 5,
+  },
+  scheduleText: {
+    color: "white",
+    textAlign: "center",
+    fontSize: 16,
+    paddingVertical: 5,
+  },
+  waive: {
+    alignSelf: "flex-end",
+    backgroundColor: "#FF0004",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 50,
+    minWidth: 100,
+  },
+  waiveText: {
     color: "white",
     alignSelf: "center",
   },
