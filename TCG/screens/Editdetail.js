@@ -27,7 +27,8 @@ import {
 import { IP } from "../App";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-export const Editdetail = ({navigation,route}) => {
+export const Editdetail = ({ navigation, route }) => {
+  const [eventID,setEventID] = useState(route.params.eventID);
   const [Ename, setEname] = useState(route.params.eventName);
   const [condition, setCondition] = useState(route.params.condition);
   const [time, setTime] = useState(route.params.time);
@@ -37,7 +38,7 @@ export const Editdetail = ({navigation,route}) => {
   const [date, setDate] = useState(new Date()); //set Date
   const [showDatepicker, setShowDatepicker] = useState(false);
   const [selectText, setSelectText] = useState(route.params.closedate);
-  const [sendText,setSendtext] = useState();
+  const [sendText, setSendtext] = useState();
 
   // console.log(isNaN(amount));
   const minDate = new Date();
@@ -85,11 +86,11 @@ export const Editdetail = ({navigation,route}) => {
       if (!Ename || !condition || !time || !amount || !address) {
         Alert.alert("แก้ไขไม่สำเร็จ", "กรอกข้อมูลให้ครบถ้วน");
         return false;
-      }else if ( isNaN(time) || time < 1) {
-        Alert.alert('แก้ไขไม่สำเร็จ','โปรดกรอกเวลาการแข่งขันให้ถูกต้อง');
+      } else if (isNaN(time) || time < 1) {
+        Alert.alert("แก้ไขไม่สำเร็จ", "โปรดกรอกเวลาการแข่งขันให้ถูกต้อง");
         return false;
-      }else if ( isNaN(amount) || amount < 1) {
-        Alert.alert('แก้ไขไม่สำเร็จ','โปรดกรอกจำนวนที่เปิดรับให้ถูกต้อง');
+      } else if (isNaN(amount) || amount < 1) {
+        Alert.alert("แก้ไขไม่สำเร็จ", "โปรดกรอกจำนวนที่เปิดรับให้ถูกต้อง");
         return false;
       }
       const username = await AsyncStorage.getItem("@vef");
@@ -129,6 +130,31 @@ export const Editdetail = ({navigation,route}) => {
     } catch (error) {
       console.log(error);
       return error;
+    }
+  };
+
+  const closeEvent = async () => {
+    try {
+      const closeE = await fetch(IP+`/api/close/${eventID}`,{
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+      const result = await closeE.json();
+      // console.log(result.message);
+      if (result.message === "ปิดรับสมัครเสร็จสิ้น"){
+        Alert.alert(result.message,"ท่านสามารถเริ่มการแข่งขันได้ทันที",[
+          {
+            text: 'ok',
+            onPress: () => navigation.navigate("Eventdetails",eventID)
+          }
+        ])
+      }else{
+        Alert.alert(result.message,"กรุณาลองอีกครั้ง")
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -223,9 +249,14 @@ export const Editdetail = ({navigation,route}) => {
             )}
           </View>
         </View>
-        <TouchableOpacity onPress={alertedit}>
-          <Text style={styles.submit}>แก้ไขกิจกรรม</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: "row-reverse" ,justifyContent: 'space-around'}}>
+          <TouchableOpacity onPress={alertedit}>
+            <Text style={styles.submit}>แก้ไขกิจกรรม</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={closeEvent}>
+            <Text style={styles.close}>ปิดรับสมัคร</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -303,11 +334,17 @@ const styles = StyleSheet.create({
   submit: {
     backgroundColor: "#176B87",
     color: "white",
-    borderRadius: 30,
+    borderRadius: 10,
     padding: 15,
-    marginBottom: 10,
-    alignSelf: "center",
-    fontSize: 20,
-    fontWeight: "bold",
+    margin: 20,
+    fontSize: 16,
+  },
+  close: {
+    backgroundColor: "#FF0004",
+    color: "white",
+    borderRadius: 10,
+    padding: 15,
+    margin: 20,
+    fontSize: 16,
   },
 });

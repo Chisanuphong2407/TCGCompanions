@@ -484,6 +484,23 @@ app.delete("/api/waive/table/:fightertable/userID/:username", async (req,res) =>
   }
 });
 
+//ปิดรับวมัคร
+app.put("/api/close/:EventID",async (req,res) => {
+  try {
+    const EventID = req.params.EventID;
+    const [closeresult] = await conn.query("UPDATE `event` SET `Status`= 1 WHERE EventID = ?",[EventID]);
+    
+    if(closeresult.affectedRows > 0) {
+      return res.status(200).json({message: "ปิดรับสมัครเสร็จสิ้น"});
+    }else {
+      return res.status(404).json({message: "เกิดข้อผิดพลาดในการปิดรับสมัคร"});
+    }
+  } catch (error) {
+    console.log('error',error);
+    return res.status(404).json({message: "ปิดรับสมัครไม่สำเร็จ"})
+  }
+});
+
 app.listen(3000, function () {
   conn.query(
     "UPDATE `event` SET `Status` = 1 WHERE `CloseDate` <= CURRENT_DATE  "

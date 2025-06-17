@@ -126,17 +126,20 @@ export const Eventdetails = ({ navigation, route }) => {
 
   const waive = async () => {
     try {
-      await fetch(`${IP}/api/waive/table/${table}/userID/${account}`,{
+      await fetch(`${IP}/api/waive/table/${table}/userID/${account}`, {
         method: "DELETE",
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       });
 
-      Alert.alert("สละสิทธิ์สำเร็จ","ท่านสามารถสมัครแข่งในกิจกรรมนี้ได้อีกครั้งหากยังไม่ปิดรับสมัคร")
+      Alert.alert(
+        "สละสิทธิ์สำเร็จ",
+        "ท่านสามารถสมัครแข่งในกิจกรรมนี้ได้อีกครั้งหากยังไม่ปิดรับสมัคร"
+      );
     } catch (error) {
       console.log(error);
-      Alert.alert("สละสิทธิ์ไม่สำเร็จ","มีข้อผิดพลาดในการลบ");
+      Alert.alert("สละสิทธิ์ไม่สำเร็จ", "มีข้อผิดพลาดในการลบ");
     }
   };
 
@@ -156,38 +159,37 @@ export const Eventdetails = ({ navigation, route }) => {
     <ScrollView style={styles.container}>
       <View style={styles.menu}>
         {status === "เปิดรับสมัคร" && isOwner && (
-          <Pressable
-            onPress={() => {
-              console.log("delete");
-              Alert.alert(
-                "ยืนยันการลบกิจกรรม",
-                "หลังยืนยัน ข้อมูลผู้สมัครก่อนหน้าจะถูกลบไปด้วย",
-                [
-                  {
-                    text: "ยกเลิก",
-                    style: "cancel",
-                  },
-                  {
-                    text: "ตกลง",
-                    onPress: () => deleteEvent(),
-                  },
-                ],
-                {
-                  cancelable: true,
-                }
-              );
-            }}
-            style={styles.menubox}
-          >
-            <Trash2 color={"#C40424"} style={styles.menubut} />
-          </Pressable>
-        )}
-        {isOwner && (
           <View style={styles.menu}>
+            <Pressable
+              onPress={() => {
+                console.log("delete");
+                Alert.alert(
+                  "ยืนยันการลบกิจกรรม",
+                  "หลังยืนยัน ข้อมูลผู้สมัครก่อนหน้าจะถูกลบไปด้วย",
+                  [
+                    {
+                      text: "ยกเลิก",
+                      style: "cancel",
+                    },
+                    {
+                      text: "ตกลง",
+                      onPress: () => deleteEvent(),
+                    },
+                  ],
+                  {
+                    cancelable: true,
+                  }
+                );
+              }}
+              style={styles.menubox}
+            >
+              <Trash2 color={"#C40424"} style={styles.menubut} />
+            </Pressable>
             <Pressable
               onPress={() => {
                 console.log("edit");
                 navigation.navigate("Editdetail", {
+                  eventID: ID,
                   eventName: eventName,
                   condition: condition,
                   rule: rule,
@@ -202,6 +204,10 @@ export const Eventdetails = ({ navigation, route }) => {
             >
               <Edit2 color={"#176B87"} style={styles.menubut} />
             </Pressable>
+          </View>
+        )}
+        {isOwner && (
+          <View style={styles.menu}>
             <Pressable
               onPress={() => {
                 console.log("Fighter");
