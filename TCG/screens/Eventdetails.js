@@ -210,7 +210,7 @@ export const Eventdetails = ({ navigation, route }) => {
           <View style={styles.menu}>
             <Pressable
               onPress={() => {
-                console.log("Fighter");
+                 navigation.navigate("contestants",table)
               }}
               style={styles.menubox}
             >
@@ -272,9 +272,11 @@ export const Eventdetails = ({ navigation, route }) => {
         <Text style={styles.content}>{moredetail}</Text>
       </View>
       {status === "ปิดรับสมัคร" && isOwner && (
-        <Pressable>
-          <Text>เริ่มการแข่งขัน</Text>
-        </Pressable>
+        <View style={styles.eventBegin}>
+          <Pressable>
+            <Text style={{ color: "white" }}>เริ่มการแข่งขัน</Text>
+          </Pressable>
+        </View>
       )}
       {status === "เปิดรับสมัคร" &&
         account !== null &&
@@ -426,5 +428,13 @@ export const styles = StyleSheet.create({
   waiveText: {
     color: "white",
     alignSelf: "center",
+  },
+  eventBegin: {
+    alignSelf: "flex-end",
+    backgroundColor: "#176B87",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 50,
+    minWidth: 100,
   },
 });

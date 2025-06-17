@@ -31,6 +31,7 @@ import { MyProfile, RePassword } from "./screens/MyProfile";
 import { CreateEvent } from "./screens/CreateEvent";
 import { Editdetail } from "./screens/Editdetail";
 import { Apply } from "./screens/Apply";
+import { contestants } from "./screens/contestants";
 
 export const IP = "http://192.168.1.6:3000";
 
@@ -419,13 +420,15 @@ const App = () => {
             headerTitle: "",
             headerLeft: () => {
               return (
-                <TouchableOpacity onPress={() => {
-                  navigation.navigate("Home");
-                }}>
-                  <ArrowLeft/>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("Home");
+                  }}
+                >
+                  <ArrowLeft />
                 </TouchableOpacity>
-              )
-            }
+              );
+            },
           })}
         />
         <Stack.Screen
@@ -482,8 +485,12 @@ const App = () => {
         <Stack.Screen
           name="Apply"
           component={Apply}
-          options={{ headerTitle: ""
-          }}
+          options={{ headerTitle: "" }}
+        />
+        <Stack.Screen
+          name="contestants"
+          component={contestants}
+          options={{ headerTitle: "" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
