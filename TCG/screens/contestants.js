@@ -15,6 +15,7 @@ import {
   Image,
   FlatList,
 } from "react-native";
+import { DataTable } from "react-native-paper";
 import { Trash2, Edit2, Users, Clock } from "react-native-feather";
 import { IP } from "../App";
 
@@ -22,6 +23,7 @@ export const contestants = ({navigation,route}) => {
     const table = route.params;
 return(
     <SafeAreaView style={styles.container}>
+        <Text></Text>
         <Text>{table}</Text>
     </SafeAreaView>
 )
