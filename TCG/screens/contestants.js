@@ -19,15 +19,68 @@ import { DataTable } from "react-native-paper";
 import { Trash2, Edit2, Users, Clock } from "react-native-feather";
 import { IP } from "../App";
 
-export const contestants = ({navigation,route}) => {
-    const table = route.params;
-return(
+export const contestants = ({ navigation, route }) => {
+  const tableID = route.params.table;
+  const owner = route.params.owner;
+  console.log('owner',owner);
+  console.log('table',tableID);
+  const [fighter, setfighter] = useState([]);
+  const itemPerPage = 14;
+  const [page, setPage] = useState(0);
+  const [isLoading, setIsloading] = useState(true);
+  const [Totalpage,setTotalpage] = useState();
+  // Math.ceil(data.length / ITEMS_PER_PAGE);
+
+  // คำนวณรายการที่จะแสดงในหน้าปัจจุบัน
+  // const from = page * ITEMS_PER_PAGE;
+  // const to = Math.min((page + 1) * ITEMS_PER_PAGE, data.length);
+  const [displayedItems,setDisplayItems] = useState();
+  //data.slice(from, to);
+
+  const fetchData = async () => {
+    try {
+      console.log("start fetch")
+      const data = await fetch(`${IP}/api/fetchcontestants/${tableID}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+      setIsloading(false);
+      setfighter(data[0]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [isLoading]);
+
+  const Nextpage = () => {
+    if (page < Totalpage) {
+      setPage(page + 1);
+    }
+  };
+
+  const Previouspage = () => {
+    if (page > 0) {
+      setPage(page - 1);
+    }
+  };
+
+  return (
     <SafeAreaView style={styles.container}>
-        <Text></Text>
-        <Text>{table}</Text>
+      <View>
+        {/*header*/}
+        <View>
+          <Text>No.</Text>
+          <Text>{fighter}</Text>
+        </View>
+      </View>
     </SafeAreaView>
-)
-}
+  );
+};
 
 export const styles = StyleSheet.create({
   container: {
@@ -35,4 +88,4 @@ export const styles = StyleSheet.create({
     backgroundColor: "#F7FAFF",
     justifyContent: "center",
   },
-})
+});

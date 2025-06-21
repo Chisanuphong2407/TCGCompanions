@@ -29,7 +29,7 @@ import { IP } from "../App";
 export const MyProfile = ({ navigation, route }) => {
   const [isLoading, setIsloading] = useState(true);
   // const [profile, setProfile] = useState([]);
-  const [fname, setfName] = useState("");
+  const [fname, setfName] = useState(""); 
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -71,7 +71,7 @@ export const MyProfile = ({ navigation, route }) => {
         },
       ]);
       return;
-    } else {
+    } else{
       try {
         console.log("start");
         const response = await fetch(IP + "/api/updateprofile", {

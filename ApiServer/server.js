@@ -24,10 +24,6 @@ const secrKey = "hahaha";
 app.use(cors());
 app.use(express.json());
 
-// const authen = () => {
-
-// };
-
 //สมัคร
 app.post("/api/register", async (req, res) => {
   try {
@@ -214,13 +210,13 @@ app.post("/api/contestants", async (req, res) => {
 app.get("/api/search/:eventname", async (req, res) => {
   try {
     const name = req.params.eventname;
-    // console.log(name);
+    console.log(name);
     const [result] = await conn.query(
-      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID WHERE event.EventName = ?",
-      [name]
+      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID WHERE event.EventName LIKE ?",
+      [`%${name}%`]
     );
 
-    // console.log(result);
+    console.log('result',result);
     return res.status(200).json(result);
   } catch (error) {
     return res.status(400);
@@ -247,12 +243,13 @@ app.put("/api/updateprofile", async (req, res) => {
   try {
     console.log("Start");
     const [existuser] = await conn.query(
-      "SELECT * FROM `user` WHERE `UserName`= ? OR `Email` = ?",
-      [req.body.name, req.body.email]
+      "SELECT * FROM `user` WHERE (`UserName`= ? OR `Email` = ?) AND NOT UserID = ?",
+      [req.body.name, req.body.email,req.body.id]
     );
     // console.log(existuser[0].Email);
     console.log(req.body.email);
     console.log(existuser.length);
+
     if (existuser.length > 0) {
       const errormessage = "username หรือ email นี้มีผู้ใช้งานแล้ว";
       return res.status(409).json(errormessage);
@@ -498,6 +495,20 @@ app.put("/api/close/:EventID",async (req,res) => {
   } catch (error) {
     console.log('error',error);
     return res.status(404).json({message: "ปิดรับสมัครไม่สำเร็จ"})
+  }
+});
+
+//ข้อมูลผู้เข้าแข่งขัน
+app.get("/api/fetchcontestants/:table", async (req,res) => {
+  const tableID = req.params.table;
+  try {
+    const [data] = await conn.query(
+      "SELECT * FROM `contestants` WHERE `FighterTable` = ?",[tableID]
+    );
+    console.log('result',data)
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(404).json(error)
   }
 });
 
