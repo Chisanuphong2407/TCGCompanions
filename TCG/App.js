@@ -33,7 +33,7 @@ import { Editdetail } from "./screens/Editdetail";
 import { Apply } from "./screens/Apply";
 import { contestants } from "./screens/contestants";
 
-export const IP = "http://192.168.1.5:3000";
+export const IP = "http://192.168.1.3:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
