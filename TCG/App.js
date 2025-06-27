@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import io from 'socket.io-client';
 import {
   Search,
   X,
@@ -33,7 +34,7 @@ import { Editdetail } from "./screens/Editdetail";
 import { Apply } from "./screens/Apply";
 import { contestants } from "./screens/contestants";
 
-export const IP = "http://192.168.1.3:3000";
+export const IP = "http://192.168.1.14:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");

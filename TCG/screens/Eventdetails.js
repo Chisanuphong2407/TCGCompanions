@@ -210,7 +210,7 @@ export const Eventdetails = ({ navigation, route }) => {
           <View style={styles.menu}>
             <Pressable
               onPress={() => {
-                navigation.navigate("contestants",{table,owner})
+                navigation.navigate("contestants", { table, owner });
               }}
               style={styles.menubox}
             >
@@ -223,11 +223,12 @@ export const Eventdetails = ({ navigation, route }) => {
             <Pressable style={styles.menubox}>
               <Clock color={"#176B87"} style={styles.menubut} />
             </Pressable>
-            <Pressable style={styles.menubox}
-            onPress={() => {
-                navigation.navigate("contestants",{table,owner})
+            <Pressable
+              style={styles.menubox}
+              onPress={() => {
+                navigation.navigate("contestants", { table, owner });
               }}
-              >
+            >
               <Users color={"#176B87"} style={styles.menubut} />
             </Pressable>
           </View>
