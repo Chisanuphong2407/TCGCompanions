@@ -27,23 +27,24 @@ import {
 import { IP } from "../App";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-export const CreateEvent = ({navigation}) => {
+export const CreateEvent = ({ navigation }) => {
   const [Ename, setEname] = useState("");
   const [condition, setCondition] = useState("");
   const [time, setTime] = useState();
   const [amount, setAmount] = useState("");
   const [address, setAddress] = useState("");
   const [moredetail, setMoredetail] = useState("");
-  const [date, setDate] = useState(new Date()); //set Date
   const [showDatepicker, setShowDatepicker] = useState(false);
   const [selectText, setSelectText] = useState("เลือกวันปิดรับสมัคร");
+  const [date, setDate] = useState(new Date());
 
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 1);
+  date.setDate(minDate.getDate());
   //onchange handle
-  const onChange = (event, selectedDate) => {
+  const onChange = (event, selectDate) => {
     console.log("re rendered");
-    const currentDate = selectedDate || date;
+    const currentDate = selectDate || date;
     setDate(currentDate);
 
     const format = currentDate.toLocaleDateString("en-US", {
@@ -52,7 +53,7 @@ export const CreateEvent = ({navigation}) => {
       day: "2-digit",
     });
     const [month, day, year] = format.split("/");
-    setSelectText(`${year}-${month}-${day}`);
+    setSelectText(`${day}-${month}-${year}`);
     setShowDatepicker(false);
   };
 
@@ -97,12 +98,11 @@ export const CreateEvent = ({navigation}) => {
           time: time,
           amount: amount,
           address: address,
-          closedate: selectText,
+          closedate: date,
           moredetail: moredetail,
         }),
       });
       const result = await submitevent.json();
-      console.log(result[0]);
       if (result[0].affectedRows === 1) {
         Alert.alert(
           "สร้างสำเร็จ",
@@ -160,6 +160,7 @@ export const CreateEvent = ({navigation}) => {
               placeholder="เวลา"
               value={time}
               onChangeText={setTime}
+              keyboardType="numeric"
             />
           </View>
           <View>
@@ -169,6 +170,7 @@ export const CreateEvent = ({navigation}) => {
               placeholder="จำนวนที่เปิดรับ"
               value={amount}
               onChangeText={setAmount}
+              keyboardType="numeric"
             />
           </View>
           <View>
@@ -267,10 +269,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "#86B6F6",
     backgroundColor: "#E1E7EF",
+    paddingLeft: 10,
     minHeight: 45,
     marginBottom: 20,
     maxWidth: 70,
-    textAlign: "center",
+    minWidth: 60,
+    textAlignVertical: "center",
     fontSize: 15,
   },
   inputBoxswiss: {

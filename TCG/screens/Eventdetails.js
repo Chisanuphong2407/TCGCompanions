@@ -114,14 +114,14 @@ export const Eventdetails = ({ navigation, route }) => {
 
   const deleteEvent = async () => {
     console.log("start del");
-    // const deleteEvent = await fetch(IP + "/api/deleteEvent/",ID,{
-    //   method: "GET",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    // });
-    // const result = deleteEvent;
-    // console.log(result);
+    const deleteEvent = await fetch(IP + "/api/deleteEvent/"+ ID,{
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const result = await deleteEvent.json();
+    console.log(result);
   };
 
   const waive = async () => {
@@ -173,7 +173,10 @@ export const Eventdetails = ({ navigation, route }) => {
                     },
                     {
                       text: "ตกลง",
-                      onPress: () => deleteEvent(),
+                      onPress: () => {
+                        deleteEvent()
+                        navigation.navigate("Home");
+                      }
                     },
                   ],
                   {

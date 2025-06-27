@@ -1,8 +1,10 @@
 const express = require("express");
+import { contestants } from './../TCG/screens/contestants';
 const cors = require("cors");
 const mysql = require("mysql2");
 const socketIo = require("socket.io");
-// const bcrypt = require("bcrypt");
+const http = require('http');
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 // const crypto = require("crypto");/
 
@@ -24,7 +26,7 @@ const secrKey = "hahaha";
 // Middleware
 app.use(cors());
 app.use(express.json());
-
+const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: "*",
@@ -34,8 +36,8 @@ const io = socketIo(server, {
 
 io.on("Connection", async (socket) => {
   console.log(`Connected:${socket.id}`);
-
-  socket.emit("refreshing",true);
+  const refresh = true;
+  socket.emit("refreshing",refresh);
 
   socket.on("Disconnect"),() => {
     console.log("Disconnected");
@@ -126,11 +128,11 @@ app.post("/api/login", async (req, res) => {
 //authorize
 app.get("/api/profile/", async (req, res, next) => {
   try {
-    const authHeader = await req.headers["authorization"];
+    const authHeader = req.headers["authorization"];
     // console.log({ token: authHeader });
     const authToken = authHeader.split(" ")[1];
     // console.log(authToken);
-    const user = await jwt.verify(authToken, secrKey);
+    const user = jwt.verify(authToken, secrKey);
     return res.json(user.username);
   } catch (error) {
     return res.json(error);
@@ -227,7 +229,7 @@ app.post("/api/contestants", async (req, res) => {
   }
 });
 
-//ค้นหากิจกรรม
+//ค้นหากิจกรรมทั่วไป
 app.get("/api/search/:eventname", async (req, res) => {
   try {
     const name = req.params.eventname;
@@ -235,6 +237,28 @@ app.get("/api/search/:eventname", async (req, res) => {
     const [result] = await conn.query(
       "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID WHERE event.EventName LIKE ?",
       [`%${name}%`]
+    );
+
+    console.log("result", result);
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(400);
+  }
+});
+
+//ค้นหากิจกรรมของฉัน
+app.get("/api/Mysearch/:eventname/:contestant", async (req, res) => {
+  try {
+    const name = req.params.eventname;
+    const contestant = req.params.contestant;
+    const [ID] = await conn.query(
+      "SELECT `UserID` FROM `user` WHERE UserName = ?",
+      [contestant]
+    );
+
+    const [result] = await conn.query(
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fighter INNER JOIN  user ON user.UserID = event.UserID WHERE contestants.UserID = ? AND event.EventName LIKE",
+      [ID[0].UserID,`%${name}%`]
     );
 
     console.log("result", result);
@@ -365,7 +389,7 @@ app.post("/api/createevent", async (req, res) => {
         req.body.moredetail,
       ]
     );
-    
+    io.emit("refreshing",true);
     return res.status(201).json(create);
   } catch (error) {
     return res.json(error);
@@ -404,9 +428,10 @@ app.delete("/api/deleteEvent/:EventID", async (req, res) => {
 
     if (
       delEvent.affectedRows > 0 &&
-      delTable.affectedRows > 0 &&
-      delContestants.affectedRows > 0
+      delTable.affectedRows > 0
     ) {
+      console.log("deleted");
+      io.emit("refreshing",true);
       return res.status(204).send("ลบสำเร็จ");
     } else {
       return res.status(500).json({
@@ -445,6 +470,7 @@ app.put("/api/editevent", async (req, res) => {
         UserID,
       ]
     );
+    io.emit("refreshing",true);
     return res.status(201).json(update);
   } catch (error) {
     return res.json(error);
@@ -529,6 +555,7 @@ app.put("/api/close/:EventID", async (req, res) => {
     );
 
     if (closeresult.affectedRows > 0) {
+      io.emit("refreshing",true);
       return res.status(200).json({ message: "ปิดรับสมัครเสร็จสิ้น" });
     } else {
       return res
@@ -556,7 +583,7 @@ app.get("/api/fetchcontestants/:table", async (req, res) => {
   }
 });
 
-app.listen(3000, function () {
+server.listen(3000, function () {
   conn.query(
     "UPDATE `event` SET `Status` = 1 WHERE `CloseDate` <= CURRENT_DATE  "
   );

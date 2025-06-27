@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import io from 'socket.io-client';
+import io from "socket.io-client";
 import {
   Search,
   X,
@@ -150,19 +150,34 @@ const Home = ({ navigation }) => {
       // console.log(search);
       if (!search) {
         Alert.alert(null, "กรอกข้อมูลให้ครบถ้วน");
-        return false
+        return false;
       }
-      console.log(search)
-      const event = await fetch(IP + "/api/search/" + search, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      console.log(event);
-      const result = await event.json();
-      console.log(result);
-      setEvent(result);
+      console.log(search);
+      if (pMenu === styles.Menu) {
+        const event = await fetch(IP + "/api/search/" + search, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(event);
+        const result = await event.json();
+        console.log(result);
+        setEvent(result);
+      } else if (cMenu === styles.Menu) {
+        fetchCEvent();
+      } else if (myMenu === styles.Menu) {
+                const event = await fetch(IP + "/api/Mysearch/" + search + user, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(event);
+        const result = await event.json();
+        console.log(result);
+        setEvent(result);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -223,6 +238,34 @@ const Home = ({ navigation }) => {
       fetchMyEvent();
     }
   }, [isLoading]);
+
+  //refresh หน้าเมื่ออัพเดตข้อมูล
+  useEffect(() => {
+    const socket = io(IP);
+
+    socket.on("connect", () => {
+      console.log("Connected to server");
+    });
+
+    socket.on("refreshing", (refresh) => {
+      console.log("Received real-time event update:", refresh);
+      setIsloading(refresh);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Disconnected from server");
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("WebSocket connection error:", err.message);
+      console.error("Error description:", err.description); // อาจมีข้อมูลเพิ่มเติม
+      console.error("Error context:", err.context); // อาจมีข้อมูลเพิ่มเติม
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
