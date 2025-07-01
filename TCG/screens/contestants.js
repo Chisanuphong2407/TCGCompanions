@@ -89,10 +89,16 @@ export const contestants = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.menu}>
-        <TouchableOpacity onPress={() => navigation.navigate("Eventdetails",EventID)}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Eventdetails", EventID)}
+        >
           <X style={styles.icon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("AddFighter",{tableID,Eventname,owner})}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("AddFighter", { tableID, Eventname, owner })
+          }
+        >
           <UserPlus style={styles.icon} />
         </TouchableOpacity>
       </View>
@@ -123,25 +129,28 @@ export const contestants = ({ navigation, route }) => {
           {displayedItems.length > 0 &&
             account &&
             displayedItems.map((item) => {
+              const FighterID = item.FighterID;
               return (
-                <DataTable.Row key={item.FighterID}>
-                  <DataTable.Cell style={styles.tableCellNo}>
-                    {item.FighterID}
-                  </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableCellName}>
-                    {item.UserName}
-                  </DataTable.Cell>
-                  {isOwner && (
-                    <DataTable.Cell style={styles.tableCellNation}>
-                      {item.Nation}
+                <Pressable onPress={() => navigation.navigate("ContestantDetail",{EventID,Eventname,tableID,owner,FighterID})}>
+                  <DataTable.Row key={item.FighterID}>
+                    <DataTable.Cell style={styles.tableCellNo}>
+                      {item.FighterID}
                     </DataTable.Cell>
-                  )}
-                  {isOwner && (
-                    <DataTable.Cell style={styles.tableCellArchtype}>
-                      {item.Archtype}
+                    <DataTable.Cell style={styles.tableCellName}>
+                      {item.UserName}
                     </DataTable.Cell>
-                  )}
-                </DataTable.Row>
+                    {isOwner && (
+                      <DataTable.Cell style={styles.tableCellNation}>
+                        {item.Nation}
+                      </DataTable.Cell>
+                    )}
+                    {isOwner && (
+                      <DataTable.Cell style={styles.tableCellArchtype}>
+                        {item.Archtype}
+                      </DataTable.Cell>
+                    )}
+                  </DataTable.Row>
+                </Pressable>
               );
             })}
         </DataTable>
