@@ -20,6 +20,7 @@ import { UserPlus, X } from "react-native-feather";
 import { IP } from "../App";
 
 export const contestants = ({ navigation, route }) => {
+  const Eventname = route.params.eventName;
   const tableID = route.params.table;
   const owner = route.params.owner.trim();
   const [account, setAccount] = useState("");
@@ -90,7 +91,7 @@ export const contestants = ({ navigation, route }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <X style={styles.icon} />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("AddFighter",{tableID,Eventname})}>
           <UserPlus style={styles.icon} />
         </TouchableOpacity>
       </View>

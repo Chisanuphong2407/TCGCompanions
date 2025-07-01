@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
 const socketIo = require("socket.io");
-const http = require('http');
+const http = require("http");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 // const crypto = require("crypto");/
@@ -36,11 +36,12 @@ const io = socketIo(server, {
 io.on("Connection", async (socket) => {
   console.log(`Connected:${socket.id}`);
   const refresh = true;
-  socket.emit("refreshing",refresh);
+  socket.emit("refreshing", refresh);
 
-  socket.on("Disconnect"),() => {
-    console.log("Disconnected");
-  }
+  socket.on("Disconnect"),
+    () => {
+      console.log("Disconnected");
+    };
 });
 
 //สมัคร
@@ -258,7 +259,7 @@ app.get("/api/Mysearch/:eventname/:contestant", async (req, res) => {
 
     const [result] = await conn.query(
       "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fighter INNER JOIN  user ON user.UserID = event.UserID WHERE contestants.UserID = ? AND event.EventName LIKE ?",
-      [ID[0].UserID,`%${name}%`]
+      [ID[0].UserID, `%${name}%`]
     );
 
     console.log("result", result);
@@ -389,7 +390,7 @@ app.post("/api/createevent", async (req, res) => {
         req.body.moredetail,
       ]
     );
-    io.emit("refreshing",true);
+    io.emit("refreshing", true);
     return res.status(201).json(create);
   } catch (error) {
     return res.json(error);
@@ -426,12 +427,9 @@ app.delete("/api/deleteEvent/:EventID", async (req, res) => {
       [table]
     );
 
-    if (
-      delEvent.affectedRows > 0 &&
-      delTable.affectedRows > 0
-    ) {
+    if (delEvent.affectedRows > 0 && delTable.affectedRows > 0) {
       console.log("deleted");
-      io.emit("refreshing",true);
+      io.emit("refreshing", true);
       return res.status(204).send("ลบสำเร็จ");
     } else {
       return res.status(500).json({
@@ -470,7 +468,7 @@ app.put("/api/editevent", async (req, res) => {
         UserID,
       ]
     );
-    io.emit("refreshing",true);
+    io.emit("refreshing", true);
     return res.status(201).json(update);
   } catch (error) {
     return res.json(error);
@@ -487,6 +485,7 @@ app.post("/api/apply", async (req, res) => {
     const fighterTable = req.body.table;
     console.log("apply");
     let fighterID;
+    let userID = null ;
 
     const [totalFighter] = await conn.query(
       "SELECT * FROM `contestants` WHERE `Fightertable` = ?",
@@ -499,15 +498,19 @@ app.post("/api/apply", async (req, res) => {
       fighterID = totalFighter.length + 1;
     }
 
-    const [userID] = await conn.query(
-      "SELECT `UserID` FROM `user` WHERE UserName = ?",
-      [username]
-    );
+    if (username) {
+      const [fetchuserID] = await conn.query(
+        "SELECT `UserID` FROM `user` WHERE UserName = ?",
+        [username]
+      );
+
+      userID = fetchuserID[0].UserID;
+    }
 
     // return res.json(userID[0].UserID);
     await conn.query(
       "INSERT INTO `contestants`(`FighterTable`, `FighterID`, `UserName`, `UserID`, `Nation`, `Archtype`) VALUES (?,?,?,?,?,?)",
-      [fighterTable, fighterID, username, userID[0].UserID, nation, architype]
+      [fighterTable, fighterID, username, userID, nation, architype]
     );
 
     return res.status(201).send({ message: "สมัครสำเร็จ" });
@@ -555,7 +558,7 @@ app.put("/api/close/:EventID", async (req, res) => {
     );
 
     if (closeresult.affectedRows > 0) {
-      io.emit("refreshing",true);
+      io.emit("refreshing", true);
       return res.status(200).json({ message: "ปิดรับสมัครเสร็จสิ้น" });
     } else {
       return res

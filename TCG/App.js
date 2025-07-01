@@ -33,6 +33,7 @@ import { CreateEvent } from "./screens/CreateEvent";
 import { Editdetail } from "./screens/Editdetail";
 import { Apply } from "./screens/Apply";
 import { contestants } from "./screens/contestants";
+import { AddFighter } from "./screens/AddFighter";
 
 export const IP = "http://192.168.1.10:3000";
 
@@ -568,6 +569,11 @@ const App = () => {
         <Stack.Screen
           name="contestants"
           component={contestants}
+          options={{ headerShown: false }}
+        />
+                <Stack.Screen
+          name="AddFighter"
+          component={AddFighter}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
