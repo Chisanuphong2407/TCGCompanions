@@ -485,8 +485,7 @@ app.post("/api/apply", async (req, res) => {
     const fighterTable = req.body.table;
     console.log("apply");
     let fighterID;
-    let userID = null ;
-
+    let userID;
     const [totalFighter] = await conn.query(
       "SELECT * FROM `contestants` WHERE `Fightertable` = ?",
       [fighterTable]
@@ -498,13 +497,14 @@ app.post("/api/apply", async (req, res) => {
       fighterID = totalFighter.length + 1;
     }
 
-    if (username) {
-      const [fetchuserID] = await conn.query(
-        "SELECT `UserID` FROM `user` WHERE UserName = ?",
-        [username]
-      );
-
-      userID = fetchuserID[0].UserID;
+    const [fetchuserID] = await conn.query(
+      "SELECT `UserID` FROM `user` WHERE UserName = ?",
+      [username]
+    );
+    if (fetchuserID.length == 0) {
+      userID = null;
+    }else{
+      userID = await fetchuserID[0].UserID;
     }
 
     // return res.json(userID[0].UserID);

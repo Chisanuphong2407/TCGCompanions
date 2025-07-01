@@ -213,7 +213,7 @@ export const Eventdetails = ({ navigation, route }) => {
           <View style={styles.menu}>
             <Pressable
               onPress={() => {
-                navigation.navigate("contestants", { table, owner,eventName });
+                navigation.navigate("contestants", { table, owner,eventName,ID });
               }}
               style={styles.menubox}
             >

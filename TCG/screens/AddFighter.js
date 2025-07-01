@@ -19,8 +19,9 @@ import { RadioButton } from "react-native-paper";
 import { IP } from "../App";
 
 export const AddFighter = ({ navigation, route }) => {
-  const Eventname = route.params.eventName;
-  const table = route.params.table;
+  const Eventname = route.params.Eventname;
+  const table = route.params.tableID;
+  const owner = route.params.owner;
   const [name,setName] = useState('');
   const [selectNation, setSelectnation] = useState();
   const [architype, setArchitype] = useState();
@@ -51,7 +52,7 @@ export const AddFighter = ({ navigation, route }) => {
   };
 
   const submit = () => {
-    if (!architype || !selectNation) {
+    if (!architype || !selectNation || !name) {
       Alert.alert("สมัครไม่สำเร็จ", "กรุณากรอกข้อมูลให้ครบถ้วน");
     } else {
       Alert.alert(
@@ -96,7 +97,7 @@ export const AddFighter = ({ navigation, route }) => {
           {
             text: "ตกลง",
             onPress: () => {
-              navigation.navigate("Eventdetails", EventID);
+              navigation.navigate("contestants", {table,Eventname,owner});
             },
           },
         ]
@@ -194,14 +195,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#EEF5FF",
   },
-  header: {
-    fontSize: 30,
-    marginTop: 20,
-    alignSelf: "center",
-    fontWeight: "bold",
-    color: "#176B87",
-    marginBottom: 30,
-  },
   bgIMG: {
     position: "absolute",
     width: 600,
@@ -211,9 +204,9 @@ const styles = StyleSheet.create({
     opacity: 0.3,
   },
   header: {
-    marginTop: 20,
+    marginTop: 40,
     fontWeight: "bold",
-    marginBottom: 30,
+    marginBottom: 10,
     fontSize: 30,
   },
   topic: {

@@ -20,6 +20,7 @@ import { UserPlus, X } from "react-native-feather";
 import { IP } from "../App";
 
 export const contestants = ({ navigation, route }) => {
+  const EventID = route.params.ID;
   const Eventname = route.params.eventName;
   const tableID = route.params.table;
   const owner = route.params.owner.trim();
@@ -88,10 +89,10 @@ export const contestants = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.menu}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.navigate("Eventdetails",EventID)}>
           <X style={styles.icon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("AddFighter",{tableID,Eventname})}>
+        <TouchableOpacity onPress={() => navigation.navigate("AddFighter",{tableID,Eventname,owner})}>
           <UserPlus style={styles.icon} />
         </TouchableOpacity>
       </View>

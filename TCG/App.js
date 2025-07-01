@@ -571,10 +571,10 @@ const App = () => {
           component={contestants}
           options={{ headerShown: false }}
         />
-                <Stack.Screen
+        <Stack.Screen
           name="AddFighter"
           component={AddFighter}
-          options={{ headerShown: false }}
+          options={{ headerTitle: '' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
