@@ -16,7 +16,7 @@ import {
   FlatList,
 } from "react-native";
 import { DataTable } from "react-native-paper";
-import { Trash2, Edit2, Users, Clock } from "react-native-feather";
+import { UserPlus, X } from "react-native-feather";
 import { IP } from "../App";
 
 export const contestants = ({ navigation, route }) => {
@@ -86,6 +86,14 @@ export const contestants = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.menu}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <X style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <UserPlus style={styles.icon} />
+        </TouchableOpacity>
+      </View>
       <View>
         <Text style={styles.header}>ผู้เข้าแข่งขัน</Text>
       </View>
@@ -108,7 +116,7 @@ export const contestants = ({ navigation, route }) => {
               </DataTable.Title>
             )}
           </DataTable.Header>
-            
+
           {/* table rows */}
           {displayedItems.length > 0 &&
             account &&
@@ -163,7 +171,7 @@ export const styles = StyleSheet.create({
   },
   tableTitleNo: {
     minWidth: 20,
-    marginHorizontal: 5
+    marginHorizontal: 5,
   },
   tableTitleName: {
     minWidth: 100,
@@ -171,26 +179,36 @@ export const styles = StyleSheet.create({
   },
   tableTitleNation: {
     minWidth: 100,
-    marginHorizontal: 5
+    marginHorizontal: 5,
   },
   tableTitleArchtype: {
     minWidth: 100,
-    marginHorizontal: 5
+    marginHorizontal: 5,
   },
   tableCellNo: {
     minWidth: 20,
-    marginHorizontal: 5
+    marginHorizontal: 5,
   },
   tableCellName: {
     minWidth: 100,
-    marginHorizontal: 5
+    marginHorizontal: 5,
   },
-    tableCellNation: {
+  tableCellNation: {
     minWidth: 100,
-    marginHorizontal: 5
+    marginHorizontal: 5,
   },
-    tableCellArchtype: {
+  tableCellArchtype: {
     minWidth: 100,
-    marginHorizontal: 5
+    marginHorizontal: 5,
+  },
+  menu: {
+    flexDirection: "row",
+    marginTop: 40,
+    padding: 20,
+    paddingBottom: 0,
+    justifyContent: "space-between",
+  },
+  icon: {
+    color: "#176B87",
   },
 });

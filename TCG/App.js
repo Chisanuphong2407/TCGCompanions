@@ -568,7 +568,7 @@ const App = () => {
         <Stack.Screen
           name="contestants"
           component={contestants}
-          options={{ headerTitle: "" }}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>
