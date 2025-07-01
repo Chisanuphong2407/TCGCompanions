@@ -34,7 +34,7 @@ import { Editdetail } from "./screens/Editdetail";
 import { Apply } from "./screens/Apply";
 import { contestants } from "./screens/contestants";
 
-export const IP = "http://192.168.1.14:3000";
+export const IP = "http://192.168.1.10:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -50,6 +50,7 @@ const Home = ({ navigation }) => {
   const [iscmenu, setIscmenu] = useState(true);
   const [isCreateEvent, setIsCreate] = useState(false);
   const [user, setUser] = useState();
+  const [searchStyle, setSearchStyle] = useState(styles.Search);
 
   //verify token
   const verify = async () => {
@@ -160,20 +161,20 @@ const Home = ({ navigation }) => {
             "Content-Type": "application/json",
           },
         });
-        console.log(event);
+        // console.log(event);
         const result = await event.json();
         console.log(result);
         setEvent(result);
       } else if (cMenu === styles.Menu) {
         fetchCEvent();
       } else if (myMenu === styles.Menu) {
-                const event = await fetch(IP + "/api/Mysearch/" + search + user, {
+        const event = await fetch(`${IP}/api/Mysearch/${search}/${user}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
         });
-        console.log(event);
+        // console.log(event);
         const result = await event.json();
         console.log(result);
         setEvent(result);
@@ -216,17 +217,20 @@ const Home = ({ navigation }) => {
     setMymenu(styles.CMenu);
     setCmenu(styles.CMenu);
     setIsCreate(false);
+    setSearchStyle(styles.Search);
   };
   const setMy = () => {
     setPmenu(styles.CMenu);
     setMymenu(styles.Menu);
     setCmenu(styles.CMenu);
     setIsCreate(false);
+    setSearchStyle(styles.Search);
   };
   const setC = () => {
     setPmenu(styles.CMenu);
     setMymenu(styles.CMenu);
     setCmenu(styles.Menu);
+    setSearchStyle(styles.DisabledSearch);
   };
 
   useEffect(() => {
@@ -364,12 +368,14 @@ const Home = ({ navigation }) => {
 
       <View style={styles.Content}>
         {/* แท็บค้นหา */}
-        <View style={styles.Search}>
+        {cMenu === styles}
+        <View style={searchStyle}>
           <TextInput
             style={styles.input}
             placeholder="ค้นหากิจกรรม"
             value={search}
             onChangeText={setSearch}
+            editable={cMenu === styles.CMenu}
           />
           <Pressable onPress={onSearch}>
             <Search justifyContent="center" margin={5} />
@@ -377,20 +383,46 @@ const Home = ({ navigation }) => {
         </View>
         {/* แท็บกิจกรรม */}
         <View style={styles.Event}>
-          <FlatList
-            data={event}
-            renderItem={({ item }) => (
-              <Item
-                EventID={item.EventID}
-                UserName={item.UserName}
-                EventName={item.EventName}
-                Address={item.Address}
-              />
-            )}
-            keyExtractor={(item) => item.EventID}
-            refreshing={isLoading}
-            onRefresh={() => setIsloading(true)}
-          />
+          {event.length > 0 ? (
+            <FlatList
+              data={event}
+              renderItem={({ item }) => (
+                <Item
+                  EventID={item.EventID}
+                  UserName={item.UserName}
+                  EventName={item.EventName}
+                  Address={item.Address}
+                />
+              )}
+              keyExtractor={(item) => item.EventID}
+              refreshing={isLoading}
+              onRefresh={() => setIsloading(true)}
+            />
+          ) : (
+            <View>
+              <Text
+                style={{ color: "#626366", textAlign: "center", fontSize: 16 }}
+              >
+                ไม่พบกิจกรรม
+              </Text>
+              <Pressable
+                onPress={() => {
+                  setIsloading(true);
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: "#1163ED",
+                    textDecorationLine: "underline",
+                    textAlign: "center",
+                  }}
+                >
+                  รีเฟรช
+                </Text>
+              </Pressable>
+            </View>
+          )}
         </View>
         {isCreateEvent && (
           <TouchableOpacity
@@ -615,6 +647,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#D3D9E3",
     backgroundColor: "#fff",
+    borderRadius: 25,
+    flexDirection: "row",
+  },
+  DisabledSearch: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    borderColor: "#D3D9E3",
+    backgroundColor: "#E8E9EB",
     borderRadius: 25,
     flexDirection: "row",
   },

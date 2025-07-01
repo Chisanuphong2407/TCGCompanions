@@ -1,5 +1,4 @@
 const express = require("express");
-import { contestants } from './../TCG/screens/contestants';
 const cors = require("cors");
 const mysql = require("mysql2");
 const socketIo = require("socket.io");
@@ -249,6 +248,7 @@ app.get("/api/search/:eventname", async (req, res) => {
 //ค้นหากิจกรรมของฉัน
 app.get("/api/Mysearch/:eventname/:contestant", async (req, res) => {
   try {
+    console.log("fetch");
     const name = req.params.eventname;
     const contestant = req.params.contestant;
     const [ID] = await conn.query(
@@ -257,7 +257,7 @@ app.get("/api/Mysearch/:eventname/:contestant", async (req, res) => {
     );
 
     const [result] = await conn.query(
-      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fighter INNER JOIN  user ON user.UserID = event.UserID WHERE contestants.UserID = ? AND event.EventName LIKE",
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fighter INNER JOIN  user ON user.UserID = event.UserID WHERE contestants.UserID = ? AND event.EventName LIKE ?",
       [ID[0].UserID,`%${name}%`]
     );
 
