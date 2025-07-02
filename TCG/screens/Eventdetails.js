@@ -137,6 +137,7 @@ export const Eventdetails = ({ navigation, route }) => {
         "สละสิทธิ์สำเร็จ",
         "ท่านสามารถสมัครแข่งในกิจกรรมนี้ได้อีกครั้งหากยังไม่ปิดรับสมัคร"
       );
+      navigation.navigate("Home");
     } catch (error) {
       console.log(error);
       Alert.alert("สละสิทธิ์ไม่สำเร็จ", "มีข้อผิดพลาดในการลบ");

@@ -486,6 +486,7 @@ app.post("/api/apply", async (req, res) => {
     console.log("apply");
     let fighterID;
     let userID;
+    let note;
     const [totalFighter] = await conn.query(
       "SELECT * FROM `contestants` WHERE `Fightertable` = ?",
       [fighterTable]
@@ -503,15 +504,20 @@ app.post("/api/apply", async (req, res) => {
     );
     if (fetchuserID.length == 0) {
       userID = null;
-    }else{
+      note = req.body.phone;
+      await conn.query(
+        "INSERT INTO `contestants`(`FighterTable`, `FighterID`, `UserName`, `UserID`, `Nation`, `Archtype`,`note`) VALUES (?,?,?,?,?,?,?)",
+        [fighterTable, fighterID, username, userID, nation, architype,note]
+      );
+    } else {
       userID = await fetchuserID[0].UserID;
+      await conn.query(
+        "INSERT INTO `contestants`(`FighterTable`, `FighterID`, `UserName`, `UserID`, `Nation`, `Archtype`) VALUES (?,?,?,?,?,?)",
+        [fighterTable, fighterID, username, userID, nation, architype]
+      );
     }
 
     // return res.json(userID[0].UserID);
-    await conn.query(
-      "INSERT INTO `contestants`(`FighterTable`, `FighterID`, `UserName`, `UserID`, `Nation`, `Archtype`) VALUES (?,?,?,?,?,?)",
-      [fighterTable, fighterID, username, userID, nation, architype]
-    );
 
     return res.status(201).send({ message: "สมัครสำเร็จ" });
   } catch (error) {
@@ -586,6 +592,29 @@ app.get("/api/fetchcontestants/:table", async (req, res) => {
   }
 });
 
+//fetch ผู้เข้าแข่งขันรายคน
+app.post("/api/contestantprofile", async (req,res) => {
+  try {
+    console.log("fetch cont");
+    const table = req.body.table;
+    const fighterID = req.body.fighterID;
+    const userID = req.body.userID;
+
+    const [fetchuser] = await conn.query("SELECT `PhoneNumber`,`UserName` FROM `user` WHERE `UserID`= ?",[userID]);
+    console.log(fetchuser.length);
+    // return res.status(200).json(fetchuser);
+    if(fetchuser.length > 0){
+      const [fetchdetail] = await conn.query("SELECT contestants.`UserName`, `Nation`, `Archtype`, user.PhoneNumber FROM `contestants` INNER JOIN user ON user.UserID = contestants.UserID WHERE `FighterID` = ? AND `FighterTable` = ?",[fighterID,table]);
+      return res.status(200).json(fetchdetail)
+    }else{
+      const [fetchdetail] = await conn.query("SELECT `UserName`, `Nation`, `Archtype`, `note` AS PhoneNumber FROM `contestants` WHERE `FighterID` = ? AND `FighterTable` = ?",[fighterID,table]);
+      return res.status(200).json(fetchdetail)
+    }
+    
+  } catch (error) {
+    return res.status(404).json(error);
+  }
+});
 server.listen(3000, function () {
   conn.query(
     "UPDATE `event` SET `Status` = 1 WHERE `CloseDate` <= CURRENT_DATE  "

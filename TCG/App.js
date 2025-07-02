@@ -34,8 +34,9 @@ import { Editdetail } from "./screens/Editdetail";
 import { Apply } from "./screens/Apply";
 import { contestants } from "./screens/contestants";
 import { AddFighter } from "./screens/AddFighter";
+import { ContestantDetail } from "./screens/ContestantDetail";
 
-export const IP = "http://192.168.1.10:3000";
+export const IP = "http://192.168.1.4:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -574,6 +575,11 @@ const App = () => {
         <Stack.Screen
           name="AddFighter"
           component={AddFighter}
+          options={{ headerTitle: '' }}
+        />
+        <Stack.Screen
+          name="ContestantDetail"
+          component={ContestantDetail}
           options={{ headerTitle: '' }}
         />
       </Stack.Navigator>

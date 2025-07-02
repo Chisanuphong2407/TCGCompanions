@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View ,ScrollView} from "react-native";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
@@ -22,9 +22,10 @@ export const AddFighter = ({ navigation, route }) => {
   const Eventname = route.params.Eventname;
   const table = route.params.tableID;
   const owner = route.params.owner;
-  const [name,setName] = useState('');
+  const [name, setName] = useState("");
   const [selectNation, setSelectnation] = useState();
   const [architype, setArchitype] = useState();
+  const [phone, setPhone] = useState();
 
   const handleRadiobutton = (value) => {
     setSelectnation(value);
@@ -84,6 +85,7 @@ export const AddFighter = ({ navigation, route }) => {
         nation: selectNation,
         architype: architype,
         username: name,
+        phone: phone,
       }),
     });
 
@@ -97,13 +99,13 @@ export const AddFighter = ({ navigation, route }) => {
           {
             text: "ตกลง",
             onPress: () => {
-              navigation.navigate("contestants", {table,Eventname,owner});
+              navigation.navigate("contestants", { table, Eventname, owner });
             },
           },
         ]
       );
-    }else{
-      Alert.alert("สมัครไม่สำเร็จ",String(res));
+    } else {
+      Alert.alert("สมัครไม่สำเร็จ", String(res));
     }
 
     console.log(architype, " ", selectNation);
@@ -115,11 +117,18 @@ export const AddFighter = ({ navigation, route }) => {
         <Text style={styles.header}>{Eventname}</Text>
         <Text style={styles.topic}>ชื่อผู้เข้าแข่งขัน:</Text>
         <TextInput
-            placeholder="กรอกข้อมูลของท่าน"
-            value={name}
-            onChangeText={setName}
-            style={styles.input}
-          />
+          placeholder="กรอกข้อมูลของท่าน"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+        />
+        <Text style={styles.topic}>โทรศัพท์:</Text>
+        <TextInput
+          placeholder="กรอกข้อมูลของท่าน"
+          value={phone}
+          onChangeText={setPhone}
+          style={styles.input}
+        />
         <Text style={styles.topic}>เนชั่นที่ใช้ในการแข่งขัน:</Text>
         <RadioButton.Group
           onValueChange={handleRadiobutton}

@@ -16,111 +16,117 @@ import {
   FlatList,
 } from "react-native";
 import { DataTable } from "react-native-paper";
-import { UserPlus, X } from "react-native-feather";
+import { Phone, UserPlus, X } from "react-native-feather";
 import { IP } from "../App";
+import { MyProfile } from "./MyProfile";
 
-export const contestants = ({ navigation, route }) => {
-  const ID = route.params.EventID;
-  const eventName = route.params.EventName;
+export const ContestantDetail = ({ navigation, route }) => {
+  // const ID = route.params.EventID;
+  // const eventName = route.params.EventName;
   const table = route.params.tableID;
-  const owner = route.params.owner.trim();
+  // const owner = route.params.owner.trim();
   const FighterID = route.params.FighterID;
+  const userID = route.params.userID;
+  const Eventname = route.params.Eventname;
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [nation, setNation] = useState("");
+  const [architype, setArchitype] = useState("");
 
   const fetchData = async () => {
     try {
-      console.log("start fetch");
-      const data = await fetch(`${IP}/api/fetchcontestants/${table}`, {
-        method: "GET",
+      const contestantProfile = await fetch(`${IP}/api/contestantprofile`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          table: table,
+          fighterID: FighterID,
+          userID: userID,
+        }),
       });
-      const response = await data.json();
-      setIsloading(false);
-      setfighter(response);
-      const vef = await AsyncStorage.getItem("@vef");
-      setAccount(vef.trim());
-      setTotalpage(Math.ceil(fighter.length / itemPerPage));
-      const from = page * itemPerPage;
-      const to = Math.min((page + 1) * itemPerPage, fighter.length);
-      setDisplayItems(fighter.slice(from, to));
-    } catch (error) {
-      console.error(error);
-    }
+
+      const fetchprofile = await contestantProfile.json();
+      setName(fetchprofile[0].UserName);
+      setPhone(fetchprofile[0].PhoneNumber);
+      setNation(fetchprofile[0].Nation);
+      setArchitype(fetchprofile[0].Archtype);
+    } catch (error) {}
   };
 
   useEffect(() => {
     fetchData();
-  }, [isLoading]);
+  }, []);
 
   return (
-    <View>
-        <Text>incoming</Text>
+    <View style={styles.container}>
+      <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
+      <View>
+        <Text style={styles.header}>{Eventname}</Text>
+        <Text style={styles.topic}>ชื่อผู้เข้าแข่งขัน:</Text>
+        <Text style={styles.detail}>{name}</Text>
+        <Text style={styles.topic}>โทรศัพท์:</Text>
+        <Text style={styles.detail}>{phone}</Text>
+        <Text style={styles.topic}>เนชั่นที่ใช้ในการแข่งขัน:</Text>
+        <Text style={styles.detail}>{nation}</Text>
+        <Text style={styles.topic}>สายที่ใช้ในการแข่งขัน:</Text>
+        <Text style={styles.detail}>{architype}</Text>
+      </View>
+      <View style={styles.delete}>
+        <TouchableOpacity>
+          <Text style={styles.deleteText}>ลบ</Text>
+        </TouchableOpacity>
+      </View>
     </View>
-      )
-    }
+  );
+};
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F7FAFF",
-    justifyContent: "center",
+    padding: 20,
   },
   header: {
     fontSize: 30,
     marginTop: 20,
-    alignSelf: "center",
     fontWeight: "bold",
     color: "#176B87",
-    marginBottom: 20,
+    marginBottom: 30,
   },
-  tableOverall: {
+  topic: {
+    fontSize: 20,
+    marginBottom: 10,
+    marginTop: 20,
+    marginLeft: 5,
+    fontWeight: "bold",
+  },
+  bgIMG: {
+    position: "absolute",
+    width: 600,
+    height: 600,
+    right: -200,
+    bottom: -200,
+    opacity: 0.3,
+  },
+  detail: {
+    fontSize: 16,
+    marginLeft: 5,
+  },
+  delete: {
     flex: 1,
-    minWidth: "100%",
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    marginBottom: 50,
+    alignSelf: "center",
     justifyContent: "center",
   },
-  tableTitleNo: {
-    minWidth: 20,
-    marginHorizontal: 5,
-  },
-  tableTitleName: {
+  deleteText: {
+    color: "white",
+    alignSelf: "center",
+    textAlign: 'center',
+    backgroundColor: "#FF0004",
+    padding: 10,
+    borderRadius: 5,
     minWidth: 100,
-    marginHorizontal: 5,
-  },
-  tableTitleNation: {
-    minWidth: 100,
-    marginHorizontal: 5,
-  },
-  tableTitleArchtype: {
-    minWidth: 100,
-    marginHorizontal: 5,
-  },
-  tableCellNo: {
-    minWidth: 20,
-    marginHorizontal: 5,
-  },
-  tableCellName: {
-    minWidth: 100,
-    marginHorizontal: 5,
-  },
-  tableCellNation: {
-    minWidth: 100,
-    marginHorizontal: 5,
-  },
-  tableCellArchtype: {
-    minWidth: 100,
-    marginHorizontal: 5,
-  },
-  menu: {
-    flexDirection: "row",
-    marginTop: 40,
-    padding: 20,
-    paddingBottom: 0,
-    justifyContent: "space-between",
-  },
-  icon: {
-    color: "#176B87",
   },
 });

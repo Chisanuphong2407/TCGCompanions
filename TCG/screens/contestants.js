@@ -131,8 +131,7 @@ export const contestants = ({ navigation, route }) => {
             displayedItems.map((item) => {
               const FighterID = item.FighterID;
               return (
-                <Pressable onPress={() => navigation.navigate("ContestantDetail",{EventID,Eventname,tableID,owner,FighterID})}>
-                  <DataTable.Row key={item.FighterID}>
+                  <DataTable.Row key={item.FighterID} onPress={() => navigation.navigate("ContestantDetail",{FighterID,tableID,userID : item.UserID,Eventname})}>
                     <DataTable.Cell style={styles.tableCellNo}>
                       {item.FighterID}
                     </DataTable.Cell>
@@ -150,7 +149,6 @@ export const contestants = ({ navigation, route }) => {
                       </DataTable.Cell>
                     )}
                   </DataTable.Row>
-                </Pressable>
               );
             })}
         </DataTable>
@@ -176,8 +174,8 @@ export const styles = StyleSheet.create({
   tableOverall: {
     flex: 1,
     minWidth: "100%",
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingHorizontal: 2,
+    paddingVertical: 2,
     justifyContent: "center",
   },
   tableTitleNo: {
