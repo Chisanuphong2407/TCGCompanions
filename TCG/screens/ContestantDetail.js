@@ -52,7 +52,17 @@ export const ContestantDetail = ({ navigation, route }) => {
       setPhone(fetchprofile[0].PhoneNumber);
       setNation(fetchprofile[0].Nation);
       setArchitype(fetchprofile[0].Archtype);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDelete = async() => {
+    try {
+      // const delete = await fetch(`${IP}/api/waive/table/${table}/userID/:username`)
+    } catch (error) {
+      
+    }
   };
 
   useEffect(() => {
@@ -74,7 +84,7 @@ export const ContestantDetail = ({ navigation, route }) => {
         <Text style={styles.detail}>{architype}</Text>
       </View>
       <View style={styles.delete}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleDelete}>
           <Text style={styles.deleteText}>ลบ</Text>
         </TouchableOpacity>
       </View>
