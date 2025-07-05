@@ -23,6 +23,7 @@ export const Eventdetails = ({ navigation, route }) => {
   const [isLoading, setIsloading] = useState(true);
   const [item, setItem] = useState([]);
   const [status, setStatus] = useState();
+  const [statusNum,setStatusNum] = useState();
   const [statusStyle, setStatusstyle] = useState();
   const [isOwner, setIsowner] = useState(false);
   const owner = item[0] && item[0].UserName;
@@ -68,9 +69,15 @@ export const Eventdetails = ({ navigation, route }) => {
       if (item[0] && item[0].Status === 0) {
         setStatus("เปิดรับสมัคร");
         setStatusstyle(styles.status0);
-      } else {
+        setStatusNum(0);
+      } else if(item[0] && item[0].Status === 1) {
         setStatus("ปิดรับสมัคร");
+        setStatusNum(1);
         setStatusstyle(styles.status1);
+      } else if(item[0] && item[0].Status === 2){
+        setStatus("กำลังแข่งขัน");
+        setStatusstyle(styles.status2);
+        setStatusNum(2);
       }
       const data = await fetch(IP + "/api/edetails", {
         method: "POST",
@@ -144,20 +151,6 @@ export const Eventdetails = ({ navigation, route }) => {
     }
   };
 
-  const eventBegin = async() => {
-    Alert.alert("ยืนยันจัดการแข่งขัน","หลังยืนยัน สถานะกิจกรรมจะเปลี่ยนเป็น 'กำลังแข่งขัน' และจะไม่สามารถลบกิจกรรมนี้ได้",[
-      {
-        text: "ยืนยัน",
-        style: 'default',
-        // onPress: () =>
-      },
-      {
-        text: "ยกเลิก",
-        style: 'cancel'
-      }
-    ])
-  }
-
   useEffect(() => {
     fetchDetail();
   }, [isLoading]);
@@ -228,7 +221,7 @@ export const Eventdetails = ({ navigation, route }) => {
           <View style={styles.menu}>
             <Pressable
               onPress={() => {
-                navigation.navigate("contestants", { table, owner,eventName,ID,status });
+                navigation.navigate("contestants", { table, owner,eventName,ID,statusNum });
               }}
               style={styles.menubox}
             >
@@ -296,7 +289,9 @@ export const Eventdetails = ({ navigation, route }) => {
       </View>
       {status === "ปิดรับสมัคร" && isOwner && (
         <View style={styles.eventBegin}>
-          <Pressable onPress={eventBegin}>
+          <Pressable onPress={() => {
+            navigation.navigate("contestants", { table, owner ,ID,eventName})
+          }}>
             <Text style={{ color: "white" }}>จัดการแข่งขัน</Text>
           </Pressable>
         </View>
@@ -372,6 +367,17 @@ export const styles = StyleSheet.create({
   status1: {
     justifyContent: "flex-start",
     backgroundColor: "#C40424",
+    padding: 5,
+    paddingLeft: 15,
+    width: 150,
+    marginLeft: -20,
+    fontSize: 20,
+    color: "white",
+    marginTop: 20,
+  },
+  status2: {
+    justifyContent: "flex-start",
+    backgroundColor: "#6a05ee",
     padding: 5,
     paddingLeft: 15,
     width: 150,

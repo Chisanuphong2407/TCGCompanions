@@ -23,7 +23,7 @@ export const contestants = ({ navigation, route }) => {
   const EventID = route.params.ID;
   const Eventname = route.params.eventName;
   const tableID = route.params.table;
-  const status = route.params.status;
+  const status = route.params.statusNum;
   const owner = route.params.owner.trim();
   const [account, setAccount] = useState("");
   const [fighter, setfighter] = useState([]);
@@ -53,6 +53,39 @@ export const contestants = ({ navigation, route }) => {
     }
   };
 
+  const eventBegin = () => {
+    Alert.alert("ยืนยันจัดการแข่งขัน","หลังยืนยัน สถานะกิจกรรมจะเปลี่ยนเป็น 'กำลังแข่งขัน' และจะไม่สามารถลบกิจกรรมนี้ได้",[
+      {
+        text: "ยืนยัน",
+        style: 'default',
+        onPress: statusChange
+      },
+      {
+        text: "ยกเลิก",
+        style: 'cancel'
+      }
+    ])
+  }
+
+  const statusChange = async() => {
+    try {
+      const change = await fetch(`${IP}/api/eventbegin/${EventID}`,{
+         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await change.json();
+
+      if (result.ok) {
+        Alert
+      }
+    } catch (error) {
+      Alert.alert("อัพเดตสถานะไม่สำเร็จ","กรุณาลองใหม่อีกครั้ง")
+    }
+  }
+
   useEffect(() => {
     fetchData();
   }, [isLoading]);
@@ -74,6 +107,7 @@ export const contestants = ({ navigation, route }) => {
         >
           <X style={styles.icon} />
         </TouchableOpacity>
+        {(status == 0) && (status == 1)}
         <TouchableOpacity
           onPress={() =>
             navigation.navigate("AddFighter", { tableID, Eventname, owner })
@@ -152,6 +186,11 @@ export const contestants = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
+      <View>
+        <TouchableOpacity onPress={eventBegin}>
+          <Text>เริ่มการแข่งขัน</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
