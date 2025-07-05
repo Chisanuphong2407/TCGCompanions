@@ -87,7 +87,7 @@ app.post("/api/login", async (req, res) => {
   const genToken = (payload) => {
     const expiresIn = "1h";
     const token = jwt.sign(payload, secrKey, { expiresIn });
-    console.log(secrKey);
+    // console.log(secrKey);
     return res.status(200).json(token);
   };
 
@@ -96,6 +96,7 @@ app.post("/api/login", async (req, res) => {
   try {
     //เช็คข้อมูลผู้ใช้งาน
     const [userVef] = await conn.query(query, [req.body.username]);
+    console.log(userVef);
     if (userVef.length === 0) {
       console.log("User not found.");
       return res.status(401).json({ message: "ชื่อผู้ใช้ไม่ถูกต้อง" }); // หรือ "รหัสไม่ถูกต้อง"
@@ -288,6 +289,14 @@ app.get("/api/getprofile/:accname", async (req, res) => {
 app.put("/api/updateprofile", async (req, res) => {
   try {
     console.log("Start");
+
+    const genToken = (payload) => {
+      const expiresIn = "1h";
+      const token = jwt.sign(payload, secrKey, { expiresIn });
+      console.log(token);
+      return res.status(200).json(token);
+    };
+
     const [existuser] = await conn.query(
       "SELECT * FROM `user` WHERE (`UserName`= ? OR `Email` = ?) AND NOT UserID = ?",
       [req.body.name, req.body.email, req.body.id]
@@ -311,9 +320,19 @@ app.put("/api/updateprofile", async (req, res) => {
           req.body.id,
         ]
       );
-      // const unhash = await bcrypt.compare(req.body.password, hashedPassword);
-      // console.log(unhash);
-      return res.status(201).json({ message: "แก้ไขสำเร็จ" });
+
+      await conn.query(
+        "UPDATE `contestants` SET `UserName` = ? WHERE UserID = ?",
+        [req.body.user, req.body.id]
+      );
+      const payload = {
+        username: req.body.user,
+        userID: req.body.id,
+      };
+      console.log(payload);
+      //สร้าง token
+      genToken(payload);
+      io.emit("refreshing", true);
     }
   } catch (err) {
     console.error("เกิดข้อผิดพลาดในการแก้ไข:", err);
@@ -507,7 +526,7 @@ app.post("/api/apply", async (req, res) => {
       note = req.body.phone;
       await conn.query(
         "INSERT INTO `contestants`(`FighterTable`, `FighterID`, `UserName`, `UserID`, `Nation`, `Archtype`,`note`) VALUES (?,?,?,?,?,?,?)",
-        [fighterTable, fighterID, username, userID, nation, architype,note]
+        [fighterTable, fighterID, username, userID, nation, architype, note]
       );
     } else {
       userID = await fetchuserID[0].UserID;
@@ -593,24 +612,32 @@ app.get("/api/fetchcontestants/:table", async (req, res) => {
 });
 
 //fetch ผู้เข้าแข่งขันรายคน
-app.post("/api/contestantprofile", async (req,res) => {
+app.post("/api/contestantprofile", async (req, res) => {
   try {
     console.log("fetch cont");
     const table = req.body.table;
     const fighterID = req.body.fighterID;
     const userID = req.body.userID;
 
-    const [fetchuser] = await conn.query("SELECT `PhoneNumber`,`UserName` FROM `user` WHERE `UserID`= ?",[userID]);
+    const [fetchuser] = await conn.query(
+      "SELECT `PhoneNumber`,`UserName` FROM `user` WHERE `UserID`= ?",
+      [userID]
+    );
     console.log(fetchuser.length);
     // return res.status(200).json(fetchuser);
-    if(fetchuser.length > 0){
-      const [fetchdetail] = await conn.query("SELECT contestants.`UserName`, `Nation`, `Archtype`, user.PhoneNumber FROM `contestants` INNER JOIN user ON user.UserID = contestants.UserID WHERE `FighterID` = ? AND `FighterTable` = ?",[fighterID,table]);
-      return res.status(200).json(fetchdetail)
-    }else{
-      const [fetchdetail] = await conn.query("SELECT `UserName`, `Nation`, `Archtype`, `note` AS PhoneNumber FROM `contestants` WHERE `FighterID` = ? AND `FighterTable` = ?",[fighterID,table]);
-      return res.status(200).json(fetchdetail)
+    if (fetchuser.length > 0) {
+      const [fetchdetail] = await conn.query(
+        "SELECT contestants.`UserName`, `Nation`, `Archtype`, user.PhoneNumber FROM `contestants` INNER JOIN user ON user.UserID = contestants.UserID WHERE `FighterID` = ? AND `FighterTable` = ?",
+        [fighterID, table]
+      );
+      return res.status(200).json(fetchdetail);
+    } else {
+      const [fetchdetail] = await conn.query(
+        "SELECT `UserName`, `Nation`, `Archtype`, `note` AS PhoneNumber FROM `contestants` WHERE `FighterID` = ? AND `FighterTable` = ?",
+        [fighterID, table]
+      );
+      return res.status(200).json(fetchdetail);
     }
-    
   } catch (error) {
     return res.status(404).json(error);
   }

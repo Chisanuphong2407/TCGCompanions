@@ -29,7 +29,7 @@ import { IP } from "../App";
 export const MyProfile = ({ navigation, route }) => {
   const [isLoading, setIsloading] = useState(true);
   // const [profile, setProfile] = useState([]);
-  const [fname, setfName] = useState(""); 
+  const [fname, setfName] = useState("");
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -71,7 +71,7 @@ export const MyProfile = ({ navigation, route }) => {
         },
       ]);
       return;
-    } else{
+    } else {
       try {
         console.log("start");
         const response = await fetch(IP + "/api/updateprofile", {
@@ -86,13 +86,24 @@ export const MyProfile = ({ navigation, route }) => {
             phone: phone,
             user: user,
             id: id,
+            password: password,
           }),
         });
         console.log("request");
-        const data = await response.json();
-        console.log(data);
 
+        if (!response.ok) {
+          // ถ้าไม่สำเร็จ ให้อ่าน response เป็น text เพื่อดูข้อความผิดพลาดจากเซิร์ฟเวอร์
+          const errorText = await response.text();
+          console.error("Server error response text:", errorText);
+          Alert.alert(
+            "แก้ไขไม่สำเร็จ",
+            "username หรือ email นี้มีผู้ใช้งานแล้ว"
+          );
+          return; // หยุดการทำงานต่อ
+        }
         if (response.ok) {
+          const token = await response.json();
+          console.log(token)
           Alert.alert(
             "สำเร็จ",
             "แก้ไขเสร็จสิ้น",
@@ -101,9 +112,10 @@ export const MyProfile = ({ navigation, route }) => {
                 text: "ตกลง",
               },
             ],
+            await AsyncStorage.setItem("@accessToken", token),
             navigation.navigate("Home")
           );
-          console.log("update successful:", data);
+          console.log("update successful:", token);
         } else {
           Alert.alert(
             "แก้ไขไม่สำเร็จ",
@@ -211,7 +223,7 @@ export const RePassword = ({ navigation, route }) => {
           Alert.alert("เปลี่ยนรหัสผ่านไม่สำเร็จ", result.message);
         } else if (result.message === "รหัสผ่านเดิมไม่ถูกต้อง") {
           Alert.alert("เปลี่ยนรหัสผ่านไม่สำเร็จ", result.message);
-        }else {
+        } else {
           Alert.alert("เปลี่ยนรหัสผ่านสำเร็จ", navigation.navigate("Home"));
         }
         console.log(result.message);

@@ -54,10 +54,10 @@ export const AddFighter = ({ navigation, route }) => {
 
   const submit = () => {
     if (!architype || !selectNation || !name) {
-      Alert.alert("สมัครไม่สำเร็จ", "กรุณากรอกข้อมูลให้ครบถ้วน");
+      Alert.alert("เพิ่มไม่สำเร็จ", "กรุณากรอกข้อมูลให้ครบถ้วน");
     } else {
       Alert.alert(
-        "ยืนยันการสมัคร",
+        "ยืนยันการเพิ่มข้อมูล",
         "หากยืนยัน ท่านจะไม่สามารถแก้ไขรายละเอียดได้อีก",
         [
           {
@@ -93,8 +93,8 @@ export const AddFighter = ({ navigation, route }) => {
 
     if (res.message === "สมัครสำเร็จ") {
       Alert.alert(
-        "สมัครสำเร็จ",
-        "ท่านสามารถตรวจสอบตารางการแข่งขันได้ที่ กิจกรรมของฉัน > กิจกรรมที่ท่านสมัคร > ตารางการแข่งขัน",
+        "เพิ่มสำเร็จ",
+        "ท่านสามารถตรวจสอบรายชื่อผู้เข้าแข่งขันได้ที่ กิจกรรมที่ฉันสร้าง > กิจกรรมที่ท่านสร้าง",
         [
           {
             text: "ตกลง",
@@ -188,7 +188,7 @@ export const AddFighter = ({ navigation, route }) => {
         </View>
       </View>
       <TouchableOpacity onPress={submit} style={styles.submit}>
-        <Text style={{ color: "white", alignSelf: "center" }}>สมัคร</Text>
+        <Text style={{ color: "white", alignSelf: "center" }}>เพิ่ม</Text>
       </TouchableOpacity>
     </ScrollView>
   );

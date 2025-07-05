@@ -18,13 +18,12 @@ import {
 import { DataTable } from "react-native-paper";
 import { Phone, UserPlus, X } from "react-native-feather";
 import { IP } from "../App";
-import { MyProfile } from "./MyProfile";
 
 export const ContestantDetail = ({ navigation, route }) => {
-  // const ID = route.params.EventID;
-  // const eventName = route.params.EventName;
+  const ID = route.params.EventID;
+  const eventName = route.params.EventName;
   const table = route.params.tableID;
-  // const owner = route.params.owner.trim();
+  const owner = route.params.owner;
   const FighterID = route.params.FighterID;
   const userID = route.params.userID;
   const Eventname = route.params.Eventname;
@@ -57,11 +56,21 @@ export const ContestantDetail = ({ navigation, route }) => {
     }
   };
 
-  const handleDelete = async() => {
+  const handleDelete = async () => {
     try {
-      // const delete = await fetch(`${IP}/api/waive/table/${table}/userID/:username`)
+      console.log("del");
+      const del = await fetch(`${IP}/api/waive/table/${table}/userID/${name}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (del.ok) {
+        Alert.alert("ลบสำเร็จ");
+        navigation.goBack();
+      }
     } catch (error) {
-      
+      Alert.alert("ลบไม่สำเร็จ", JSON.stringify(error));
     }
   };
 
@@ -84,7 +93,25 @@ export const ContestantDetail = ({ navigation, route }) => {
         <Text style={styles.detail}>{architype}</Text>
       </View>
       <View style={styles.delete}>
-        <TouchableOpacity onPress={handleDelete}>
+        <TouchableOpacity
+          onPress={() => {
+            Alert.alert(
+              "ลบผู้เข้าแข่งขัน",
+              "ท่านยืนยันที่จะลบผู้เข้าแข่งขันท่านนี้",
+              [
+                {
+                  text: "ยืนยัน",
+                  style: "destructive",
+                  onPress: handleDelete,
+                },
+                {
+                  text: "ยกเลิก",
+                  style: "cancel",
+                },
+              ]
+            );
+          }}
+        >
           <Text style={styles.deleteText}>ลบ</Text>
         </TouchableOpacity>
       </View>
@@ -133,7 +160,7 @@ export const styles = StyleSheet.create({
   deleteText: {
     color: "white",
     alignSelf: "center",
-    textAlign: 'center',
+    textAlign: "center",
     backgroundColor: "#FF0004",
     padding: 10,
     borderRadius: 5,

@@ -23,14 +23,14 @@ export const contestants = ({ navigation, route }) => {
   const EventID = route.params.ID;
   const Eventname = route.params.eventName;
   const tableID = route.params.table;
+  const status = route.params.status;
   const owner = route.params.owner.trim();
   const [account, setAccount] = useState("");
   const [fighter, setfighter] = useState([]);
-  const itemPerPage = 14;
+  const itemPerPage = 10;
   const [page, setPage] = useState(0);
   const [isLoading, setIsloading] = useState(true);
   const [Totalpage, setTotalpage] = useState(0);
-  const [displayedItems, setDisplayItems] = useState([]);
   const [isOwner, setIsowner] = useState(false);
 
   const fetchData = async () => {
@@ -48,9 +48,6 @@ export const contestants = ({ navigation, route }) => {
       const vef = await AsyncStorage.getItem("@vef");
       setAccount(vef.trim());
       setTotalpage(Math.ceil(fighter.length / itemPerPage));
-      const from = page * itemPerPage;
-      const to = Math.min((page + 1) * itemPerPage, fighter.length);
-      setDisplayItems(fighter.slice(from, to));
     } catch (error) {
       console.error(error);
     }
@@ -66,25 +63,8 @@ export const contestants = ({ navigation, route }) => {
     }
   }, [account]);
 
-  useEffect(() => {
-    const from = page * itemPerPage;
-    const to = Math.min((page + 1) * itemPerPage, fighter.length);
-    const slicedItems = fighter.slice(from, to);
-    setDisplayItems(slicedItems);
-    console.log("display", displayedItems);
-  }, [fighter]);
-
-  const Nextpage = () => {
-    if (page < Totalpage) {
-      setPage(page + 1);
-    }
-  };
-
-  const Previouspage = () => {
-    if (page > 0) {
-      setPage(page - 1);
-    }
-  };
+  const from = page * itemPerPage;
+  const to = Math.min((page + 1) * itemPerPage, fighter.length);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -105,52 +85,71 @@ export const contestants = ({ navigation, route }) => {
       <View>
         <Text style={styles.header}>ผู้เข้าแข่งขัน</Text>
       </View>
-      <ScrollView horizontal contentContainerStyle={styles.tableOverall}>
+      <ScrollView>
         {/*table header*/}
-        <DataTable>
+        <DataTable style={styles.table}>
           <DataTable.Header>
-            <DataTable.Title style={styles.tableTitleNo}>No.</DataTable.Title>
-            <DataTable.Title style={styles.tableTitleName}>
+            <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
+            <DataTable.Title style={styles.tableName}>
               ชื่อผู้เข้าแข่งขัน
             </DataTable.Title>
             {isOwner && (
-              <DataTable.Title style={styles.tableTitleNation}>
+              <DataTable.Title style={styles.tableNation}>
                 เนชัน
               </DataTable.Title>
             )}
             {isOwner && (
-              <DataTable.Title style={styles.tableTitleArchtype}>
+              <DataTable.Title style={styles.tableArchtype}>
                 สายการเล่น
               </DataTable.Title>
             )}
           </DataTable.Header>
 
           {/* table rows */}
-          {displayedItems.length > 0 &&
+          {fighter.slice(from, to).length > 0 &&
             account &&
-            displayedItems.map((item) => {
+            fighter.slice(from, to).map((item) => {
               const FighterID = item.FighterID;
               return (
-                  <DataTable.Row key={item.FighterID} onPress={() => navigation.navigate("ContestantDetail",{FighterID,tableID,userID : item.UserID,Eventname})}>
-                    <DataTable.Cell style={styles.tableCellNo}>
-                      {item.FighterID}
+                <DataTable.Row
+                  key={item.FighterID}
+                  onPress={() =>
+                    navigation.navigate("ContestantDetail", {
+                      FighterID,
+                      tableID,
+                      userID: item.UserID,
+                      Eventname,
+                    })
+                  }
+                >
+                  <DataTable.Cell style={styles.tableNo}>
+                    {item.FighterID}
+                  </DataTable.Cell>
+                  <DataTable.Cell style={styles.tableName}>
+                    {item.UserName}
+                  </DataTable.Cell>
+                  {isOwner && (
+                    <DataTable.Cell style={styles.tableNation}>
+                      {item.Nation}
                     </DataTable.Cell>
-                    <DataTable.Cell style={styles.tableCellName}>
-                      {item.UserName}
+                  )}
+                  {isOwner && (
+                    <DataTable.Cell style={styles.tableArchtype}>
+                      {item.Archtype}
                     </DataTable.Cell>
-                    {isOwner && (
-                      <DataTable.Cell style={styles.tableCellNation}>
-                        {item.Nation}
-                      </DataTable.Cell>
-                    )}
-                    {isOwner && (
-                      <DataTable.Cell style={styles.tableCellArchtype}>
-                        {item.Archtype}
-                      </DataTable.Cell>
-                    )}
-                  </DataTable.Row>
+                  )}
+                </DataTable.Row>
               );
             })}
+
+          <DataTable.Pagination
+            page={page}
+            numberOfPages={Totalpage}
+            onPageChange={(page) => setPage(page)}
+            label={`${page + 1} of ${Totalpage}`}
+            numberOfItemsPerPage={itemPerPage}
+            showFastPaginationControls
+          />
         </DataTable>
       </ScrollView>
     </SafeAreaView>
@@ -171,43 +170,20 @@ export const styles = StyleSheet.create({
     color: "#176B87",
     marginBottom: 20,
   },
-  tableOverall: {
-    flex: 1,
-    minWidth: "100%",
-    paddingHorizontal: 2,
-    paddingVertical: 2,
-    justifyContent: "center",
-  },
-  tableTitleNo: {
-    minWidth: 20,
+  tableNo: {
+    minWidth: "5%",
     marginHorizontal: 5,
   },
-  tableTitleName: {
-    minWidth: 100,
+  tableName: {
+    minWidth: "25%",
     marginHorizontal: 5,
   },
-  tableTitleNation: {
-    minWidth: 100,
+  tableNation: {
+    minWidth: "20%",
     marginHorizontal: 5,
   },
-  tableTitleArchtype: {
-    minWidth: 100,
-    marginHorizontal: 5,
-  },
-  tableCellNo: {
-    minWidth: 20,
-    marginHorizontal: 5,
-  },
-  tableCellName: {
-    minWidth: 100,
-    marginHorizontal: 5,
-  },
-  tableCellNation: {
-    minWidth: 100,
-    marginHorizontal: 5,
-  },
-  tableCellArchtype: {
-    minWidth: 100,
+  tableArchtype: {
+    minWidth: "15%",
     marginHorizontal: 5,
   },
   menu: {
@@ -219,5 +195,15 @@ export const styles = StyleSheet.create({
   },
   icon: {
     color: "#176B87",
+  },
+  table: {
+    minWidth: "60%",
+    maxWidth: "95%",
+    margin: 10,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderRadius: 5,
+    overflow: "hidden",
+    justifyContent: 'space-evenly'
   },
 });

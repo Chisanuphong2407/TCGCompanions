@@ -144,6 +144,20 @@ export const Eventdetails = ({ navigation, route }) => {
     }
   };
 
+  const eventBegin = async() => {
+    Alert.alert("ยืนยันจัดการแข่งขัน","หลังยืนยัน สถานะกิจกรรมจะเปลี่ยนเป็น 'กำลังแข่งขัน' และจะไม่สามารถลบกิจกรรมนี้ได้",[
+      {
+        text: "ยืนยัน",
+        style: 'default',
+        // onPress: () =>
+      },
+      {
+        text: "ยกเลิก",
+        style: 'cancel'
+      }
+    ])
+  }
+
   useEffect(() => {
     fetchDetail();
   }, [isLoading]);
@@ -214,7 +228,7 @@ export const Eventdetails = ({ navigation, route }) => {
           <View style={styles.menu}>
             <Pressable
               onPress={() => {
-                navigation.navigate("contestants", { table, owner,eventName,ID });
+                navigation.navigate("contestants", { table, owner,eventName,ID,status });
               }}
               style={styles.menubox}
             >
@@ -230,7 +244,7 @@ export const Eventdetails = ({ navigation, route }) => {
             <Pressable
               style={styles.menubox}
               onPress={() => {
-                navigation.navigate("contestants", { table, owner });
+                navigation.navigate("contestants", { table, owner ,ID,eventName});
               }}
             >
               <Users color={"#176B87"} style={styles.menubut} />
@@ -282,8 +296,8 @@ export const Eventdetails = ({ navigation, route }) => {
       </View>
       {status === "ปิดรับสมัคร" && isOwner && (
         <View style={styles.eventBegin}>
-          <Pressable>
-            <Text style={{ color: "white" }}>เริ่มการแข่งขัน</Text>
+          <Pressable onPress={eventBegin}>
+            <Text style={{ color: "white" }}>จัดการแข่งขัน</Text>
           </Pressable>
         </View>
       )}

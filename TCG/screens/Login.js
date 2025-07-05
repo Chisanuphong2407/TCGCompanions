@@ -36,10 +36,9 @@ export const Login = ({ navigation}) => {
       })
     });
     const accessToken = await FetchLogin.json();
-    console.log(accessToken);
-    // console.log(accessToken);
-    if ( accessToken === 'รหัสไม่ถูกต้อง' ){
-      Alert.alert("รหัสผ่านไม่ถูกต้อง","โปรดกรอกรหัสผ่านใหม่",[{
+    console.log( accessToken === 'ชื่อผู้ใช้ไม่ถูกต้อง');
+    if ( accessToken.message === 'รหัสไม่ถูกต้อง' || accessToken.message === "ชื่อผู้ใช้ไม่ถูกต้อง" ){
+      Alert.alert("รหัสผ่านหรือชื่อผู้ใช้ไม่ถูกต้อง","โปรดลองอีกครั้ง",[{
         text: "ตกลง"
       }
       ])

@@ -28,7 +28,7 @@ import {
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
-import { MyProfile, RePassword } from "./screens/MyProfile";
+import { MyProfile,RePassword } from "./screens/myProfile";
 import { CreateEvent } from "./screens/CreateEvent";
 import { Editdetail } from "./screens/Editdetail";
 import { Apply } from "./screens/Apply";
@@ -36,7 +36,7 @@ import { contestants } from "./screens/contestants";
 import { AddFighter } from "./screens/AddFighter";
 import { ContestantDetail } from "./screens/ContestantDetail";
 
-export const IP = "http://192.168.1.4:3000";
+export const IP = "http://192.168.1.7:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -58,7 +58,7 @@ const Home = ({ navigation }) => {
   const verify = async () => {
     try {
       const token = await AsyncStorage.getItem("@accessToken");
-      // console.log(token);
+      console.log(token);
       const vef = await fetch(IP + "/api/profile/", {
         method: "GET",
         headers: {
@@ -66,7 +66,7 @@ const Home = ({ navigation }) => {
         },
       });
       const passvef = await vef.json();
-      // console.log("vef", passvef);
+      console.log("vef", passvef);
       if (token === null) {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
