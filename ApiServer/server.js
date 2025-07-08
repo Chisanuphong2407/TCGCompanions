@@ -643,6 +643,7 @@ app.post("/api/contestantprofile", async (req, res) => {
   }
 });
 
+//อัพเดตสถานะกิจกรรมเป็น กำลังแข่งขัน
 app.put("/api/eventbegin/:EventID",async(req,res) => {
   try {
     const EventID = req.params.EventID;

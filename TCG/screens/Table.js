@@ -16,45 +16,51 @@ import {
   FlatList,
 } from "react-native";
 import { DataTable } from "react-native-paper";
-import { UserPlus, X } from "react-native-feather";
+import { Users } from "react-native-feather";
 import { IP } from "../App";
 
-export const Fighterlist = ({ route, navigation }) => {
+export const Table = ({ route, navigation }) => {
   const tableID = route.params.tableID;
-  const [fighter, setfighter] = useState([]);
+  const [fighter, setFighter] = useState([]);
+  const [round, setRound] = useState(0);
   const [Totalpage, setTotalpage] = useState(0);
   const itemPerPage = 10;
   const [page, setPage] = useState(0);
 
-  const fetchData = async () => {
+  const fetchAllFighter = async () => {
     try {
-      console.log("start fetch");
-      const data = await fetch(`${IP}/api/fetchcontestants/${tableID}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const response = await data.json();
-      setfighter(response);
-      setTotalpage(Math.ceil(fighter.length / itemPerPage));
+      const fetchFighter = await fetch(
+        `${IP}/api/fetchcontestants/${tableID}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const result = await fetchFighter.json();
+      setFighter(result);
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchAllFighter();
   }, []);
 
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, fighter.length);
-
   return (
     <SafeAreaView style={styles.container}>
-        <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
+      <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
+      <View style={styles.icon}>
+        <Users color={"#176b87"} width={35} height={35} />
+      </View>
       <View>
-        <Text style={styles.header}>ผู้เข้าแข่งขัน</Text>
+        <Text style={styles.header}>ตารางการแข่งขัน</Text>
+        <Text>รอบที่ {round}</Text>
       </View>
       <ScrollView>
         {/*table header*/}
@@ -64,10 +70,6 @@ export const Fighterlist = ({ route, navigation }) => {
             <DataTable.Title style={styles.tableName}>
               ชื่อผู้เข้าแข่งขัน
             </DataTable.Title>
-            <DataTable.Title style={styles.tableNation}>เนชัน</DataTable.Title>
-            <DataTable.Title style={styles.tableArchtype}>
-              สายการเล่น
-            </DataTable.Title>
           </DataTable.Header>
 
           {/* table rows */}
@@ -75,28 +77,12 @@ export const Fighterlist = ({ route, navigation }) => {
             fighter.slice(from, to).map((item) => {
               const FighterID = item.FighterID;
               return (
-                <DataTable.Row
-                  key={item.FighterID}
-                  onPress={() =>
-                    navigation.navigate("ContestantDetail", {
-                      FighterID,
-                      tableID,
-                      userID: item.UserID,
-                      Eventname,
-                    })
-                  }
-                >
+                <DataTable.Row key={item.FighterID}>
                   <DataTable.Cell style={styles.tableNo}>
                     {item.FighterID}
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableName}>
                     {item.UserName}
-                  </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableNation}>
-                    {item.Nation}
-                  </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableArchtype}>
-                    {item.Archtype}
                   </DataTable.Cell>
                 </DataTable.Row>
               );
@@ -116,13 +102,6 @@ export const Fighterlist = ({ route, navigation }) => {
           <Text style={styles.byeText}>1</Text>
         </View>
       </ScrollView>
-      <View>
-        <TouchableOpacity onPress={() => {
-          navigation.navigate("Table",{tableID});
-        }} style={styles.Createtable}>
-          <Text style={styles.CreattableText}>สร้างตาราง</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 };
@@ -149,16 +128,8 @@ const styles = StyleSheet.create({
     minWidth: "25%",
     marginHorizontal: 5,
   },
-  tableNation: {
-    minWidth: "20%",
-    marginHorizontal: 5,
-  },
-  tableArchtype: {
-    minWidth: "15%",
-    marginHorizontal: 5,
-  },
   table: {
-    flex:0.8,
+    flex: 0.8,
     minWidth: "60%",
     maxWidth: "95%",
     margin: 10,
@@ -170,32 +141,27 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     justifyContent: "space-evenly",
   },
-  byeScore: {
-    margin: 15,
-  },
-  byeText: {
-    fontSize: 18,
-    marginBottom: 15,
-  },
-  Createtable: {
-    alignSelf: "flex-end",
-    backgroundColor: "#176b87",
-    padding: 10,
-    borderRadius: 15,
-    margin: 20,
-    marginLeft: 15,
-    minWidth: 100,
-  },
-  CreattableText: {
-    color: "white",
-    fontSize: 18,
-  },
-    bgIMG: {
+  bgIMG: {
     position: "absolute",
     width: 600,
     height: 600,
     right: -200,
     bottom: -200,
     opacity: 0.3,
+  },
+  icon: {
+    flexDirection: "row",
+    marginTop: 40,
+    padding: 20,
+    paddingBottom: 0,
+    justifyContent: "flex-end",
+  },
+  header: {
+    fontSize: 30,
+    marginTop: 30,
+    alignSelf: "center",
+    fontWeight: "bold",
+    color: "#176B87",
+    marginBottom: 20,
   },
 });

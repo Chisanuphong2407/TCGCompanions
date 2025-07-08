@@ -28,7 +28,7 @@ import { IP } from "../App";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 export const Editdetail = ({ navigation, route }) => {
-  const [eventID,setEventID] = useState(route.params.eventID);
+  const [eventID, setEventID] = useState(route.params.eventID);
   const [Ename, setEname] = useState(route.params.eventName);
   const [condition, setCondition] = useState(route.params.condition);
   const [time, setTime] = useState(route.params.time);
@@ -39,6 +39,7 @@ export const Editdetail = ({ navigation, route }) => {
   const [showDatepicker, setShowDatepicker] = useState(false);
   const [selectText, setSelectText] = useState(route.params.closedate);
   const [sendText, setSendtext] = useState();
+  const status = route.params.status;
 
   // console.log(isNaN(amount));
   const minDate = new Date();
@@ -135,23 +136,23 @@ export const Editdetail = ({ navigation, route }) => {
 
   const closeEvent = async () => {
     try {
-      const closeE = await fetch(IP+`/api/close/${eventID}`,{
+      const closeE = await fetch(IP + `/api/close/${eventID}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-        }
+        },
       });
       const result = await closeE.json();
       // console.log(result.message);
-      if (result.message === "ปิดรับสมัครเสร็จสิ้น"){
-        Alert.alert(result.message,"ท่านสามารถเริ่มการแข่งขันได้ทันที",[
+      if (result.message === "ปิดรับสมัครเสร็จสิ้น") {
+        Alert.alert(result.message, "ท่านสามารถเริ่มการแข่งขันได้ทันที", [
           {
-            text: 'ok',
-            onPress: () => navigation.navigate("Eventdetails",eventID)
-          }
-        ])
-      }else{
-        Alert.alert(result.message,"กรุณาลองอีกครั้ง")
+            text: "ok",
+            onPress: () => navigation.navigate("Eventdetails", eventID),
+          },
+        ]);
+      } else {
+        Alert.alert(result.message, "กรุณาลองอีกครั้ง");
       }
     } catch (error) {
       console.log(error);
@@ -249,13 +250,20 @@ export const Editdetail = ({ navigation, route }) => {
             )}
           </View>
         </View>
-        <View style={{ flexDirection: "row-reverse" ,justifyContent: 'space-around'}}>
+        <View
+          style={{
+            flexDirection: "row-reverse",
+            justifyContent: "space-around",
+          }}
+        >
           <TouchableOpacity onPress={alertedit}>
             <Text style={styles.submit}>แก้ไขกิจกรรม</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={closeEvent}>
-            <Text style={styles.close}>ปิดรับสมัคร</Text>
-          </TouchableOpacity>
+          {status == 0 && (
+            <TouchableOpacity onPress={closeEvent}>
+              <Text style={styles.close}>ปิดรับสมัคร</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </View>

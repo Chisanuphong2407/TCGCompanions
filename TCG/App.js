@@ -36,6 +36,7 @@ import { contestants } from "./screens/contestants";
 import { AddFighter } from "./screens/AddFighter";
 import { ContestantDetail } from "./screens/ContestantDetail";
 import { Fighterlist } from "./screens/Fighterlist";
+import { Table } from "./screens/Table";
 
 export const IP = "http://192.168.1.10:3000";
 
@@ -586,6 +587,11 @@ const App = () => {
         <Stack.Screen
           name="Fighterlist"
           component={Fighterlist}
+          options={{ headerTitle: "" }}
+        />
+        <Stack.Screen
+          name="Table"
+          component={Table}
           options={{ headerTitle: "" }}
         />
       </Stack.Navigator>

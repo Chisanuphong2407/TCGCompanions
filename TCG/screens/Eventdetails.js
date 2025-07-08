@@ -222,6 +222,7 @@ export const Eventdetails = ({ navigation, route }) => {
                   address: address,
                   moredetail: moredetail,
                   closedate: closedate,
+                  status: statusNum
                 });
               }}
               style={styles.menubox}
