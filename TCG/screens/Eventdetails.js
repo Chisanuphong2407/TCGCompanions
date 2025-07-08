@@ -78,6 +78,10 @@ export const Eventdetails = ({ navigation, route }) => {
         setStatus("กำลังแข่งขัน");
         setStatusstyle(styles.status2);
         setStatusNum(2);
+      } else if(item[0] && item[0].Status === 3){
+        setStatus("แข่งขันเสร็จสิ้น");
+        setStatusstyle(styles.status3);
+        setStatusNum(2);
       }
       const data = await fetch(IP + "/api/edetails", {
         method: "POST",
@@ -377,7 +381,18 @@ export const styles = StyleSheet.create({
   },
   status2: {
     justifyContent: "flex-start",
-    backgroundColor: "#6a05ee",
+    backgroundColor: "#03A9F4",
+    padding: 5,
+    paddingLeft: 15,
+    width: 150,
+    marginLeft: -20,
+    fontSize: 20,
+    color: "white",
+    marginTop: 20,
+  },
+  status3: {
+    justifyContent: "flex-start",
+    backgroundColor: "#9C27B0",
     padding: 5,
     paddingLeft: 15,
     width: 150,

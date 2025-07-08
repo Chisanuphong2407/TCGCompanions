@@ -650,10 +650,10 @@ app.put("/api/eventbegin/:EventID",async(req,res) => {
 
     if (begin.affectedRows > 0){
       io.emit("refreshing",true)
-      return res.status(200).json({message: "อัพเดตสำเร็จ"});
+      return res.status(200).json({message: "อัพเดตสำเร็จ",begin});
     }
     else{
-      return res.status(404).json({message: "อัพเดตไม่สำเร็จ"})
+      return res.status(404).json({message: "อัพเดตไม่สำเร็จ",begin})
     }
   } catch (error) {
     return res.status(404).json({message: JSON.stringify(error)})

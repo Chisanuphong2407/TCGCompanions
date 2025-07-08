@@ -19,6 +19,56 @@ import { DataTable } from "react-native-paper";
 import { UserPlus, X } from "react-native-feather";
 import { IP } from "../App";
 
+export const eventBegin = (EventID, navigation) => {
+  const statusChange = async () => {
+    try {
+      console.log(EventID);
+      const change = await fetch(`${IP}/api/eventbegin/${EventID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await change.json();
+      console.log(result);
+      if (result.message == "อัพเดตสำเร็จ") {
+        Alert.alert(
+          "เริ่มต้นเสร็จสิ้น",
+          "ท่านสามารถจัดการแข่งขันได้แล้วในขณะนี้",
+          [
+            {
+              text: "ตกลง",
+              style: "default",
+              onPress: () => navigation.navigate("Eventdetails", EventID),
+            },
+          ]
+        );
+      } else {
+        Alert.alert("ไม่สำเร็จ");
+      }
+    } catch (error) {
+      Alert.alert("อัพเดตสถานะไม่สำเร็จ", `กรุณาลองใหม่อีกครั้ง ${error}`);
+    }
+  };
+
+  Alert.alert(
+    "ยืนยันจัดการแข่งขัน",
+    "หลังยืนยัน สถานะกิจกรรมจะเปลี่ยนเป็น 'กำลังแข่งขัน' และจะไม่สามารถลบกิจกรรมนี้ได้",
+    [
+      {
+        text: "ยืนยัน",
+        style: "default",
+        onPress: statusChange,
+      },
+      {
+        text: "ยกเลิก",
+        style: "cancel",
+      },
+    ]
+  );
+};
+
 export const contestants = ({ navigation, route }) => {
   const EventID = route.params.ID;
   const Eventname = route.params.eventName;
@@ -53,39 +103,6 @@ export const contestants = ({ navigation, route }) => {
     }
   };
 
-  const eventBegin = () => {
-    Alert.alert("ยืนยันจัดการแข่งขัน","หลังยืนยัน สถานะกิจกรรมจะเปลี่ยนเป็น 'กำลังแข่งขัน' และจะไม่สามารถลบกิจกรรมนี้ได้",[
-      {
-        text: "ยืนยัน",
-        style: 'default',
-        onPress: statusChange
-      },
-      {
-        text: "ยกเลิก",
-        style: 'cancel'
-      }
-    ])
-  }
-
-  const statusChange = async() => {
-    try {
-      const change = await fetch(`${IP}/api/eventbegin/${EventID}`,{
-         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const result = await change.json();
-
-      if (result.ok) {
-        Alert
-      }
-    } catch (error) {
-      Alert.alert("อัพเดตสถานะไม่สำเร็จ","กรุณาลองใหม่อีกครั้ง")
-    }
-  }
-
   useEffect(() => {
     fetchData();
   }, [isLoading]);
@@ -107,7 +124,7 @@ export const contestants = ({ navigation, route }) => {
         >
           <X style={styles.icon} />
         </TouchableOpacity>
-        {(status == 0) && (status == 1)}
+        {status == 0 && status == 1}
         <TouchableOpacity
           onPress={() =>
             navigation.navigate("AddFighter", { tableID, Eventname, owner })
@@ -186,11 +203,17 @@ export const contestants = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
-      <View>
-        <TouchableOpacity onPress={eventBegin}>
-          <Text>เริ่มการแข่งขัน</Text>
-        </TouchableOpacity>
-      </View>
+      {status != 3 && owner && (
+        <View style={styles.manageEvent}>
+          <TouchableOpacity
+            onPress={() => {
+              eventBegin(EventID, navigation);
+            }}
+          >
+            <Text style={styles.manageEventText}>เริ่มการแข่งขัน</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -233,7 +256,7 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   icon: {
-    color: "#176B87",
+    color: "#176b87",
   },
   table: {
     minWidth: "60%",
@@ -243,6 +266,19 @@ export const styles = StyleSheet.create({
     borderColor: "#e0e0e0",
     borderRadius: 5,
     overflow: "hidden",
-    justifyContent: 'space-evenly'
+    justifyContent: "space-evenly",
+  },
+  manageEvent: {
+    alignSelf: "flex-end",
+    backgroundColor: "#176b87",
+    padding: 10,
+    borderRadius: 5,
+    margin: 30,
+    marginLeft: 15,
+    minWidth: 100,
+  },
+  manageEventText: {
+    color: "white",
+    alignSelf: "center",
   },
 });
