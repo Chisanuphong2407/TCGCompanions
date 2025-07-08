@@ -21,7 +21,7 @@ import { IP } from "../App";
 
 export const Fighterlist = ({ route, navigation }) => {
   const tableID = route.params.tableID;
-  const [fighter, setfighter] = useState([]);
+  const [fighter, setFighter] = useState([]);
   const [Totalpage, setTotalpage] = useState(0);
   const itemPerPage = 10;
   const [page, setPage] = useState(0);
@@ -36,8 +36,10 @@ export const Fighterlist = ({ route, navigation }) => {
         },
       });
       const response = await data.json();
-      setfighter(response);
+      setFighter(response);
+      console.log(fighter)
       setTotalpage(Math.ceil(fighter.length / itemPerPage));
+      console.log(Totalpage)
     } catch (error) {
       console.error(error);
     }

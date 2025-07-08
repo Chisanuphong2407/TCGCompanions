@@ -41,6 +41,7 @@ export const Table = ({ route, navigation }) => {
 
       const result = await fetchFighter.json();
       setFighter(result);
+      setTotalpage(Math.ceil(fighter.length / itemPerPage));
     } catch (error) {
       console.error(error);
     }
@@ -52,6 +53,7 @@ export const Table = ({ route, navigation }) => {
 
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, fighter.length);
+
   return (
     <SafeAreaView style={styles.container}>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
@@ -60,12 +62,16 @@ export const Table = ({ route, navigation }) => {
       </View>
       <View>
         <Text style={styles.header}>ตารางการแข่งขัน</Text>
-        <Text>รอบที่ {round}</Text>
+        <Text style={styles.round}>รอบที่ {round}</Text>
       </View>
       <ScrollView>
         {/*table header*/}
         <DataTable style={styles.table}>
           <DataTable.Header>
+            <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
+            <DataTable.Title style={styles.tableName}>
+              ชื่อผู้เข้าแข่งขัน
+            </DataTable.Title>
             <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
             <DataTable.Title style={styles.tableName}>
               ชื่อผู้เข้าแข่งขัน
@@ -78,6 +84,12 @@ export const Table = ({ route, navigation }) => {
               const FighterID = item.FighterID;
               return (
                 <DataTable.Row key={item.FighterID}>
+                  <DataTable.Cell style={styles.tableNo}>
+                    {item.FighterID}
+                  </DataTable.Cell>
+                  <DataTable.Cell style={styles.tableName}>
+                    {item.UserName}
+                  </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNo}>
                     {item.FighterID}
                   </DataTable.Cell>
@@ -97,10 +109,6 @@ export const Table = ({ route, navigation }) => {
             showFastPaginationControls
           />
         </DataTable>
-        <View style={styles.byeScore}>
-          <Text style={styles.byeText}>คะแนนผู้ที่ชนะบาย :</Text>
-          <Text style={styles.byeText}>1</Text>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -163,5 +171,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#176B87",
     marginBottom: 20,
+  },
+  round: {
+    marginLeft: 20,
+    marginBottom: 10,
   },
 });
