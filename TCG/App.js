@@ -28,13 +28,14 @@ import {
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
-import { MyProfile,RePassword } from "./screens/myProfile";
+import { MyProfile, RePassword } from "./screens/myProfile";
 import { CreateEvent } from "./screens/CreateEvent";
 import { Editdetail } from "./screens/Editdetail";
 import { Apply } from "./screens/Apply";
 import { contestants } from "./screens/contestants";
 import { AddFighter } from "./screens/AddFighter";
 import { ContestantDetail } from "./screens/ContestantDetail";
+import { Fighterlist } from "./screens/Fighterlist";
 
 export const IP = "http://192.168.1.10:3000";
 
@@ -575,12 +576,17 @@ const App = () => {
         <Stack.Screen
           name="AddFighter"
           component={AddFighter}
-          options={{ headerTitle: '' }}
+          options={{ headerTitle: "" }}
         />
         <Stack.Screen
           name="ContestantDetail"
           component={ContestantDetail}
-          options={{ headerTitle: '' }}
+          options={{ headerTitle: "" }}
+        />
+        <Stack.Screen
+          name="Fighterlist"
+          component={Fighterlist}
+          options={{ headerTitle: "" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

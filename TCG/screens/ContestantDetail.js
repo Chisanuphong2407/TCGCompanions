@@ -31,8 +31,10 @@ export const ContestantDetail = ({ navigation, route }) => {
   const [phone, setPhone] = useState("");
   const [nation, setNation] = useState("");
   const [architype, setArchitype] = useState("");
+  const [isLoading,setIsloading] = useState();
 
   const fetchData = async () => {
+    setIsloading(true);
     try {
       const contestantProfile = await fetch(`${IP}/api/contestantprofile`, {
         method: "POST",
@@ -51,8 +53,10 @@ export const ContestantDetail = ({ navigation, route }) => {
       setPhone(fetchprofile[0].PhoneNumber);
       setNation(fetchprofile[0].Nation);
       setArchitype(fetchprofile[0].Archtype);
+      setIsloading(false);
     } catch (error) {
       console.log(error);
+      setIsloading(false);
     }
   };
 
@@ -76,7 +80,7 @@ export const ContestantDetail = ({ navigation, route }) => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [isLoading]);
 
   return (
     <View style={styles.container}>

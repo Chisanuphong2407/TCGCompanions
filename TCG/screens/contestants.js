@@ -40,7 +40,9 @@ export const eventBegin = (EventID, navigation) => {
             {
               text: "ตกลง",
               style: "default",
-              onPress: () => navigation.navigate("Eventdetails", EventID),
+              onPress: () => {
+                navigation.navigate("Eventdetails", EventID);
+              },
             },
           ]
         );
@@ -118,6 +120,7 @@ export const contestants = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
       <View style={styles.menu}>
         <TouchableOpacity
           onPress={() => navigation.navigate("Eventdetails", EventID)}
@@ -203,14 +206,18 @@ export const contestants = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
-      {status != 3 && owner && (
+      {status != 3 && (owner == account) && (
         <View style={styles.manageEvent}>
           <TouchableOpacity
             onPress={() => {
-              eventBegin(EventID, navigation);
+              if (status == 0 || status == 1) {
+                eventBegin(EventID, navigation);
+              } else if (status == 2) {
+                navigation.navigate("Fighterlist",{tableID});
+              } 
             }}
           >
-            <Text style={styles.manageEventText}>เริ่มการแข่งขัน</Text>
+            <Text style={styles.manageEventText}>จัดการแข่งขัน</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -264,6 +271,8 @@ export const styles = StyleSheet.create({
     margin: 10,
     borderWidth: 1,
     borderColor: "#e0e0e0",
+    backgroundColor: "#f4f7fa",
+    opacity: 0.8,
     borderRadius: 5,
     overflow: "hidden",
     justifyContent: "space-evenly",
@@ -280,5 +289,13 @@ export const styles = StyleSheet.create({
   manageEventText: {
     color: "white",
     alignSelf: "center",
+  },
+    bgIMG: {
+    position: "absolute",
+    width: 600,
+    height: 600,
+    right: -200,
+    bottom: -200,
+    opacity: 0.3,
   },
 });

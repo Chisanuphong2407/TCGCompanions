@@ -17,13 +17,15 @@ import {
 } from "react-native";
 import { Trash2, Edit2, Users, Clock } from "react-native-feather";
 import { IP } from "../App";
+import { eventBegin } from "./contestants";
+import io from "socket.io-client";
 
 export const Eventdetails = ({ navigation, route }) => {
   const ID = route.params;
   const [isLoading, setIsloading] = useState(true);
   const [item, setItem] = useState([]);
   const [status, setStatus] = useState();
-  const [statusNum,setStatusNum] = useState();
+  const [statusNum, setStatusNum] = useState();
   const [statusStyle, setStatusstyle] = useState();
   const [isOwner, setIsowner] = useState(false);
   const owner = item[0] && item[0].UserName;
@@ -70,15 +72,15 @@ export const Eventdetails = ({ navigation, route }) => {
         setStatus("เปิดรับสมัคร");
         setStatusstyle(styles.status0);
         setStatusNum(0);
-      } else if(item[0] && item[0].Status === 1) {
+      } else if (item[0] && item[0].Status === 1) {
         setStatus("ปิดรับสมัคร");
         setStatusNum(1);
         setStatusstyle(styles.status1);
-      } else if(item[0] && item[0].Status === 2){
+      } else if (item[0] && item[0].Status === 2) {
         setStatus("กำลังแข่งขัน");
         setStatusstyle(styles.status2);
         setStatusNum(2);
-      } else if(item[0] && item[0].Status === 3){
+      } else if (item[0] && item[0].Status === 3) {
         setStatus("แข่งขันเสร็จสิ้น");
         setStatusstyle(styles.status3);
         setStatusNum(2);
@@ -125,7 +127,7 @@ export const Eventdetails = ({ navigation, route }) => {
 
   const deleteEvent = async () => {
     console.log("start del");
-    const deleteEvent = await fetch(IP + "/api/deleteEvent/"+ ID,{
+    const deleteEvent = await fetch(IP + "/api/deleteEvent/" + ID, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -157,6 +159,13 @@ export const Eventdetails = ({ navigation, route }) => {
 
   useEffect(() => {
     fetchDetail();
+
+    const socket = io(IP);
+
+    socket.on("refreshing", (refresh) => {
+      console.log("Received real-time event update:", refresh);
+      setIsloading(refresh);
+    });
   }, [isLoading]);
 
   useEffect(() => {
@@ -186,9 +195,9 @@ export const Eventdetails = ({ navigation, route }) => {
                     {
                       text: "ตกลง",
                       onPress: () => {
-                        deleteEvent()
+                        deleteEvent();
                         navigation.navigate("Home");
-                      }
+                      },
                     },
                   ],
                   {
@@ -225,7 +234,13 @@ export const Eventdetails = ({ navigation, route }) => {
           <View style={styles.menu}>
             <Pressable
               onPress={() => {
-                navigation.navigate("contestants", { table, owner,eventName,ID,statusNum });
+                navigation.navigate("contestants", {
+                  table,
+                  owner,
+                  eventName,
+                  ID,
+                  statusNum,
+                });
               }}
               style={styles.menubox}
             >
@@ -241,7 +256,12 @@ export const Eventdetails = ({ navigation, route }) => {
             <Pressable
               style={styles.menubox}
               onPress={() => {
-                navigation.navigate("contestants", { table, owner ,ID,eventName});
+                navigation.navigate("contestants", {
+                  table,
+                  owner,
+                  ID,
+                  eventName,
+                });
               }}
             >
               <Users color={"#176B87"} style={styles.menubut} />
@@ -291,11 +311,17 @@ export const Eventdetails = ({ navigation, route }) => {
         <Text style={styles.header}>รายละเอียดอื่นๆ:</Text>
         <Text style={styles.content}>{moredetail}</Text>
       </View>
-      {status === "ปิดรับสมัคร" && isOwner && (
+      {(status === "ปิดรับสมัคร" || status === "กำลังแข่งขัน") && isOwner && (
         <View style={styles.eventBegin}>
-          <Pressable onPress={() => {
-            navigation.navigate("contestants", { table, owner ,ID,eventName})
-          }}>
+          <Pressable
+            onPress={() => {
+              if (statusNum == 1) {
+                eventBegin(ID, navigation);
+              } else if (statusNum == 2){
+                navigation.navigate("Fighterlist",{tableID: table})
+              }
+            }}
+          >
             <Text style={{ color: "white" }}>จัดการแข่งขัน</Text>
           </Pressable>
         </View>
