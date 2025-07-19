@@ -38,7 +38,7 @@ import { ContestantDetail } from "./screens/ContestantDetail";
 import { Fighterlist } from "./screens/Fighterlist";
 import { Table } from "./screens/Table";
 
-export const IP = "http://192.168.1.10:3000";
+export const IP = "http://192.168.1.7:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");

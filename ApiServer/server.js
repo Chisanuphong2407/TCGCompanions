@@ -661,9 +661,20 @@ app.put("/api/eventbegin/:EventID",async(req,res) => {
   }
 });
 
+
+// app.post("/api/insertTable",async(req,res) => {
+//   try {
+//     let fighter1 = req.body.fighter1;
+//     let fighter2 = req.body.fighter2;
+//     const insert = await conn.query("")
+//   } catch (error) {
+//     return res.status(404);
+//   }
+// });
+
 server.listen(3000, function () {
   conn.query(
-    "UPDATE `event` SET `Status` = 1 WHERE `CloseDate` <= CURRENT_DATE  "
+    "UPDATE `event` SET `Status` = 1 WHERE `CloseDate` <= CURRENT_DATE AND `Status` = 0  "
   );
   console.log("CORS-enabled web server listening on port 3000");
 });

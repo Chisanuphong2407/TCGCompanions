@@ -26,6 +26,7 @@ export const Table = ({ route, navigation }) => {
   const [Totalpage, setTotalpage] = useState(0);
   const itemPerPage = 10;
   const [page, setPage] = useState(0);
+  const randomPass = [];
 
   const fetchAllFighter = async () => {
     try {
@@ -47,9 +48,25 @@ export const Table = ({ route, navigation }) => {
     }
   };
 
+  const match = async () => {
+    while (fighter.length != 0) {
+      const random = Math.floor(Math.random() * fighter.length);
+      const index = fighter[random];
+      randomPass.push(index);
+      console.log(randomPass);
+      if(randomPass.length == 2){
+        //insert data
+      }
+    }
+  };
+
   useEffect(() => {
     fetchAllFighter();
   }, []);
+
+  useEffect(() => {
+    match();
+  }, [fighter]);
 
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, fighter.length);
