@@ -251,7 +251,9 @@ export const Eventdetails = ({ navigation, route }) => {
         )}
         {isContestant && !isOwner && (
           <View style={styles.menu}>
-            <Pressable style={styles.menubox}>
+            <Pressable style={styles.menubox} onPress={() => {
+              navigation.navigate("History",account);
+            }}>
               <Clock color={"#176B87"} style={styles.menubut} />
             </Pressable>
             <Pressable
