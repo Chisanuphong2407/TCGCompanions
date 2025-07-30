@@ -260,7 +260,26 @@ export const Editdetail = ({ navigation, route }) => {
             <Text style={styles.submit}>แก้ไขกิจกรรม</Text>
           </TouchableOpacity>
           {status == 0 && (
-            <TouchableOpacity onPress={closeEvent}>
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert(
+                  "ยืนยันการปิดรับสมัคร",
+                  "หากปิดรับสมัคร จะไม่สามารถกลับมาเปิดรับสมัครได้อีก",
+                  [
+                    {
+                      text: "ยกเลิก",
+                      style: "cancel",
+                    },
+                    {
+                      text: "ตกลง",
+                      onPress: () => {
+                        closeEvent();
+                      },
+                    },
+                  ]
+                );
+              }}
+            >
               <Text style={styles.close}>ปิดรับสมัคร</Text>
             </TouchableOpacity>
           )}

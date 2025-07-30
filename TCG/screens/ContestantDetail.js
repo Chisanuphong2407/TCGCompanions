@@ -31,7 +31,8 @@ export const ContestantDetail = ({ navigation, route }) => {
   const [phone, setPhone] = useState("");
   const [nation, setNation] = useState("");
   const [architype, setArchitype] = useState("");
-  const [isLoading,setIsloading] = useState();
+  const [isLoading, setIsloading] = useState();
+  const status = route.params.status;
 
   const fetchData = async () => {
     setIsloading(true);
@@ -73,7 +74,7 @@ export const ContestantDetail = ({ navigation, route }) => {
       });
       if (del.ok) {
         Alert.alert("ลบสำเร็จ");
-        navigation.goBack({ table,eventName:Eventname, owner,EventID });
+        navigation.goBack({ table, eventName: Eventname, owner, EventID });
       }
     } catch (error) {
       Alert.alert("ลบไม่สำเร็จ", JSON.stringify(error));
@@ -99,27 +100,29 @@ export const ContestantDetail = ({ navigation, route }) => {
         <Text style={styles.detail}>{architype}</Text>
       </View>
       <View style={styles.delete}>
-        <TouchableOpacity
-          onPress={() => {
-            Alert.alert(
-              "ลบผู้เข้าแข่งขัน",
-              "ท่านยืนยันที่จะลบผู้เข้าแข่งขันท่านนี้",
-              [
-                {
-                  text: "ยืนยัน",
-                  style: "destructive",
-                  onPress: handleDelete,
-                },
-                {
-                  text: "ยกเลิก",
-                  style: "cancel",
-                },
-              ]
-            );
-          }}
-        >
-          <Text style={styles.deleteText}>ลบ</Text>
-        </TouchableOpacity>
+        {(status == 0 || status == 1) && (
+          <TouchableOpacity
+            onPress={() => {
+              Alert.alert(
+                "ลบผู้เข้าแข่งขัน",
+                "ท่านยืนยันที่จะลบผู้เข้าแข่งขันท่านนี้",
+                [
+                  {
+                    text: "ยืนยัน",
+                    style: "destructive",
+                    onPress: handleDelete,
+                  },
+                  {
+                    text: "ยกเลิก",
+                    style: "cancel",
+                  },
+                ]
+              );
+            }}
+          >
+            <Text style={styles.deleteText}>ลบ</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

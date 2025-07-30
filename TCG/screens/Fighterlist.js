@@ -25,10 +25,11 @@ export const Fighterlist = ({ route, navigation }) => {
   const [Totalpage, setTotalpage] = useState(0);
   const itemPerPage = 10;
   const [page, setPage] = useState(0);
+  const [isLoading,setIsloading] = useState(true);
 
   const fetchData = async () => {
     try {
-      console.log("start fetch");
+      // console.log("start fetch");
       const data = await fetch(`${IP}/api/fetchcontestants/${tableID}`, {
         method: "GET",
         headers: {
@@ -40,6 +41,7 @@ export const Fighterlist = ({ route, navigation }) => {
       console.log(fighter)
       setTotalpage(Math.ceil(fighter.length / itemPerPage));
       console.log(Totalpage)
+      setIsloading(false);
     } catch (error) {
       console.error(error);
     }
@@ -47,7 +49,7 @@ export const Fighterlist = ({ route, navigation }) => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [isLoading]);
 
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, fighter.length);

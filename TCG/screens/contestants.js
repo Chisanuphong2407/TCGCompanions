@@ -128,6 +128,7 @@ export const contestants = ({ navigation, route }) => {
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, fighter.length);
 
+  console.log(status);
   return (
     <SafeAreaView style={styles.container}>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
@@ -137,14 +138,20 @@ export const contestants = ({ navigation, route }) => {
         >
           <X style={styles.icon} />
         </TouchableOpacity>
-        {status == 0 && status == 1}
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("AddFighter", { tableID, Eventname, owner,EventID })
-          }
-        >
-          <UserPlus style={styles.icon} />
-        </TouchableOpacity>
+        {(status == 0 || status == 1) && (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("AddFighter", {
+                tableID,
+                Eventname,
+                owner,
+                EventID,
+              })
+            }
+          >
+            <UserPlus style={styles.icon} />
+          </TouchableOpacity>
+        )}
       </View>
       <View>
         <Text style={styles.header}>ผู้เข้าแข่งขัน</Text>
@@ -184,7 +191,8 @@ export const contestants = ({ navigation, route }) => {
                         tableID,
                         userID: item.UserID,
                         Eventname,
-                        EventID
+                        EventID,
+                        status
                       });
                     }
                   }}

@@ -106,6 +106,7 @@ const Home = ({ navigation }) => {
       setUser(vef);
       // console.log(event);
       verify();
+      setSearch("");
     } catch (error) {
       console.error("Fetch Error (Catch):", error);
     }
@@ -184,6 +185,7 @@ const Home = ({ navigation }) => {
         console.log(result);
         setEvent(result);
       }
+      setSearch("");
     } catch (error) {
       console.log(error);
     }
