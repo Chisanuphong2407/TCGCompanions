@@ -593,14 +593,14 @@ const App = () => {
           options={{ headerTitle: "" }}
         />
         <Stack.Screen
-          name="Table"
-          component={Table}
-          options={{ headerTitle: "" }}
-        />
-                <Stack.Screen
           name="History"
           component={History}
           options={{ headerTitle: "" }}
+        />
+        <Stack.Screen
+          name="Table"
+          component={Table}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

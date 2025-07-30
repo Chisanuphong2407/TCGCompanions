@@ -22,11 +22,14 @@ import { IP } from "../App";
 export const Table = ({ route, navigation }) => {
   const tableID = route.params.tableID;
   const [fighter, setFighter] = useState([]);
+  const [fighterLength, setFighterlength] = useState(0);
   const [round, setRound] = useState(0);
   const [Totalpage, setTotalpage] = useState(0);
   const itemPerPage = 10;
   const [page, setPage] = useState(0);
-  const randomPass = [];
+  const fighter1st = [];
+  const fighter2nd = [];
+  const [isLoading, setIsloading] = useState(true);
 
   const fetchAllFighter = async () => {
     try {
@@ -41,35 +44,47 @@ export const Table = ({ route, navigation }) => {
       );
 
       const result = await fetchFighter.json();
+
       setFighter(result);
-      setTotalpage(Math.ceil(fighter.length / itemPerPage));
+      setFighterlength(fighter.length);
+      setTotalpage(Math.ceil(fighterLength / itemPerPage));
+      setIsloading(false);
+      console.log("fetch Finish");
+      // console.log("len", fighter.length);
+      // console.log(fighterLength);
     } catch (error) {
       console.error(error);
     }
   };
 
   const match = async () => {
-    while (fighter.length != 0) {
-      const random = Math.floor(Math.random() * fighter.length);
-      const index = fighter[random];
-      randomPass.push(index);
-      console.log(randomPass);
-      if(randomPass.length == 2){
-        //insert data
+    // console.log("fighterlen", fighterLength);
+    for (let index = 0; index < fighterLength; index++) {
+      console.warn("round", index + 1);
+      console.log("len", fighter.length);
+      const randomIndex = Math.floor(Math.random() * fighter.length);
+      console.log("Random", randomIndex);
+      if (index % 2 == 0) {
+        fighter1st.push(fighter[randomIndex].FighterID);
+      } else {
+        fighter2nd.push(fighter[randomIndex].FighterID);
       }
+      fighter.splice(randomIndex, 1);
     }
+    console.log("match finish");
+    console.log("result", fighter1st, fighter2nd);
   };
 
   useEffect(() => {
-    fetchAllFighter();
-  }, []);
-
-  useEffect(() => {
-    match();
-  }, [fighter]);
+    if (fighterLength == 0) {
+      fetchAllFighter();
+    } else {
+      match();
+    }
+  }, [isLoading, fighterLength]);
 
   const from = page * itemPerPage;
-  const to = Math.min((page + 1) * itemPerPage, fighter.length);
+  const to = Math.min((page + 1) * itemPerPage, fighterLength);
 
   return (
     <SafeAreaView style={styles.container}>

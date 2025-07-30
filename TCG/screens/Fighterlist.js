@@ -21,6 +21,7 @@ import { IP } from "../App";
 
 export const Fighterlist = ({ route, navigation }) => {
   const tableID = route.params.tableID;
+  const EventID = route.params.EventID
   const [fighter, setFighter] = useState([]);
   const [Totalpage, setTotalpage] = useState(0);
   const itemPerPage = 10;
@@ -38,9 +39,9 @@ export const Fighterlist = ({ route, navigation }) => {
       });
       const response = await data.json();
       setFighter(response);
-      console.log(fighter)
+      // console.log(fighter)
       setTotalpage(Math.ceil(fighter.length / itemPerPage));
-      console.log(Totalpage)
+      // console.log(Totalpage)
       setIsloading(false);
     } catch (error) {
       console.error(error);
@@ -122,7 +123,7 @@ export const Fighterlist = ({ route, navigation }) => {
       </ScrollView>
       <View>
         <TouchableOpacity onPress={() => {
-          navigation.navigate("Table",{tableID});
+          navigation.navigate("Table",{tableID,EventID});
         }} style={styles.Createtable}>
           <Text style={styles.CreattableText}>สร้างตาราง</Text>
         </TouchableOpacity>

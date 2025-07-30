@@ -74,7 +74,7 @@ export const ContestantDetail = ({ navigation, route }) => {
       });
       if (del.ok) {
         Alert.alert("ลบสำเร็จ");
-        navigation.goBack({ table, eventName: Eventname, owner, EventID });
+        navigation.goBack({ table, eventName: Eventname, owner, EventID,statusNum:status });
       }
     } catch (error) {
       Alert.alert("ลบไม่สำเร็จ", JSON.stringify(error));

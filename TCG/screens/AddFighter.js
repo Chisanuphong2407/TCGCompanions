@@ -23,12 +23,12 @@ export const AddFighter = ({ navigation, route }) => {
   const Eventname = route.params.Eventname;
   const table = route.params.tableID;
   const owner = route.params.owner;
+  const status = route.params.status;
   const [name, setName] = useState("");
   const [selectNation, setSelectnation] = useState();
   const [architype, setArchitype] = useState();
   const [phone, setPhone] = useState();
 
-  console.log(EventID);
   const handleRadiobutton = (value) => {
     setSelectnation(value);
 
@@ -103,7 +103,7 @@ export const AddFighter = ({ navigation, route }) => {
           {
             text: "ตกลง",
             onPress: () => {
-              navigation.navigate("contestants", { table,eventName:Eventname, owner ,EventID});
+              navigation.navigate("contestants", { table,eventName:Eventname, owner ,EventID,statusNum:status});
             },
           },
         ]

@@ -146,6 +146,7 @@ export const contestants = ({ navigation, route }) => {
                 Eventname,
                 owner,
                 EventID,
+                status
               })
             }
           >
@@ -234,7 +235,7 @@ export const contestants = ({ navigation, route }) => {
               if (status == 0 || status == 1) {
                 eventBegin(EventID, navigation);
               } else if (status == 2) {
-                navigation.navigate("Fighterlist", { tableID });
+                navigation.navigate("Fighterlist", { tableID ,EventID});
               }
             }}
           >
