@@ -15,6 +15,7 @@ import {
   Image,
   FlatList,
 } from "react-native";
+import io from "socket.io-client";
 import { DataTable } from "react-native-paper";
 import { UserPlus, X } from "react-native-feather";
 import { IP } from "../App";
@@ -72,7 +73,7 @@ export const eventBegin = (EventID, navigation) => {
 };
 
 export const contestants = ({ navigation, route }) => {
-  const EventID = route.params.ID;
+  const EventID = route.params.EventID;
   const Eventname = route.params.eventName;
   const tableID = route.params.table;
   const status = route.params.statusNum;
@@ -88,6 +89,7 @@ export const contestants = ({ navigation, route }) => {
   const fetchData = async () => {
     try {
       console.log("start fetch");
+      console.log(EventID);
       const data = await fetch(`${IP}/api/fetchcontestants/${tableID}`, {
         method: "GET",
         headers: {
@@ -110,6 +112,14 @@ export const contestants = ({ navigation, route }) => {
   }, [isLoading]);
 
   useEffect(() => {
+    const socket = io(IP);
+
+    socket.on("refreshing", (refresh) => {
+      console.log("Received real-time contestant update:", refresh);
+      setIsloading(refresh);
+    });
+  });
+  useEffect(() => {
     if (account == owner) {
       setIsowner(true);
     }
@@ -130,7 +140,7 @@ export const contestants = ({ navigation, route }) => {
         {status == 0 && status == 1}
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate("AddFighter", { tableID, Eventname, owner })
+            navigation.navigate("AddFighter", { tableID, Eventname, owner,EventID })
           }
         >
           <UserPlus style={styles.icon} />
@@ -167,14 +177,17 @@ export const contestants = ({ navigation, route }) => {
               return (
                 <DataTable.Row
                   key={item.FighterID}
-                  onPress={() =>
-                    navigation.navigate("ContestantDetail", {
-                      FighterID,
-                      tableID,
-                      userID: item.UserID,
-                      Eventname,
-                    })
-                  }
+                  onPress={() => {
+                    if (owner == account) {
+                      navigation.navigate("ContestantDetail", {
+                        FighterID,
+                        tableID,
+                        userID: item.UserID,
+                        Eventname,
+                        EventID
+                      });
+                    }
+                  }}
                 >
                   <DataTable.Cell style={styles.tableNo}>
                     {item.FighterID}
@@ -206,15 +219,15 @@ export const contestants = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
-      {status != 3 && (owner == account) && (
+      {status != 3 && owner == account && (
         <View style={styles.manageEvent}>
           <TouchableOpacity
             onPress={() => {
               if (status == 0 || status == 1) {
                 eventBegin(EventID, navigation);
               } else if (status == 2) {
-                navigation.navigate("Fighterlist",{tableID});
-              } 
+                navigation.navigate("Fighterlist", { tableID });
+              }
             }}
           >
             <Text style={styles.manageEventText}>จัดการแข่งขัน</Text>
@@ -290,7 +303,7 @@ export const styles = StyleSheet.create({
     color: "white",
     alignSelf: "center",
   },
-    bgIMG: {
+  bgIMG: {
     position: "absolute",
     width: 600,
     height: 600,

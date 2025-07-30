@@ -118,7 +118,7 @@ app.post("/api/login", async (req, res) => {
       console.log("login");
       console.log(payload.username);
     } else {
-      return res.status(401).json("รหัสไม่ถูกต้อง");
+      return res.status(401).json({message:"รหัสไม่ถูกต้อง"});
     }
   } catch (error) {
     console.log(error);
@@ -145,7 +145,7 @@ app.get("/api/events", async (req, res) => {
   try {
     // console.log("Event");
     const [result] = await conn.query(
-      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID"
+      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID"
     );
     // console.log(result);
     return res.json(result);
@@ -160,7 +160,7 @@ app.get("/api/fetchcreateevent/:owner", async (req, res) => {
     const owner = req.params.owner;
     console.log(owner);
     const [result] = await conn.query(
-      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName FROM `event` INNER JOIN USER ON user.UserID = EVENT.UserID WHERE user.UserName = ?",
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName FROM `event` INNER JOIN USER ON user.UserID = EVENT.OwnerUserID WHERE user.UserName = ?",
       [owner]
     );
     console.log(result);
@@ -180,7 +180,7 @@ app.get("/api/fetchmyevent/:contestant", async (req, res) => {
     );
 
     const [result] = await conn.query(
-      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fighter INNER JOIN  user ON user.UserID = event.UserID WHERE contestants.UserID = ?",
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fightertable INNER JOIN  user ON user.UserID = event.OwnerUserID WHERE contestants.UserID = ?",
       [ID[0].UserID]
     );
     console.log(result);
@@ -195,7 +195,7 @@ app.post("/api/edetails", async (req, res) => {
   try {
     console.log("start");
     const [details] = await conn.query(
-      "SELECT event.Status, event.Fighter,event.Condition,event.Rule,event.Time,event.Amount,DATE_FORMAT(event.CloseDate,'%d-%m-%Y')  AS CloseDate,event.MoreDetail,event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID WHERE event.EventID = ?",
+      "SELECT event.Status, event.Fightertable,event.Condition,event.Rule,event.Time,event.Amount,DATE_FORMAT(event.CloseDate,'%d-%m-%Y')  AS CloseDate,event.MoreDetail,event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE event.EventID = ?",
       [req.body.EventID]
     );
 
@@ -236,7 +236,7 @@ app.get("/api/search/:eventname", async (req, res) => {
     const name = req.params.eventname;
     console.log(name);
     const [result] = await conn.query(
-      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.UserID WHERE event.EventName LIKE ?",
+      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE event.EventName LIKE ?",
       [`%${name}%`]
     );
 
@@ -259,7 +259,7 @@ app.get("/api/Mysearch/:eventname/:contestant", async (req, res) => {
     );
 
     const [result] = await conn.query(
-      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fighter INNER JOIN  user ON user.UserID = event.UserID WHERE contestants.UserID = ? AND event.EventName LIKE ?",
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fightertable INNER JOIN  user ON user.UserID = event.OwnerUserID WHERE contestants.UserID = ? AND event.EventName LIKE ?",
       [ID[0].UserID, `%${name}%`]
     );
 
@@ -390,13 +390,13 @@ app.post("/api/createevent", async (req, res) => {
     const UserID = user[0].UserID;
     // return res.json(UserID);
     const table = await conn.query(
-      "INSERT INTO `fightertable`(`Fighter`) VALUES (Null)"
+      "INSERT INTO `fightertable`(`table`) VALUES (Null)"
     );
     console.log(table[0].insertId);
     const fightertable = table[0].insertId;
 
     const create = await conn.query(
-      "INSERT INTO `event`(`UserID`, `Fighter`, `EventName`, `Condition`, `Rule`, `Time`, `Amount`, `Address`, `CloseDate`, `MoreDetail`, `Status`) VALUES (?,?,?,?,'swiss',?,?,?,?,?,0)",
+      "INSERT INTO `event`(`OwnerUserID`, `Fightertable`, `EventName`, `Condition`, `Rule`, `Time`, `Amount`, `Address`, `CloseDate`, `MoreDetail`, `Status`) VALUES (?,?,?,?,'swiss',?,?,?,?,?,0)",
       [
         UserID,
         fightertable,
@@ -421,10 +421,10 @@ app.delete("/api/deleteEvent/:EventID", async (req, res) => {
   try {
     const ID = req.params.EventID;
     const [fetchTable] = await conn.query(
-      "SELECT `Fighter` FROM `event` WHERE EventID = ?",
+      "SELECT `Fightertable` FROM `event` WHERE EventID = ?",
       [ID]
     );
-    const table = fetchTable[0].Fighter;
+    const table = fetchTable[0].Fightertable;
 
     if (fetchTable.length === 0) {
       return res.status(404).json({
@@ -442,7 +442,7 @@ app.delete("/api/deleteEvent/:EventID", async (req, res) => {
       [table]
     );
     const [delTable] = await conn.query(
-      "DELETE from `fightertable` WHERE Fighter = ?",
+      "DELETE from `fightertable` WHERE table = ?",
       [table]
     );
 
@@ -475,7 +475,7 @@ app.put("/api/editevent", async (req, res) => {
     const UserID = user[0].UserID;
 
     const update = await conn.query(
-      "UPDATE `event` SET `EventName`= ?,`Condition`= ?,`Time`= ?,`Amount`= ?,`Address`= ?,`CloseDate`= ?,`MoreDetail`= ? WHERE UserID = ?",
+      "UPDATE `event` SET `EventName`= ?,`Condition`= ?,`Time`= ?,`Amount`= ?,`Address`= ?,`CloseDate`= ?,`MoreDetail`= ? WHERE OwnerUserID = ?",
       [
         req.body.eventname,
         req.body.condition,
@@ -494,7 +494,7 @@ app.put("/api/editevent", async (req, res) => {
   }
 });
 
-//สมัครแข่ง
+//สมัครแข่ง เพิ่มข้อมูลผู้เข้าแข่งขัน
 app.post("/api/apply", async (req, res) => {
   try {
     const username = req.body.username;
@@ -525,7 +525,7 @@ app.post("/api/apply", async (req, res) => {
       userID = null;
       note = req.body.phone;
       await conn.query(
-        "INSERT INTO `contestants`(`FighterTable`, `FighterID`, `UserName`, `UserID`, `Nation`, `Archtype`,`note`) VALUES (?,?,?,?,?,?,?)",
+        "INSERT INTO `contestants`(`FighterTable`, `FighterID`, `UserName`, `UserID`, `Nation`, `Archtype`,`contact`) VALUES (?,?,?,?,?,?,?)",
         [fighterTable, fighterID, username, userID, nation, architype, note]
       );
     } else {
@@ -545,7 +545,7 @@ app.post("/api/apply", async (req, res) => {
   }
 });
 
-//สละสิทธิ์
+//สละสิทธิ์ ลบผู้เข้าแข่งขัน
 app.delete(
   "/api/waive/table/:fightertable/userID/:username",
   async (req, res) => {
@@ -560,6 +560,7 @@ app.delete(
 
       if (waived.affectedRows > 0) {
         console.log(waived);
+        io.emit("refreshing", true);
         return res.sendStatus(204);
       } else {
         return res
@@ -599,6 +600,7 @@ app.put("/api/close/:EventID", async (req, res) => {
 //ข้อมูลผู้เข้าแข่งขัน
 app.get("/api/fetchcontestants/:table", async (req, res) => {
   const tableID = req.params.table;
+  console.log(tableID);
   try {
     const [data] = await conn.query(
       "SELECT * FROM `contestants` WHERE `FighterTable` = ?",
@@ -611,10 +613,10 @@ app.get("/api/fetchcontestants/:table", async (req, res) => {
   }
 });
 
-//fetch ผู้เข้าแข่งขันรายคน
+//fetch ข้อมูลผู้เข้าแข่งขันรายคน
 app.post("/api/contestantprofile", async (req, res) => {
   try {
-    console.log("fetch cont");
+    // console.log("fetch cont");
     const table = req.body.table;
     const fighterID = req.body.fighterID;
     const userID = req.body.userID;
@@ -623,8 +625,7 @@ app.post("/api/contestantprofile", async (req, res) => {
       "SELECT `PhoneNumber`,`UserName` FROM `user` WHERE `UserID`= ?",
       [userID]
     );
-    console.log(fetchuser.length);
-    // return res.status(200).json(fetchuser);
+    // console.log(fetchuser.length);
     if (fetchuser.length > 0) {
       const [fetchdetail] = await conn.query(
         "SELECT contestants.`UserName`, `Nation`, `Archtype`, user.PhoneNumber FROM `contestants` INNER JOIN user ON user.UserID = contestants.UserID WHERE `FighterID` = ? AND `FighterTable` = ?",
@@ -633,7 +634,7 @@ app.post("/api/contestantprofile", async (req, res) => {
       return res.status(200).json(fetchdetail);
     } else {
       const [fetchdetail] = await conn.query(
-        "SELECT `UserName`, `Nation`, `Archtype`, `note` AS PhoneNumber FROM `contestants` WHERE `FighterID` = ? AND `FighterTable` = ?",
+        "SELECT `UserName`, `Nation`, `Archtype`, `contact` AS PhoneNumber FROM `contestants` WHERE `FighterID` = ? AND `FighterTable` = ?",
         [fighterID, table]
       );
       return res.status(200).json(fetchdetail);

@@ -13,6 +13,7 @@ import {
   Pressable,
   Image,
 } from "react-native";
+import { IP } from "../App";
 
 export const Register = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -22,6 +23,8 @@ export const Register = ({ navigation }) => {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [Vpassword, setVPassword] = useState("");
+
+  const emailRegex = /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   const handleRegister = async () => {
     if (
@@ -33,17 +36,27 @@ export const Register = ({ navigation }) => {
       !lastname ||
       !Vpassword
     ) {
-      Alert.alert("ไม่สำเร็จ", "กรุณากรอกข้อมูลให้ครบถ้วน",[{
-        text: "ตกลง"
-      }
+      Alert.alert("ไม่สำเร็จ", "กรุณากรอกข้อมูลให้ครบถ้วน", [
+        {
+          text: "ตกลง",
+        },
       ]);
       return;
+    } else if (phone.length < 10) {
+      Alert.alert("เพิ่มไม่สำเร็จ", "กรุณากรอกหมายเลขโทรศัพท์ให้ครบ");
     } else if (password !== Vpassword) {
-      Alert.alert("รหัสผ่านไม่ตรงกัน", "กรุณากรอกรหัสผ่านใหม่",[{
-        text: "ตกลง"
-      }
+      Alert.alert("รหัสผ่านไม่ตรงกัน", "กรุณากรอกรหัสผ่านใหม่", [
+        {
+          text: "ตกลง",
+        },
       ]);
-    } else {
+    } else if (!(emailRegex.test(email))) {
+      Alert.alert("อีเมล์ไม่ถูกต้อง", "กรุณากรอกอีเมล์ใหม่", [
+        {
+          text: "ตกลง",
+        },
+      ]);
+    }else {
       try {
         console.log("start");
         const response = await fetch(IP + "/api/register", {
@@ -66,10 +79,12 @@ export const Register = ({ navigation }) => {
         if (response.ok) {
           Alert.alert(
             "สำเร็จ",
-            "สมัครสมาชิกเสร็จสิ้น",[{
-        text: "ตกลง"
-      }
-      ],
+            "สมัครสมาชิกเสร็จสิ้น",
+            [
+              {
+                text: "ตกลง",
+              },
+            ],
             navigation.navigate("Login")
           );
           console.log("Registration successful:", data);

@@ -19,7 +19,7 @@ import { RadioButton } from "react-native-paper";
 import { IP } from "../App";
 
 export const Apply = ({ navigation, route }) => {
-  const EventID = route.params.ID;
+  const EventID = route.params.EventID;
   const Eventname = route.params.eventName;
   const table = route.params.table;
   const username = route.params.account;

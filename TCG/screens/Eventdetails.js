@@ -21,7 +21,7 @@ import { eventBegin } from "./contestants";
 import io from "socket.io-client";
 
 export const Eventdetails = ({ navigation, route }) => {
-  const ID = route.params;
+  const EventID = route.params;
   const [isLoading, setIsloading] = useState(true);
   const [item, setItem] = useState([]);
   const [status, setStatus] = useState();
@@ -91,7 +91,7 @@ export const Eventdetails = ({ navigation, route }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          EventID: ID,
+          EventID: EventID,
         }),
       });
       const responseData = await data.json();
@@ -107,7 +107,7 @@ export const Eventdetails = ({ navigation, route }) => {
       setAddress(item[0] && item[0].Address);
       setMoredetail(item[0] && item[0].MoreDetail);
       setClosedate(item[0] && item[0].CloseDate);
-      setTable(item[0] && item[0].Fighter);
+      setTable(item[0] && item[0].Fightertable);
     } catch (error) {
       console.log(error);
     }
@@ -127,7 +127,7 @@ export const Eventdetails = ({ navigation, route }) => {
 
   const deleteEvent = async () => {
     console.log("start del");
-    const deleteEvent = await fetch(IP + "/api/deleteEvent/" + ID, {
+    const deleteEvent = await fetch(IP + "/api/deleteEvent/" + EventID, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -213,7 +213,7 @@ export const Eventdetails = ({ navigation, route }) => {
               onPress={() => {
                 console.log("edit");
                 navigation.navigate("Editdetail", {
-                  eventID: ID,
+                  eventID: EventID,
                   eventName: eventName,
                   condition: condition,
                   rule: rule,
@@ -239,7 +239,7 @@ export const Eventdetails = ({ navigation, route }) => {
                   table,
                   owner,
                   eventName,
-                  ID,
+                  EventID,
                   statusNum,
                 });
               }}
@@ -262,7 +262,7 @@ export const Eventdetails = ({ navigation, route }) => {
                 navigation.navigate("contestants", {
                   table,
                   owner,
-                  ID,
+                  EventID,
                   eventName,
                 });
               }}
@@ -319,7 +319,7 @@ export const Eventdetails = ({ navigation, route }) => {
           <Pressable
             onPress={() => {
               if (statusNum == 1) {
-                eventBegin(ID, navigation);
+                eventBegin(EventID, navigation);
               } else if (statusNum == 2){
                 navigation.navigate("Fighterlist",{tableID: table})
               }
@@ -336,8 +336,8 @@ export const Eventdetails = ({ navigation, route }) => {
           <View style={styles.apply}>
             <TouchableOpacity
               onPress={() => {
-                console.log(ID);
-                navigation.navigate("Apply", { ID, eventName, table, account });
+                console.log(EventID);
+                navigation.navigate("Apply", { EventID, eventName, table, account });
               }}
             >
               <Text style={styles.applyText}>สมัคร</Text>

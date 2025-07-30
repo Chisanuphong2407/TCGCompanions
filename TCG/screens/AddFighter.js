@@ -19,6 +19,7 @@ import { RadioButton } from "react-native-paper";
 import { IP } from "../App";
 
 export const AddFighter = ({ navigation, route }) => {
+  const EventID = route.params.EventID
   const Eventname = route.params.Eventname;
   const table = route.params.tableID;
   const owner = route.params.owner;
@@ -27,6 +28,7 @@ export const AddFighter = ({ navigation, route }) => {
   const [architype, setArchitype] = useState();
   const [phone, setPhone] = useState();
 
+  console.log(EventID);
   const handleRadiobutton = (value) => {
     setSelectnation(value);
 
@@ -53,8 +55,10 @@ export const AddFighter = ({ navigation, route }) => {
   };
 
   const submit = () => {
-    if (!architype || !selectNation || !name) {
+    if (!architype || !selectNation || !name || !phone) {
       Alert.alert("เพิ่มไม่สำเร็จ", "กรุณากรอกข้อมูลให้ครบถ้วน");
+    } else if (phone.length < 10) {
+      Alert.alert("เพิ่มไม่สำเร็จ", "กรุณากรอกหมายเลขโทรศัพท์ให้ครบ");
     } else {
       Alert.alert(
         "ยืนยันการเพิ่มข้อมูล",
@@ -99,7 +103,7 @@ export const AddFighter = ({ navigation, route }) => {
           {
             text: "ตกลง",
             onPress: () => {
-              navigation.navigate("contestants", { table, Eventname, owner });
+              navigation.navigate("contestants", { table,eventName:Eventname, owner ,EventID});
             },
           },
         ]

@@ -20,7 +20,7 @@ import { Phone, UserPlus, X } from "react-native-feather";
 import { IP } from "../App";
 
 export const ContestantDetail = ({ navigation, route }) => {
-  const ID = route.params.EventID;
+  const EventID = route.params.EventID;
   const eventName = route.params.EventName;
   const table = route.params.tableID;
   const owner = route.params.owner;
@@ -35,6 +35,8 @@ export const ContestantDetail = ({ navigation, route }) => {
 
   const fetchData = async () => {
     setIsloading(true);
+    console.log(EventID);
+
     try {
       const contestantProfile = await fetch(`${IP}/api/contestantprofile`, {
         method: "POST",
@@ -71,7 +73,7 @@ export const ContestantDetail = ({ navigation, route }) => {
       });
       if (del.ok) {
         Alert.alert("ลบสำเร็จ");
-        navigation.goBack();
+        navigation.goBack({ table,eventName:Eventname, owner,EventID });
       }
     } catch (error) {
       Alert.alert("ลบไม่สำเร็จ", JSON.stringify(error));

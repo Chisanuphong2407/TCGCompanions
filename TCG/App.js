@@ -39,7 +39,7 @@ import { Fighterlist } from "./screens/Fighterlist";
 import { Table } from "./screens/Table";
 import { History } from "./screens/History";
 
-export const IP = "http://192.168.1.11:3000";
+export const IP = "http://192.168.1.7:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -87,7 +87,7 @@ const Home = ({ navigation }) => {
         setIsmyMenu(false);
         setIscmenu(false);
       }
-      AsyncStorage.setItem("@vef", passvef);
+      await AsyncStorage.setItem("@vef", passvef);
       return passvef;
     } catch (error) {
       console.log(error);
@@ -622,7 +622,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   RightTab: {
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: "bold",
     textAlign: "right",
     paddingRight: 15,
