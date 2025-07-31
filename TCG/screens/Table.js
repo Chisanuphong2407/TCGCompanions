@@ -30,6 +30,7 @@ export const Table = ({ route, navigation }) => {
   const fighter1st = [];
   const fighter2nd = [];
   const [isLoading, setIsloading] = useState(true);
+  const [schedule,setSchedule] = useState([]);
 
   const fetchAllFighter = async () => {
     try {
@@ -72,7 +73,26 @@ export const Table = ({ route, navigation }) => {
       fighter.splice(randomIndex, 1);
     }
     console.log("match finish");
-    console.log("result", fighter1st, fighter2nd);
+    // console.log("result", fighter1st, fighter2nd);
+    const insert = await fetch(`${IP}/api/insertTable`,{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        Fightertable: tableID,
+        fighter1st: fighter1st,
+        fighter2nd:fighter2nd
+      }),
+    })
+
+    const res = await insert.json();
+    if (res.message == "failed") {
+      Alert.alert("เกิดข้อผิดพลาด","กรุณาลองใหม่อีกครั้ง");
+    }else{
+      Alert.alert("สร้างตารางสำเร็จ");
+      setRound(res.round);
+    }
   };
 
   useEffect(() => {

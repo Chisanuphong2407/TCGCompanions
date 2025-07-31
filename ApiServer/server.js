@@ -118,7 +118,7 @@ app.post("/api/login", async (req, res) => {
       console.log("login");
       console.log(payload.username);
     } else {
-      return res.status(401).json({message:"รหัสไม่ถูกต้อง"});
+      return res.status(401).json({ message: "รหัสไม่ถูกต้อง" });
     }
   } catch (error) {
     console.log(error);
@@ -645,33 +645,75 @@ app.post("/api/contestantprofile", async (req, res) => {
 });
 
 //อัพเดตสถานะกิจกรรมเป็น กำลังแข่งขัน
-app.put("/api/eventbegin/:EventID",async(req,res) => {
+app.put("/api/eventbegin/:EventID", async (req, res) => {
   try {
     const EventID = req.params.EventID;
-    const [begin] = await conn.query("UPDATE `event` SET `Status`= 2 WHERE `EventID` = ?",[EventID])
+    const [begin] = await conn.query(
+      "UPDATE `event` SET `Status`= 2 WHERE `EventID` = ?",
+      [EventID]
+    );
 
-    if (begin.affectedRows > 0){
-      io.emit("refreshing",true)
-      return res.status(200).json({message: "อัพเดตสำเร็จ",begin});
-    }
-    else{
-      return res.status(404).json({message: "อัพเดตไม่สำเร็จ",begin})
+    if (begin.affectedRows > 0) {
+      io.emit("refreshing", true);
+      return res.status(200).json({ message: "อัพเดตสำเร็จ", begin });
+    } else {
+      return res.status(404).json({ message: "อัพเดตไม่สำเร็จ", begin });
     }
   } catch (error) {
-    return res.status(404).json({message: JSON.stringify(error)})
+    return res.status(404).json({ message: JSON.stringify(error) });
   }
 });
 
+//สร้างตารางการแข่งขัน
+app.post("/api/insertTable", async (req, res) => {
+  try {
+    const table = req.body.Fightertable;
+    let fighter1 = req.body.fighter1st;
+    let fighter2 = req.body.fighter2nd;
+    const [Event] = await conn.query(
+      "SELECT `EventID` FROM `event` WHERE `Fightertable` = ?",
+      [table]
+    );
+    const EventID = Event[0].EventID;
+    const [round] = await conn.query(
+      "SELECT `EventID`, `Round` FROM `matchschedule` WHERE `EventID` = ? GROUP BY Round",
+      [EventID]
+    );
 
-// app.post("/api/insertTable",async(req,res) => {
-//   try {
-//     let fighter1 = req.body.fighter1;
-//     let fighter2 = req.body.fighter2;
-//     const insert = await conn.query("")
-//   } catch (error) {
-//     return res.status(404);
-//   }
-// });
+    for (let index = 0; index < fighter1.length; index++) {
+      const [insert] = await conn.query(
+        "INSERT INTO `matchschedule`(`EventID`, `Round`, `Fighter1st`, `Fighter2nd`) VALUES (?,?,?,?)",
+        [EventID, round.length + 1, fighter1[index], fighter2[index]] 
+      );
+      if(insert.affectedRows == 0) {
+        return res.status(404).json({message: "failed"} );
+      }
+    }
+
+    return res.status(200).json({message: 'success',round: round.length+1});
+  } catch (error) {
+    return res.status(404);
+  }
+});
+
+//ดึงข้อมูลตารางการแข่งขัน
+app.get("/api/getMatch/:table/:round",async(req,res) => {
+  try {
+    const table = req.params.table;
+    const round = req.params.round;
+    const [Eventquery] = await conn.query("SELECT `EventID` FROM `event` WHERE `Fightertable` = ?",[
+      table
+    ]);
+    
+    const EventID = Eventquery[0].EventID;
+    const [schedule] = await conn.query("SELECT * FROM `matchschedule` WHERE `EventID` = ? AND Round = ?" ,[
+      EventID,round
+    ]);
+    return res.status(200).json(schedule);
+  } catch (error) {
+    return res.status(404).json(error);
+  }
+})
 
 server.listen(3000, function () {
   conn.query(
