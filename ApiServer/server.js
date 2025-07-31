@@ -682,8 +682,8 @@ app.post("/api/insertTable", async (req, res) => {
 
     for (let index = 0; index < fighter1.length; index++) {
       const [insert] = await conn.query(
-        "INSERT INTO `matchschedule`(`EventID`, `Round`, `Fighter1st`, `Fighter2nd`) VALUES (?,?,?,?)",
-        [EventID, round.length + 1, fighter1[index], fighter2[index]] 
+        "INSERT INTO `matchschedule`(`EventID`, `Round`,`Fightertable`, `Fighter1st`, `Fighter2nd`) VALUES (?,?,?,?,?)",
+        [EventID, round.length + 1, table,fighter1[index], fighter2[index]] 
       );
       if(insert.affectedRows == 0) {
         return res.status(404).json({message: "failed"} );
@@ -701,14 +701,9 @@ app.get("/api/getMatch/:table/:round",async(req,res) => {
   try {
     const table = req.params.table;
     const round = req.params.round;
-    const [Eventquery] = await conn.query("SELECT `EventID` FROM `event` WHERE `Fightertable` = ?",[
-      table
-    ]);
-    
-    const EventID = Eventquery[0].EventID;
-    const [schedule] = await conn.query("SELECT * FROM `matchschedule` WHERE `EventID` = ? AND Round = ?" ,[
-      EventID,round
-    ]);
+
+    const [schedule] = await conn.query('SELECT `MatchID`, `EventID`,matchschedule.Fightertable, `Round`, matchschedule.Fighter1st, conts1.UserName AS "fighter1stName",matchschedule.Fighter2nd, conts2.UserName AS "fighter2ndName" FROM `matchschedule` JOIN contestants AS conts1 ON conts1.FighterID = matchschedule.Fighter1st JOIN contestants AS conts2 ON conts2.FighterID = matchschedule.Fighter2nd WHERE matchschedule.`Fightertable` = ? AND ROUND = ? AND conts1.FighterTable = ? AND conts2.FighterTable = ?' ,[table,round,table,table]);
+
     return res.status(200).json(schedule);
   } catch (error) {
     return res.status(404).json(error);

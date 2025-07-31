@@ -30,7 +30,7 @@ export const Table = ({ route, navigation }) => {
   const fighter1st = [];
   const fighter2nd = [];
   const [isLoading, setIsloading] = useState(true);
-  const [schedule,setSchedule] = useState([]);
+  const [schedule, setSchedule] = useState([]);
 
   const fetchAllFighter = async () => {
     try {
@@ -48,7 +48,7 @@ export const Table = ({ route, navigation }) => {
 
       setFighter(result);
       setFighterlength(fighter.length);
-      setTotalpage(Math.ceil(fighterLength / itemPerPage));
+      setTotalpage(Math.ceil(Math.ceil(fighter.length/2) / itemPerPage));
       setIsloading(false);
       console.log("fetch Finish");
       // console.log("len", fighter.length);
@@ -74,7 +74,7 @@ export const Table = ({ route, navigation }) => {
     }
     console.log("match finish");
     // console.log("result", fighter1st, fighter2nd);
-    const insert = await fetch(`${IP}/api/insertTable`,{
+    const insert = await fetch(`${IP}/api/insertTable`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -82,16 +82,36 @@ export const Table = ({ route, navigation }) => {
       body: JSON.stringify({
         Fightertable: tableID,
         fighter1st: fighter1st,
-        fighter2nd:fighter2nd
+        fighter2nd: fighter2nd,
       }),
-    })
+    });
 
     const res = await insert.json();
     if (res.message == "failed") {
-      Alert.alert("เกิดข้อผิดพลาด","กรุณาลองใหม่อีกครั้ง");
-    }else{
+      Alert.alert("เกิดข้อผิดพลาด", "กรุณาลองใหม่อีกครั้ง");
+    } else {
       Alert.alert("สร้างตารางสำเร็จ");
-      setRound(res.round);
+      console.log("1stround", res.round);
+      const thisRound = res.round;
+      setRound(thisRound);
+    }
+  };
+
+  const getSchedule = async () => {
+    try {
+      const result = await fetch(`${IP}/api/getMatch/${tableID}/${round}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const fetchschedule = await result.json();
+      console.log(fetchschedule);
+      setSchedule(fetchschedule);
+      console.log("schedule", schedule);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -102,6 +122,19 @@ export const Table = ({ route, navigation }) => {
       match();
     }
   }, [isLoading, fighterLength]);
+
+  useEffect(() => {
+    if (round !== null) {
+      console.log("round (updated in useEffect):", round);
+      getSchedule();
+    }
+  }, [round]);
+
+  useEffect(() => {
+    if (schedule !== null) {
+      console.log("schedule :", schedule);
+    }
+  }, [schedule]);
 
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, fighterLength);
@@ -124,6 +157,9 @@ export const Table = ({ route, navigation }) => {
             <DataTable.Title style={styles.tableName}>
               ชื่อผู้เข้าแข่งขัน
             </DataTable.Title>
+            <DataTable.Title style={styles.tableVS}>
+              <Text style={styles.fontVS}>VS.</Text>
+            </DataTable.Title>
             <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
             <DataTable.Title style={styles.tableName}>
               ชื่อผู้เข้าแข่งขัน
@@ -131,22 +167,24 @@ export const Table = ({ route, navigation }) => {
           </DataTable.Header>
 
           {/* table rows */}
-          {fighter.slice(from, to).length > 0 &&
-            fighter.slice(from, to).map((item) => {
-              const FighterID = item.FighterID;
+          {schedule.slice(from, to).length > 0 &&
+            schedule.slice(from, to).map((item) => {
               return (
                 <DataTable.Row key={item.FighterID}>
                   <DataTable.Cell style={styles.tableNo}>
-                    {item.FighterID}
+                    {item.Fighter1st}
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableName}>
-                    {item.UserName}
+                    {item.fighter1stName}
+                  </DataTable.Cell>
+                  <DataTable.Cell style={styles.tableVS}>
+                    <Text style={styles.fontVS}>VS.</Text>
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNo}>
-                    {item.FighterID}
+                    {item.Fighter2nd}
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableName}>
-                    {item.UserName}
+                    {item.fighter2ndName}
                   </DataTable.Cell>
                 </DataTable.Row>
               );
@@ -182,11 +220,20 @@ const styles = StyleSheet.create({
   },
   tableNo: {
     minWidth: "5%",
-    marginHorizontal: 5,
+    marginHorizontal: 3,
+    justifyContent: "flex-start",
   },
   tableName: {
     minWidth: "25%",
-    marginHorizontal: 5,
+    marginHorizontal: 3,
+    justifyContent: "flex-start",
+  },
+  tableVS: {
+    minWidth: "15%",
+    justifyContent: "center",
+  },
+  fontVS: {
+    fontWeight: "bold",
   },
   table: {
     flex: 0.8,
