@@ -38,6 +38,7 @@ import { ContestantDetail } from "./screens/ContestantDetail";
 import { Fighterlist } from "./screens/Fighterlist";
 import { Table } from "./screens/Table";
 import { History } from "./screens/History";
+import { SubmitScore } from "./screens/SubmitScore";
 
 export const IP = "http://10.160.184.199:3000";
 
@@ -601,6 +602,11 @@ const App = () => {
           name="Table"
           component={Table}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SubmitScore"
+          component={SubmitScore}
+          options={{ headerTitle: "" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -18,6 +18,7 @@ import {
 import { DataTable } from "react-native-paper";
 import { Users } from "react-native-feather";
 import { IP } from "../App";
+import { SubmitScore } from "./SubmitScore";
 
 export const Table = ({ route, navigation }) => {
   const tableID = route.params.tableID;
@@ -48,7 +49,7 @@ export const Table = ({ route, navigation }) => {
 
       setFighter(result);
       setFighterlength(fighter.length);
-      setTotalpage(Math.ceil(Math.ceil(fighter.length/2) / itemPerPage));
+      setTotalpage(Math.ceil(Math.ceil(fighter.length / 2) / itemPerPage));
       setIsloading(false);
       console.log("fetch Finish");
       // console.log("len", fighter.length);
@@ -170,7 +171,7 @@ export const Table = ({ route, navigation }) => {
           {schedule.slice(from, to).length > 0 &&
             schedule.slice(from, to).map((item) => {
               return (
-                <DataTable.Row key={item.FighterID}>
+                <DataTable.Row key={item.MatchID}>
                   <DataTable.Cell style={styles.tableNo}>
                     {item.Fighter1st}
                   </DataTable.Cell>
@@ -200,6 +201,13 @@ export const Table = ({ route, navigation }) => {
           />
         </DataTable>
       </ScrollView>
+      <View>
+        <TouchableOpacity style={styles.submitScore} onPress={() =>{
+          navigation.navigate("SubmitScore",{tableID,round});
+        }}>
+          <Text style={styles.submitScoreText}>ลงคะแนน</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -274,5 +282,18 @@ const styles = StyleSheet.create({
   round: {
     marginLeft: 20,
     marginBottom: 10,
+  },
+  submitScore: {
+    alignSelf: "flex-end",
+    backgroundColor: "#176b87",
+    padding: 10,
+    borderRadius: 15,
+    margin: 20,
+    minWidth: 100,
+  },
+  submitScoreText: {
+    color: "white",
+    fontSize: 18,
+    textAlign: 'center'
   },
 });
