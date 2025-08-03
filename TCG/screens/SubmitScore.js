@@ -61,16 +61,16 @@ export const SubmitScore = ({ navigation, route }) => {
         {/*table header*/}
         <DataTable style={styles.table}>
           <DataTable.Header>
-            <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
-            <DataTable.Title style={styles.tableName}>
+            <DataTable.Title style={styles.tableNameLeft}>
               ผู้เข้าแข่งขัน
             </DataTable.Title>
+            <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
             <DataTable.Title style={styles.inputSpace}></DataTable.Title>
             <DataTable.Title style={styles.tableVS}>
-              <Text style={styles.fontVS}>VS</Text>
+              <Text style={styles.fontVS}>VS.</Text>
             </DataTable.Title>
             <DataTable.Title style={styles.inputSpace}></DataTable.Title>
-            <DataTable.Title style={styles.tableNoRight}>No.</DataTable.Title>
+            <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
             <DataTable.Title style={styles.tableNameRight}>
               ผู้เข้าแข่งขัน
             </DataTable.Title>
@@ -81,11 +81,11 @@ export const SubmitScore = ({ navigation, route }) => {
             schedule.slice(from, to).map((item) => {
               return (
                 <DataTable.Row key={item.MatchID}>
+                  <DataTable.Cell style={styles.tableNameLeft}>
+                    {item.fighter1stName}
+                  </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNo}>
                     {item.Fighter1st}
-                  </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableName}>
-                    {item.fighter1stName}
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableInput}>
                     <TextInput style={styles.inputScore} />
@@ -99,7 +99,7 @@ export const SubmitScore = ({ navigation, route }) => {
                   <DataTable.Cell style={styles.tableNo}>
                     {item.Fighter2nd}
                   </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableName}>
+                  <DataTable.Cell style={styles.tableNameRight}>
                     {item.fighter2ndName}
                   </DataTable.Cell>
                 </DataTable.Row>
@@ -127,58 +127,56 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   tableNo: {
-    flex: 0.2,
-    minWidth: "6%",
-    marginHorizontal: 1,
-    justifyContent: "flex-start",
+    minWidth: "5%",
+    marginHorizontal: 3,
+    justifyContent: "center",
   },
   tableNoRight: {
-    flex: 0.2,
+    // flex: 0.2,
     minWidth: "6%",
     marginHorizontal: 1,
     justifyContent: "flex-end",
   },
-  tableName: {
-    flex: 0.2,
-    minWidth: "20%",
-    marginHorizontal: 2,
-    justifyContent: "flex-start",
-  },
-  tableNameRight: {
-    flex: 0.2,
-    minWidth: "20%",
-    marginHorizontal: 2,
+  tableNameLeft: {
+    minWidth: "25%",
+    marginHorizontal: 3,
     justifyContent: "flex-end",
   },
+  tableNameRight: {
+    minWidth: "25%",
+    marginHorizontal: 3,
+    justifyContent: "flex-start",
+  },
   tableInput: {
-    flex: 0.1,
+    // flex: 0.1,
     minWidth: "20%",
     marginHorizontal: 3,
     justifyContent: "center",
   },
   tableVS: {
-    minWidth: "5%",
+    minWidth: "10%",
     justifyContent: "center",
     marginHorizontal: 1,
+    borderWidth: 1,
   },
   tabledat: {
-    minWidth: "1%",
-    justifyContent: "center",
+    minWidth: "10%",
+    alignSelf: "center",
     marginHorizontal: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
   },
   inputSpace: {
-    flex: 0.1,
+    // flex: 0.1,
     minWidth: "10%",
     marginHorizontal: 1,
-    alignSelf: "center",
     backgroundColor: "#9b9a9a",
   },
   inputScore: {
-    flex: 0.1,
+    // flex: 0.1,
     backgroundColor: "#9b9a9a",
     minWidth: "10%",
     marginHorizontal: 1,
-    alignSelf: "center",
   },
   fontVS: {
     fontWeight: "bold",

@@ -154,37 +154,37 @@ export const Table = ({ route, navigation }) => {
         {/*table header*/}
         <DataTable style={styles.table}>
           <DataTable.Header>
-            <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
-            <DataTable.Title style={styles.tableName}>
+            <DataTable.Title style={styles.tableNameLeft}>
               ชื่อผู้เข้าแข่งขัน
             </DataTable.Title>
+            <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
             <DataTable.Title style={styles.tableVS}>
-              <Text style={styles.fontVS}>VS.</Text>
+              <Text style={styles.fontVS}>โต๊ะที่</Text>
             </DataTable.Title>
             <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
-            <DataTable.Title style={styles.tableName}>
+            <DataTable.Title style={styles.tableNameRight}>
               ชื่อผู้เข้าแข่งขัน
             </DataTable.Title>
           </DataTable.Header>
 
           {/* table rows */}
           {schedule.slice(from, to).length > 0 &&
-            schedule.slice(from, to).map((item) => {
+            schedule.slice(from, to).map((item,index) => {
               return (
                 <DataTable.Row key={item.MatchID}>
+                  <DataTable.Cell style={styles.tableNameLeft}>
+                    {item.fighter1stName}
+                  </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNo}>
                     {item.Fighter1st}
                   </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableName}>
-                    {item.fighter1stName}
-                  </DataTable.Cell>
                   <DataTable.Cell style={styles.tableVS}>
-                    <Text style={styles.fontVS}>VS.</Text>
+                    <Text style={styles.fontVS}>{index+1}</Text>
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNo}>
                     {item.Fighter2nd}
                   </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableName}>
+                  <DataTable.Cell style={styles.tableNameRight}>
                     {item.fighter2ndName}
                   </DataTable.Cell>
                 </DataTable.Row>
@@ -229,9 +229,14 @@ const styles = StyleSheet.create({
   tableNo: {
     minWidth: "5%",
     marginHorizontal: 3,
-    justifyContent: "flex-start",
+    justifyContent: "center",
   },
-  tableName: {
+  tableNameLeft: {
+    minWidth: "25%",
+    marginHorizontal: 3,
+    justifyContent: "flex-end",
+  },
+  tableNameRight: {
     minWidth: "25%",
     marginHorizontal: 3,
     justifyContent: "flex-start",
@@ -239,6 +244,9 @@ const styles = StyleSheet.create({
   tableVS: {
     minWidth: "15%",
     justifyContent: "center",
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor:"#e0e0e0"
   },
   fontVS: {
     fontWeight: "bold",
