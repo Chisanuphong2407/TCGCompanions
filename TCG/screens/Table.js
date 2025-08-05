@@ -18,7 +18,6 @@ import {
 import { DataTable } from "react-native-paper";
 import { Users } from "react-native-feather";
 import { IP } from "../App";
-import { SubmitScore } from "./SubmitScore";
 
 export const Table = ({ route, navigation }) => {
   const tableID = route.params.tableID;
@@ -144,7 +143,11 @@ export const Table = ({ route, navigation }) => {
     <SafeAreaView style={styles.container}>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
       <View style={styles.icon}>
-        <Users color={"#176b87"} width={35} height={35} />
+        <TouchableOpacity onPress={() => (
+          navigation.navigate("contestantsList",{tableID})
+        )}>
+          <Users color={"#176b87"} width={35} height={35} />
+        </TouchableOpacity>
       </View>
       <View>
         <Text style={styles.header}>ตารางการแข่งขัน</Text>
@@ -169,7 +172,7 @@ export const Table = ({ route, navigation }) => {
 
           {/* table rows */}
           {schedule.slice(from, to).length > 0 &&
-            schedule.slice(from, to).map((item,index) => {
+            schedule.slice(from, to).map((item, index) => {
               return (
                 <DataTable.Row key={item.MatchID}>
                   <DataTable.Cell style={styles.tableNameLeft}>
@@ -179,7 +182,7 @@ export const Table = ({ route, navigation }) => {
                     {item.Fighter1st}
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableVS}>
-                    <Text style={styles.fontVS}>{index+1}</Text>
+                    <Text style={styles.fontVS}>{index + 1}</Text>
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNo}>
                     {item.Fighter2nd}
@@ -202,9 +205,12 @@ export const Table = ({ route, navigation }) => {
         </DataTable>
       </ScrollView>
       <View>
-        <TouchableOpacity style={styles.submitScore} onPress={() =>{
-          navigation.navigate("SubmitScore",{tableID,round});
-        }}>
+        <TouchableOpacity
+          style={styles.submitScore}
+          onPress={() => {
+            navigation.navigate("SubmitScore", { tableID, round });
+          }}
+        >
           <Text style={styles.submitScoreText}>ลงคะแนน</Text>
         </TouchableOpacity>
       </View>
@@ -246,7 +252,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderLeftWidth: 1,
     borderRightWidth: 1,
-    borderColor:"#e0e0e0"
+    borderColor: "#e0e0e0",
   },
   fontVS: {
     fontWeight: "bold",
@@ -302,6 +308,6 @@ const styles = StyleSheet.create({
   submitScoreText: {
     color: "white",
     fontSize: 18,
-    textAlign: 'center'
+    textAlign: "center",
   },
 });

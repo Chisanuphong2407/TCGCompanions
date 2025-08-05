@@ -25,6 +25,7 @@ export const SubmitScore = ({ navigation, route }) => {
   const [schedule, setSchedule] = useState([]);
   const itemPerPage = 10;
   const [page, setPage] = useState(0);
+  const [Totalpage, setTotalpage] = useState(0);
 
   const getSchedule = async () => {
     try {
@@ -37,6 +38,7 @@ export const SubmitScore = ({ navigation, route }) => {
 
       const fetchschedule = await result.json();
       setSchedule(fetchschedule);
+      setTotalpage(Math.ceil(schedule.length / itemPerPage));
     } catch (error) {
       console.error(error);
     }
@@ -65,11 +67,11 @@ export const SubmitScore = ({ navigation, route }) => {
               ผู้เข้าแข่งขัน
             </DataTable.Title>
             <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
-            <DataTable.Title style={styles.inputSpace}></DataTable.Title>
+            <DataTable.Title></DataTable.Title>
             <DataTable.Title style={styles.tableVS}>
-              <Text style={styles.fontVS}>VS.</Text>
+              <Text>VS.</Text>
             </DataTable.Title>
-            <DataTable.Title style={styles.inputSpace}></DataTable.Title>
+            <DataTable.Title></DataTable.Title>
             <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
             <DataTable.Title style={styles.tableNameRight}>
               ผู้เข้าแข่งขัน
@@ -88,13 +90,19 @@ export const SubmitScore = ({ navigation, route }) => {
                     {item.Fighter1st}
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableInput}>
-                    <TextInput style={styles.inputScore} />
+                    <TextInput
+                      style={styles.inputScore}
+                      keyboardType="numeric"
+                    />
                   </DataTable.Cell>
-                  <DataTable.Cell style={styles.tabledat}>
-                    <Text style={styles.fontVS}>-</Text>
+                  <DataTable.Cell style={styles.tableVS}>
+                    <Text>-</Text>
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableInput}>
-                    <TextInput style={styles.inputScore} />
+                    <TextInput
+                      style={styles.inputScore}
+                      keyboardType="numeric"
+                    />
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNo}>
                     {item.Fighter2nd}
@@ -105,8 +113,20 @@ export const SubmitScore = ({ navigation, route }) => {
                 </DataTable.Row>
               );
             })}
+
+          <DataTable.Pagination
+            page={page}
+            numberOfPages={Totalpage}
+            onPageChange={(page) => setPage(page)}
+            label={`${page + 1} of ${Totalpage}`}
+            numberOfItemsPerPage={itemPerPage}
+            showFastPaginationControls
+          />
         </DataTable>
       </ScrollView>
+      <TouchableOpacity style={styles.submitButton}>
+        <Text style={styles.submitText}>บันทึก</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -126,72 +146,55 @@ const styles = StyleSheet.create({
     color: "#176B87",
     marginBottom: 20,
   },
-  tableNo: {
-    minWidth: "5%",
-    marginHorizontal: 3,
-    justifyContent: "center",
-  },
-  tableNoRight: {
-    // flex: 0.2,
-    minWidth: "6%",
-    marginHorizontal: 1,
-    justifyContent: "flex-end",
-  },
-  tableNameLeft: {
-    minWidth: "25%",
-    marginHorizontal: 3,
-    justifyContent: "flex-end",
-  },
-  tableNameRight: {
-    minWidth: "25%",
-    marginHorizontal: 3,
-    justifyContent: "flex-start",
-  },
-  tableInput: {
-    // flex: 0.1,
-    minWidth: "20%",
-    marginHorizontal: 3,
-    justifyContent: "center",
-  },
-  tableVS: {
-    minWidth: "10%",
-    justifyContent: "center",
-    marginHorizontal: 1,
-    borderWidth: 1,
-  },
-  tabledat: {
-    minWidth: "10%",
-    alignSelf: "center",
-    marginHorizontal: 1,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-  },
-  inputSpace: {
-    // flex: 0.1,
-    minWidth: "10%",
-    marginHorizontal: 1,
-    backgroundColor: "#9b9a9a",
-  },
-  inputScore: {
-    // flex: 0.1,
-    backgroundColor: "#9b9a9a",
-    minWidth: "10%",
-    marginHorizontal: 1,
-  },
-  fontVS: {
-    fontWeight: "bold",
-  },
   table: {
     flex: 1,
     minWidth: "70%",
     maxWidth: "95%",
     margin: 5,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: "#d3d0d0",
     backgroundColor: "#f4f7fa",
     opacity: 0.8,
-    borderRadius: 5,
+    borderRadius: 3,
     overflow: "hidden",
     justifyContent: "center",
   },
+  tableVS: {
+    justifyContent: "center",
+  },
+  tableInput: {
+    justifyContent: "center",
+  },
+  inputScore: {
+    backgroundColor: "#efeded",
+    borderRadius: 2,
+    borderWidth: 1,
+    borderColor: "black",
+    minWidth: 30,
+    textAlign: "center",
+  },
+  tableNo: {
+    justifyContent: "center",
+  },
+  tableNameLeft: {
+    justifyContent: "flex-end",
+    minWidth: 30,
+  },
+  tableNameRight: {
+    justifyContent: "flex-start",
+    minWidth: 30,
+  },
+  submitButton: {
+    flexDirection: 'row-reverse',
+    margin: 15,
+    
+  },
+  submitText: {
+    backgroundColor: '#176b87',
+    padding: 10,
+    paddingHorizontal:20,
+    borderRadius: 15,
+    fontSize: 18,
+    color:"white"
+  }
 });
