@@ -88,6 +88,7 @@ const Home = ({ navigation }) => {
         setIsvisiblelogout(true);
         setIsmyMenu(false);
         setIscmenu(false);
+        setUser(passvef);
       }
       await AsyncStorage.setItem("@vef", passvef);
       return passvef;
@@ -105,7 +106,6 @@ const Home = ({ navigation }) => {
       setIsloading(false);
       setEvent(Edata);
       const vef = await AsyncStorage.getItem("@vef");
-      setUser(vef);
       // console.log(event);
       verify();
       setSearch("");
@@ -609,7 +609,7 @@ const App = () => {
           component={SubmitScore}
           options={{ headerTitle: "" }}
         />
-                <Stack.Screen
+        <Stack.Screen
           name="contestantsList"
           component={contestantsList}
           options={{ headerTitle: "" }}

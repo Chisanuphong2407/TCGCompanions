@@ -5,6 +5,7 @@ const socketIo = require("socket.io");
 const http = require("http");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { json } = require("body-parser");
 // const crypto = require("crypto");/
 
 //Profile ไว้ query register
@@ -709,6 +710,31 @@ app.get("/api/getMatch/:table/:round",async(req,res) => {
     return res.status(404).json(error);
   }
 })
+
+//บันทึกผลคะแนน บันทึกคะแนน
+app.post("/api/submitScore",async(req,res) => {
+  const schedule = req.body.schedule;
+  const firstScore = req.body.firstScore;
+  const secondScore = req.body.secondScore;
+  const scheduleValue = schedule.map((item,index) => [
+  item.EventID,
+  item.MatchID,
+  item.Round,
+  item.Fighter1st,
+  item.Fighter2nd,
+  firstScore[index],
+  secondScore[index]
+]);
+
+  try {
+    const [SubmitScore] = await conn.query("INSERT INTO `match_participants`(`EventID`, `MatchID`, `Round`, `Fighter1st`, `Fighter2nd`, `Fighter1st_Score`, `Fighter2nd_Score`) VALUES ?",[scheduleValue]);
+
+    // console.log(schedule[0].MatchID);
+    return res.status(200).json(SubmitScore)
+  } catch (error) {
+    return res.status(500),json(error);
+  }
+});
 
 server.listen(3000, function () {
   conn.query(

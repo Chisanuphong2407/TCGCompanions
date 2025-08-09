@@ -26,6 +26,8 @@ export const SubmitScore = ({ navigation, route }) => {
   const itemPerPage = 10;
   const [page, setPage] = useState(0);
   const [Totalpage, setTotalpage] = useState(0);
+  const [firstScore, setFirstscore] = useState([]);
+  const [secondScore, setSecondscore] = useState([]);
 
   const getSchedule = async () => {
     try {
@@ -41,6 +43,39 @@ export const SubmitScore = ({ navigation, route }) => {
       setTotalpage(Math.ceil(schedule.length / itemPerPage));
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handle1stScore = (text, index) => {
+    const newScore = [...firstScore];
+    newScore[index] = text;
+    setFirstscore(newScore);
+  };
+
+  const handle2ndScore = (text, index) => {
+    const newScore = [...secondScore];
+    newScore[index] = text;
+    setSecondscore(newScore);
+  };
+
+  const handleSubmit = async() => {
+    try {
+      const fetchAPI = await fetch(`${IP}/api/submitScore`,{
+        method: "POST",
+        headers:{
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          schedule: schedule,
+          firstScore: firstScore,
+          secondScore: secondScore
+        })
+      });
+
+      const res = await fetchAPI.json();
+      Alert.alert("noti",JSON.stringify(res.schedule[0].MatchID));
+    } catch (error) {
+      
     }
   };
 
@@ -80,7 +115,7 @@ export const SubmitScore = ({ navigation, route }) => {
 
           {/* table rows */}
           {schedule.slice(from, to).length > 0 &&
-            schedule.slice(from, to).map((item) => {
+            schedule.slice(from, to).map((item, index) => {
               return (
                 <DataTable.Row key={item.MatchID}>
                   <DataTable.Cell style={styles.tableNameLeft}>
@@ -91,6 +126,8 @@ export const SubmitScore = ({ navigation, route }) => {
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableInput}>
                     <TextInput
+                      value={firstScore[index]}
+                      onChangeText={(text) => handle1stScore(text, index)}
                       style={styles.inputScore}
                       keyboardType="numeric"
                     />
@@ -101,6 +138,8 @@ export const SubmitScore = ({ navigation, route }) => {
                   <DataTable.Cell style={styles.tableInput}>
                     <TextInput
                       style={styles.inputScore}
+                      value={secondScore[index]}
+                      onChangeText={(text) => handle2ndScore(text, index)}
                       keyboardType="numeric"
                     />
                   </DataTable.Cell>
@@ -124,7 +163,9 @@ export const SubmitScore = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
-      <TouchableOpacity style={styles.submitButton}>
+      <Text>current 1stScore: {firstScore}</Text>
+      <Text>current 2ndScore: {secondScore}</Text>
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitText}>บันทึก</Text>
       </TouchableOpacity>
     </View>
@@ -185,16 +226,15 @@ const styles = StyleSheet.create({
     minWidth: 30,
   },
   submitButton: {
-    flexDirection: 'row-reverse',
+    flexDirection: "row-reverse",
     margin: 15,
-    
   },
   submitText: {
-    backgroundColor: '#176b87',
+    backgroundColor: "#176b87",
     padding: 10,
-    paddingHorizontal:20,
+    paddingHorizontal: 20,
     borderRadius: 15,
     fontSize: 18,
-    color:"white"
-  }
+    color: "white",
+  },
 });
