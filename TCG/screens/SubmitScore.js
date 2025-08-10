@@ -28,6 +28,7 @@ export const SubmitScore = ({ navigation, route }) => {
   const [Totalpage, setTotalpage] = useState(0);
   const [firstScore, setFirstscore] = useState([]);
   const [secondScore, setSecondscore] = useState([]);
+  const [byeCheck,setByecheck] = useState(false);
 
   const getSchedule = async () => {
     try {
@@ -58,25 +59,47 @@ export const SubmitScore = ({ navigation, route }) => {
     setSecondscore(newScore);
   };
 
-  const handleSubmit = async() => {
+  const handleSubmit = () => {
     try {
-      const fetchAPI = await fetch(`${IP}/api/submitScore`,{
+      if((!firstScore || !secondScore || firstScore.indexOf(undefined) != -1 || secondScore.indexOf(undefined) != -1) && byeCheck){
+        Alert.alert("บันทึกไม่สำเร็จ","โปรดกรอกข้อมูลให้ครบถ้วน");
+      }else{
+        Alert.alert("ยืนยันการบันทึกข้อมูล","หากยืนยัน ท่านจะไม่สามารถแก้ไขได้",[
+          {
+            text:"ตกลง",
+            style: "default",
+            onPress: submitScore,
+          },
+          {
+            text:"ยกเลิก"
+          }
+        ]);
+      }
+    } catch (error) {
+      Alert.alert("บันทึกคะแนนไม่สำเร็จ","โปรดลองอีกครั้ง");
+    }
+  };
+
+  const submitScore = async () => {
+    try {
+      const submit = await fetch(`${IP}/api/submitScore`, {
         method: "POST",
-        headers:{
+        headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           schedule: schedule,
           firstScore: firstScore,
-          secondScore: secondScore
-        })
+          secondScore: secondScore,
+        }),
       });
 
-      const res = await fetchAPI.json();
-      Alert.alert("noti",JSON.stringify(res.schedule[0].MatchID));
-    } catch (error) {
+      const res = await submit.json();
+      if(res.affectedRows > 0){
+        Alert.alert("","บันทึกคะแนนสำเร็จ")
+      }
       
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -86,6 +109,17 @@ export const SubmitScore = ({ navigation, route }) => {
       console.log(schedule);
     }
   }, [round]);
+
+  useEffect(() => {
+    schedule.forEach((item, index) => {
+      if (item.Fighter2nd == 0) {
+        const newScore = [...firstScore];
+        newScore[index] = 1;
+        setFirstscore(newScore);
+        setByecheck(true);
+      }
+    });
+  }, [schedule]);
 
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, schedule.length);
@@ -124,27 +158,38 @@ export const SubmitScore = ({ navigation, route }) => {
                   <DataTable.Cell style={styles.tableNo}>
                     {item.Fighter1st}
                   </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableInput}>
-                    <TextInput
-                      value={firstScore[index]}
-                      onChangeText={(text) => handle1stScore(text, index)}
-                      style={styles.inputScore}
-                      keyboardType="numeric"
-                    />
-                  </DataTable.Cell>
+                  {item.Fighter2nd != 0 && (
+                    <DataTable.Cell style={styles.tableInput}>
+                      <TextInput
+                        value={firstScore[index]}
+                        onChangeText={(text) => handle1stScore(text, index)}
+                        style={styles.inputScore}
+                        keyboardType="numeric"
+                        editable={item.Fighter2nd != 0}
+                      />
+                    </DataTable.Cell>
+                  )}
+                  {item.Fighter2nd == 0 && (
+                    <DataTable.Cell style={styles.tableInput}>
+                      <Text>1</Text>
+                    </DataTable.Cell>
+                  )}
                   <DataTable.Cell style={styles.tableVS}>
                     <Text>-</Text>
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableInput}>
-                    <TextInput
-                      style={styles.inputScore}
-                      value={secondScore[index]}
-                      onChangeText={(text) => handle2ndScore(text, index)}
-                      keyboardType="numeric"
-                    />
+                    {item.Fighter2nd != 0 && (
+                      <TextInput
+                        style={styles.inputScore}
+                        value={secondScore[index]}
+                        onChangeText={(text) => handle2ndScore(text, index)}
+                        keyboardType="numeric"
+                        editable={item.Fighter2nd != 0}
+                      />
+                    )}
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNo}>
-                    {item.Fighter2nd}
+                    {item.Fighter2nd != 0 && item.Fighter2nd}
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNameRight}>
                     {item.fighter2ndName}

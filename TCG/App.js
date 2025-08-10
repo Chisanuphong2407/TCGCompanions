@@ -41,7 +41,7 @@ import { History } from "./screens/History";
 import { SubmitScore } from "./screens/SubmitScore";
 import { contestantsList } from "./screens/contestantsList";
 
-export const IP = "http://10.244.240.199:3000";
+export const IP = "http://192.168.1.9:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");

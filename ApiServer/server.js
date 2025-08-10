@@ -665,6 +665,20 @@ app.put("/api/eventbegin/:EventID", async (req, res) => {
   }
 });
 
+//ดึงรอบการแข่งขัน
+app.get("/api/getRound/:tableID", async (req, res) => {
+  const tableID = req.params.tableID;
+  try {
+    const [round] = await conn.query(
+      "SELECT `EventID`, `Round` FROM `matchschedule` WHERE `Fightertable` = ? GROUP BY Round",
+      [tableID]
+    );
+    return res.status(200).json(round.length);
+  } catch (error) {
+    return res.status(404).json(error);
+  }
+});
+
 //สร้างตารางการแข่งขัน
 app.post("/api/insertTable", async (req, res) => {
   try {
@@ -684,55 +698,89 @@ app.post("/api/insertTable", async (req, res) => {
     for (let index = 0; index < fighter1.length; index++) {
       const [insert] = await conn.query(
         "INSERT INTO `matchschedule`(`EventID`, `Round`,`Fightertable`, `Fighter1st`, `Fighter2nd`) VALUES (?,?,?,?,?)",
-        [EventID, round.length + 1, table,fighter1[index], fighter2[index]] 
+        [EventID, round.length + 1, table, fighter1[index], fighter2[index]]
       );
-      if(insert.affectedRows == 0) {
-        return res.status(404).json({message: "failed"} );
+      if (insert.affectedRows == 0) {
+        return res.status(404).json({ message: "failed" });
       }
     }
 
-    return res.status(200).json({message: 'success',round: round.length+1});
+    return res
+      .status(200)
+      .json({ message: "success", round: round.length + 1 });
   } catch (error) {
     return res.status(404);
   }
 });
 
+//สร้าง leaderboard
+app.get("/api/createLeaderboard/:tableID", async (req, res) => {
+  const tableID = req.params.tableID;
+  try {
+    const [contestant] = await conn.query(
+      "SELECT * FROM `contestants` WHERE Fightertable = ?",
+      [tableID]
+    );
+
+    const contestantsList = contestant.map((item, index) => [
+      tableID,
+      item.FighterID,
+      0,
+      0
+    ]);
+
+    const [create] = await conn.query(
+      "INSERT INTO `leaderboard`(`Fightertable`, `FighterID`, `TotalScore`, `solkolf_score`) VALUES ?",
+      [contestantsList]
+    );
+    return res.status(200).json(contestantsList);
+  } catch (error) {
+    return res.status(404).json(error);
+  }
+});
+
 //ดึงข้อมูลตารางการแข่งขัน
-app.get("/api/getMatch/:table/:round",async(req,res) => {
+app.get("/api/getMatch/:table/:round", async (req, res) => {
   try {
     const table = req.params.table;
     const round = req.params.round;
 
-    const [schedule] = await conn.query('SELECT `MatchID`, `EventID`,matchschedule.Fightertable, `Round`, matchschedule.Fighter1st, conts1.UserName AS "fighter1stName",matchschedule.Fighter2nd, conts2.UserName AS "fighter2ndName" FROM `matchschedule` JOIN contestants AS conts1 ON conts1.FighterID = matchschedule.Fighter1st JOIN contestants AS conts2 ON conts2.FighterID = matchschedule.Fighter2nd WHERE matchschedule.`Fightertable` = ? AND ROUND = ? AND conts1.FighterTable = ? AND conts2.FighterTable = ?' ,[table,round,table,table]);
+    const [schedule] = await conn.query(
+      'SELECT `MatchID`, `EventID`,matchschedule.Fightertable, `Round`, matchschedule.Fighter1st, conts1.UserName AS "fighter1stName",matchschedule.Fighter2nd, conts2.UserName AS "fighter2ndName" FROM `matchschedule` JOIN contestants AS conts1 ON conts1.FighterID = matchschedule.Fighter1st LEFT JOIN contestants AS conts2 ON conts2.FighterID = matchschedule.Fighter2nd WHERE matchschedule.`Fightertable` = ? AND ROUND = ? AND conts1.FighterTable = ? AND (conts2.FighterTable = ? OR conts2.FighterTable IS NULL )',
+      [table, round, table, table]
+    );
 
     return res.status(200).json(schedule);
   } catch (error) {
     return res.status(404).json(error);
   }
-})
+});
 
 //บันทึกผลคะแนน บันทึกคะแนน
-app.post("/api/submitScore",async(req,res) => {
+app.post("/api/submitScore", async (req, res) => {
   const schedule = req.body.schedule;
   const firstScore = req.body.firstScore;
   const secondScore = req.body.secondScore;
-  const scheduleValue = schedule.map((item,index) => [
-  item.EventID,
-  item.MatchID,
-  item.Round,
-  item.Fighter1st,
-  item.Fighter2nd,
-  firstScore[index],
-  secondScore[index]
-]);
+  const scheduleValue = schedule.map((item, index) => [
+    item.EventID,
+    item.MatchID,
+    item.Round,
+    item.Fighter1st,
+    item.Fighter2nd,
+    firstScore[index],
+    secondScore[index],
+  ]);
 
   try {
-    const [SubmitScore] = await conn.query("INSERT INTO `match_participants`(`EventID`, `MatchID`, `Round`, `Fighter1st`, `Fighter2nd`, `Fighter1st_Score`, `Fighter2nd_Score`) VALUES ?",[scheduleValue]);
+    const [SubmitScore] = await conn.query(
+      "INSERT INTO `match_participants`(`EventID`, `MatchID`, `Round`, `Fighter1st`, `Fighter2nd`, `Fighter1st_Score`, `Fighter2nd_Score`) VALUES ?",
+      [scheduleValue]
+    );
 
     // console.log(schedule[0].MatchID);
-    return res.status(200).json(SubmitScore)
+    return res.status(200).json(SubmitScore);
   } catch (error) {
-    return res.status(500),json(error);
+    return res.status(500), json(error);
   }
 });
 

@@ -59,8 +59,19 @@ export const Table = ({ route, navigation }) => {
   };
 
   const match = async () => {
-    // console.log("fighterlen", fighterLength);
-    for (let index = 0; index < fighterLength; index++) {
+    const getRound = await fetch(`${IP}/api/getRound/${tableID}`,{
+      method:"GET",
+      headers:{
+        "Content-Type": "application/json",
+      }
+    });
+
+    const result = await getRound.json();
+    console.log("get round",result);
+    if(result == 0) {
+      await fetch(`${IP}/api/createLeaderboard/${tableID}`);
+
+      for (let index = 0; index < fighterLength; index++) {
       console.warn("round", index + 1);
       console.log("len", fighter.length);
       const randomIndex = Math.floor(Math.random() * fighter.length);
@@ -68,12 +79,17 @@ export const Table = ({ route, navigation }) => {
       if (index % 2 == 0) {
         fighter1st.push(fighter[randomIndex].FighterID);
       } else {
-        fighter2nd.push(fighter[randomIndex].FighterID);
+          fighter2nd.push(fighter[randomIndex].FighterID);    
       }
       fighter.splice(randomIndex, 1);
     }
+    console.log(fighter.length);
+    if(fighter1st.length > fighter2nd.length){
+      fighter2nd.push(0);
+    }
     console.log("match finish");
-    // console.log("result", fighter1st, fighter2nd);
+    }
+
     const insert = await fetch(`${IP}/api/insertTable`, {
       method: "POST",
       headers: {
@@ -185,10 +201,12 @@ export const Table = ({ route, navigation }) => {
                     <Text style={styles.fontVS}>{index + 1}</Text>
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNo}>
-                    {item.Fighter2nd}
+                    {item.Fighter2nd == 0 && (<Text></Text>)}
+                    {item.Fighter2nd != 0 && (item.Fighter2nd)}
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNameRight}>
-                    {item.fighter2ndName}
+                    {item.Fighter2nd == 0 && ("ชนะบาย")}
+                    {item.Fighter2nd != 0 && (item.fighter2ndName)}
                   </DataTable.Cell>
                 </DataTable.Row>
               );
