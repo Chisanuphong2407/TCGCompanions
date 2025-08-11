@@ -94,9 +94,25 @@ export const SubmitScore = ({ navigation, route }) => {
         }),
       });
 
+      await fetch(`${IP}/api/updateLeaderboard`,{
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tableID: tableID
+        }),
+      });
+
       const res = await submit.json();
-      if(res.affectedRows > 0){
-        Alert.alert("","บันทึกคะแนนสำเร็จ")
+      if(res > 0){
+        Alert.alert("","บันทึกคะแนนสำเร็จ",[
+          {
+            text:"ตกลง",
+            style:'default',
+            onPress: () => navigation.navigate("Leaderboard",{tableID})
+          }
+        ])
       }
       
     } catch (error) {}

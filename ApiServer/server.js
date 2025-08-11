@@ -762,7 +762,7 @@ app.post("/api/submitScore", async (req, res) => {
   const firstScore = req.body.firstScore;
   const secondScore = req.body.secondScore;
   const scheduleValue = schedule.map((item, index) => [
-    item.EventID,
+    item.Fightertable,
     item.MatchID,
     item.Round,
     item.Fighter1st,
@@ -773,14 +773,43 @@ app.post("/api/submitScore", async (req, res) => {
 
   try {
     const [SubmitScore] = await conn.query(
-      "INSERT INTO `match_participants`(`EventID`, `MatchID`, `Round`, `Fighter1st`, `Fighter2nd`, `Fighter1st_Score`, `Fighter2nd_Score`) VALUES ?",
+      "INSERT INTO `match_participants`(`fightertable`, `MatchID`, `Round`, `Fighter1st`, `Fighter2nd`, `Fighter1st_Score`, `Fighter2nd_Score`) VALUES ?",
       [scheduleValue]
     );
 
-    // console.log(schedule[0].MatchID);
-    return res.status(200).json(SubmitScore);
+    return res.status(200).json(SubmitScore.affectedRows);
   } catch (error) {
     return res.status(500), json(error);
+  }
+});
+
+//อัพเดต leaderboard
+app.put("/api/updateLeaderboard",async (req,res) => {
+  const tableID = req.body.tableID;
+  try {
+    const [leaderboardfetch] = await conn.query("SELECT leaderboard.Fightertable, leaderboard.FighterID, CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd END AS MatchedFighter, CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st_Score WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd_Score END AS MatchScore, leaderboard.TotalScore, leaderboard.solkolf_score FROM leaderboard JOIN match_participants ON leaderboard.FighterID = match_participants.Fighter1st OR leaderboard.FighterID = match_participants.Fighter2nd WHERE match_participants.fightertable = ? GROUP BY FighterID",[tableID]);
+
+    for (const item of leaderboardfetch) {
+      const TotalScore = item.TotalScore + item.MatchScore;
+      await conn.query("UPDATE `leaderboard` SET `TotalScore`= ? WHERE FighterID = ?",[TotalScore,item.FighterID]);
+    }
+    
+
+    return res.status(200).json(leaderboardfetch);
+  } catch (error) {
+    return res.status(404).json(error);
+  }
+});
+
+//ดึงข้อมูล leaderboard
+app.get("/api/getLeaderboard/:tableID",async (req,res) => {
+  const tableID = req.params.tableID;
+  try {
+    const [leaderboard] = await conn.query("SELECT `LeaderboardID`, leaderboard.`Fightertable`, leaderboard.`FighterID`,contName.UserName,contName.Nation, `TotalScore`, `solkolf_score` FROM `leaderboard` JOIN contestants ON contestants.FighterTable = leaderboard.Fightertable JOIN contestants AS contName ON contName.FighterID = leaderboard.FighterID WHERE leaderboard.`Fightertable` = ? GROUP BY LeaderboardID",[tableID]);
+
+    return res.status(200).json(leaderboard);
+  } catch (error) {
+    return res.status(404).json(error);
   }
 });
 
