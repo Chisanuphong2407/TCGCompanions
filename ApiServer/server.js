@@ -758,6 +758,7 @@ app.get("/api/getMatch/:table/:round", async (req, res) => {
 
 //บันทึกผลคะแนน บันทึกคะแนน
 app.post("/api/submitScore", async (req, res) => {
+  console.log("submit start");
   const schedule = req.body.schedule;
   const firstScore = req.body.firstScore;
   const secondScore = req.body.secondScore;

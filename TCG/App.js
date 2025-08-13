@@ -42,7 +42,7 @@ import { SubmitScore } from "./screens/SubmitScore";
 import { contestantsList } from "./screens/contestantsList";
 import { Leaderboard } from "./screens/Leaderboard";
 
-export const IP = "http://192.168.1.6:3000";
+export const IP = "http://192.168.1.7:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");

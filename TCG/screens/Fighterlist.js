@@ -77,11 +77,12 @@ export const Fighterlist = ({ route, navigation }) => {
 
           {/* table rows */}
           {fighter.slice(from, to).length > 0 &&
-            fighter.slice(from, to).map((item) => {
+            fighter.slice(from, to).map((item,index) => {
               const FighterID = item.FighterID;
               return (
                 <DataTable.Row
                   key={item.FighterID}
+                  style={index % 2 == 0 ? styles.cell1 : styles.cell0}
                   onPress={() =>
                     navigation.navigate("ContestantDetail", {
                       FighterID,
@@ -169,8 +170,8 @@ const styles = StyleSheet.create({
     margin: 10,
     borderWidth: 1,
     borderColor: "#e0e0e0",
-    backgroundColor: "#f4f7fa",
-    opacity: 0.8,
+    backgroundColor: "#98c9f9",
+    opacity: 0.9,
     borderRadius: 5,
     overflow: "hidden",
     justifyContent: "space-evenly",
@@ -202,5 +203,11 @@ const styles = StyleSheet.create({
     right: -200,
     bottom: -200,
     opacity: 0.3,
+  },
+    cell1: {
+    backgroundColor: "#ddd",
+  },
+  cell0: {
+    backgroundColor: "#f4f7fa",
   },
 });

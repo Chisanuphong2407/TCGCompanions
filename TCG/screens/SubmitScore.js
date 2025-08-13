@@ -28,7 +28,7 @@ export const SubmitScore = ({ navigation, route }) => {
   const [Totalpage, setTotalpage] = useState(0);
   const [firstScore, setFirstscore] = useState([]);
   const [secondScore, setSecondscore] = useState([]);
-  const [byeCheck,setByecheck] = useState(false);
+  const [byeCheck, setByecheck] = useState(false);
 
   const getSchedule = async () => {
     try {
@@ -41,7 +41,6 @@ export const SubmitScore = ({ navigation, route }) => {
 
       const fetchschedule = await result.json();
       setSchedule(fetchschedule);
-      setTotalpage(Math.ceil(schedule.length / itemPerPage));
     } catch (error) {
       console.error(error);
     }
@@ -61,22 +60,32 @@ export const SubmitScore = ({ navigation, route }) => {
 
   const handleSubmit = () => {
     try {
-      if((!firstScore || !secondScore || firstScore.indexOf(undefined) != -1 || secondScore.indexOf(undefined) != -1) && byeCheck){
-        Alert.alert("บันทึกไม่สำเร็จ","โปรดกรอกข้อมูลให้ครบถ้วน");
-      }else{
-        Alert.alert("ยืนยันการบันทึกข้อมูล","หากยืนยัน ท่านจะไม่สามารถแก้ไขได้",[
-          {
-            text:"ตกลง",
-            style: "default",
-            onPress: submitScore,
-          },
-          {
-            text:"ยกเลิก"
-          }
-        ]);
+      if (
+        (!firstScore ||
+          !secondScore ||
+          firstScore.indexOf(undefined) != -1 ||
+          secondScore.indexOf(undefined) != -1) &&
+        byeCheck
+      ) {
+        Alert.alert("บันทึกไม่สำเร็จ", "โปรดกรอกข้อมูลให้ครบถ้วน");
+      } else {
+        Alert.alert(
+          "ยืนยันการบันทึกข้อมูล",
+          "หากยืนยัน ท่านจะไม่สามารถแก้ไขได้",
+          [
+            {
+              text: "ตกลง",
+              style: "default",
+              onPress: submitScore,
+            },
+            {
+              text: "ยกเลิก",
+            },
+          ]
+        );
       }
     } catch (error) {
-      Alert.alert("บันทึกคะแนนไม่สำเร็จ","โปรดลองอีกครั้ง");
+      Alert.alert("บันทึกคะแนนไม่สำเร็จ", "โปรดลองอีกครั้ง");
     }
   };
 
@@ -94,27 +103,26 @@ export const SubmitScore = ({ navigation, route }) => {
         }),
       });
 
-      await fetch(`${IP}/api/updateLeaderboard`,{
+      await fetch(`${IP}/api/updateLeaderboard`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          tableID: tableID
+          tableID: tableID,
         }),
       });
 
       const res = await submit.json();
-      if(res > 0){
-        Alert.alert("","บันทึกคะแนนสำเร็จ",[
+      if (res > 0) {
+        Alert.alert("", "บันทึกคะแนนสำเร็จ", [
           {
-            text:"ตกลง",
-            style:'default',
-            onPress: () => navigation.navigate("Leaderboard",{tableID})
-          }
-        ])
+            text: "ตกลง",
+            style: "default",
+            onPress: () => navigation.navigate("Leaderboard", { tableID }),
+          },
+        ]);
       }
-      
     } catch (error) {}
   };
 
@@ -125,6 +133,10 @@ export const SubmitScore = ({ navigation, route }) => {
       console.log(schedule);
     }
   }, [round]);
+
+  useEffect(() => {
+    setTotalpage(Math.ceil(schedule.length / itemPerPage));
+  }, [schedule]);
 
   useEffect(() => {
     schedule.forEach((item, index) => {
