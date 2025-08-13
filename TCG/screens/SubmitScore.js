@@ -41,6 +41,7 @@ export const SubmitScore = ({ navigation, route }) => {
 
       const fetchschedule = await result.json();
       setSchedule(fetchschedule);
+
     } catch (error) {
       console.error(error);
     }
@@ -236,8 +237,10 @@ export const SubmitScore = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
+      <Text>current 1stScore: {JSON.stringify(schedule[0].Fighter1st)}{JSON.stringify(schedule[1].Fighter1st)}</Text>
       <Text>current 1stScore: {firstScore}</Text>
       <Text>current 2ndScore: {secondScore}</Text>
+      <Text>current 2stScore: {JSON.stringify(schedule[0].Fighter2nd)}{JSON.stringify(schedule[1].Fighter2nd)}</Text>
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitText}>บันทึก</Text>
       </TouchableOpacity>

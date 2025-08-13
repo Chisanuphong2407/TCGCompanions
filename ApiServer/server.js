@@ -788,11 +788,16 @@ app.post("/api/submitScore", async (req, res) => {
 app.put("/api/updateLeaderboard",async (req,res) => {
   const tableID = req.body.tableID;
   try {
-    const [leaderboardfetch] = await conn.query("SELECT leaderboard.Fightertable, leaderboard.FighterID, CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd END AS MatchedFighter, CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st_Score WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd_Score END AS MatchScore, leaderboard.TotalScore, leaderboard.solkolf_score FROM leaderboard JOIN match_participants ON leaderboard.FighterID = match_participants.Fighter1st OR leaderboard.FighterID = match_participants.Fighter2nd WHERE match_participants.fightertable = ? GROUP BY FighterID",[tableID]);
+    console.log("update");
+    const [leaderboardfetch] = await conn.query("SELECT leaderboard.Fightertable,CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd END AS MatchedFighter, CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st_Score WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd_Score END AS MatchScore, leaderboard.TotalScore, leaderboard.solkolf_score FROM leaderboard JOIN match_participants ON leaderboard.FighterID = match_participants.Fighter1st OR leaderboard.FighterID = match_participants.Fighter2nd WHERE match_participants.fightertable = ? GROUP BY FighterID",[tableID]);
 
-    for (const item of leaderboardfetch) {
-      const TotalScore = item.TotalScore + item.MatchScore;
-      await conn.query("UPDATE `leaderboard` SET `TotalScore`= ? WHERE FighterID = ?",[TotalScore,item.FighterID]);
+    console.log(leaderboardfetch);
+    for (let index = 0;index < leaderboardfetch.length;index++) {
+      const NewTotalScore = leaderboardfetch[index].TotalScore + leaderboardfetch[index].MatchScore;
+      console.log(NewTotalScore);
+      console.log(leaderboardfetch[index]);
+      console.log("Fighter",leaderboardfetch[index].MatchedFighter);
+      await conn.query("UPDATE `leaderboard` SET `TotalScore`= ? WHERE FighterID = ?",[NewTotalScore,leaderboardfetch[index].MatchedFighter]);
     }
     
 
