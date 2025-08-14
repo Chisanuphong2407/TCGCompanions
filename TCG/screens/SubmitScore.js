@@ -41,7 +41,6 @@ export const SubmitScore = ({ navigation, route }) => {
 
       const fetchschedule = await result.json();
       setSchedule(fetchschedule);
-
     } catch (error) {
       console.error(error);
     }
@@ -111,10 +110,38 @@ export const SubmitScore = ({ navigation, route }) => {
         },
         body: JSON.stringify({
           tableID: tableID,
+          round: round,
         }),
       });
 
       const res = await submit.json();
+
+      if (round == 5) {
+        schedule.forEach( async(item) => {
+          await fetch(`${IP}/api/solkoftSum`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              tableID: tableID,
+              fighterID: item.Fighter1st
+            }),
+          });
+
+                    await fetch(`${IP}/api/solkoftSum`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              tableID: tableID,
+              fighterID: item.Fighter2nd
+            }),
+          });
+        });
+      }
+
       if (res > 0) {
         Alert.alert("", "บันทึกคะแนนสำเร็จ", [
           {
@@ -237,10 +264,8 @@ export const SubmitScore = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
-      <Text>current 1stScore: {JSON.stringify(schedule[0].Fighter1st)}{JSON.stringify(schedule[1].Fighter1st)}</Text>
       <Text>current 1stScore: {firstScore}</Text>
       <Text>current 2ndScore: {secondScore}</Text>
-      <Text>current 2stScore: {JSON.stringify(schedule[0].Fighter2nd)}{JSON.stringify(schedule[1].Fighter2nd)}</Text>
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitText}>บันทึก</Text>
       </TouchableOpacity>

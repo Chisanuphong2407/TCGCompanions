@@ -772,6 +772,7 @@ app.post("/api/submitScore", async (req, res) => {
     secondScore[index],
   ]);
 
+  console.log(scheduleValue);
   try {
     const [SubmitScore] = await conn.query(
       "INSERT INTO `match_participants`(`fightertable`, `MatchID`, `Round`, `Fighter1st`, `Fighter2nd`, `Fighter1st_Score`, `Fighter2nd_Score`) VALUES ?",
@@ -787,16 +788,20 @@ app.post("/api/submitScore", async (req, res) => {
 //อัพเดต leaderboard
 app.put("/api/updateLeaderboard",async (req,res) => {
   const tableID = req.body.tableID;
+  const round = req.body.round;
   try {
     console.log("update");
-    const [leaderboardfetch] = await conn.query("SELECT leaderboard.Fightertable,CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd END AS MatchedFighter, CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st_Score WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd_Score END AS MatchScore, leaderboard.TotalScore, leaderboard.solkolf_score FROM leaderboard JOIN match_participants ON leaderboard.FighterID = match_participants.Fighter1st OR leaderboard.FighterID = match_participants.Fighter2nd WHERE match_participants.fightertable = ? GROUP BY FighterID",[tableID]);
+    console.log("round",round);
+    const [leaderboardfetch] = await conn.query("SELECT leaderboard.Fightertable,CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd END AS MatchedFighter, CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st_Score WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd_Score END AS MatchScore, leaderboard.TotalScore, leaderboard.solkolf_score FROM leaderboard JOIN match_participants ON leaderboard.FighterID = match_participants.Fighter1st OR leaderboard.FighterID = match_participants.Fighter2nd WHERE match_participants.fightertable = ? AND Round = ? GROUP BY FighterID",[tableID,round]);
 
-    console.log(leaderboardfetch);
+    // console.log(leaderboardfetch);
     for (let index = 0;index < leaderboardfetch.length;index++) {
-      const NewTotalScore = leaderboardfetch[index].TotalScore + leaderboardfetch[index].MatchScore;
+      const NewTotalScore = parseInt(leaderboardfetch[index].TotalScore) + parseInt(leaderboardfetch[index].MatchScore);
       console.log(NewTotalScore);
-      console.log(leaderboardfetch[index]);
+      console.log(leaderboardfetch[index].TotalScore);
+      console.log(leaderboardfetch[index].MatchScore);
       console.log("Fighter",leaderboardfetch[index].MatchedFighter);
+      
       await conn.query("UPDATE `leaderboard` SET `TotalScore`= ? WHERE FighterID = ?",[NewTotalScore,leaderboardfetch[index].MatchedFighter]);
     }
     
@@ -812,6 +817,36 @@ app.get("/api/getLeaderboard/:tableID",async (req,res) => {
   const tableID = req.params.tableID;
   try {
     const [leaderboard] = await conn.query("SELECT `LeaderboardID`, leaderboard.`Fightertable`, leaderboard.`FighterID`,contName.UserName,contName.Nation, `TotalScore`, `solkolf_score` FROM `leaderboard` JOIN contestants ON contestants.FighterTable = leaderboard.Fightertable JOIN contestants AS contName ON contName.FighterID = leaderboard.FighterID WHERE leaderboard.`Fightertable` = ? GROUP BY LeaderboardID",[tableID]);
+
+    return res.status(200).json(leaderboard);
+  } catch (error) {
+    return res.status(404).json(error);
+  }
+});
+
+//รวมคะแนน solkoft
+app.post("/api/solkoftSum", async (req,res) => {
+  const tableID = req.body.tableID;
+  const fighterID = req.body.fighterID;
+  console.log("table",tableID);
+  console.log("ID",fighterID);
+  try {
+    const [history] = await conn.query("SELECT `MatchID`,`Round`,CASE WHEN `Fighter1st` = ? THEN `Fighter2nd_Score` WHEN `Fighter2nd` = ? THEN `Fighter1st_Score` END AS 'OppomentScore' FROM `match_participants` WHERE (`Fighter1st` = ? OR `Fighter2nd` = ?) AND `fightertable` = ?",[fighterID,fighterID,fighterID,fighterID,tableID]);
+
+    const [leaderboard] = await conn.query("SELECT  `FighterID`, `TotalScore`, `solkolf_score` FROM `leaderboard` WHERE `FighterID` = ? AND `Fightertable` = ?",[fighterID,tableID]);
+    const allScore = await history.map((item) => {
+      return item.OppomentScore;
+    });
+
+    console.log(allScore);
+
+    const sumScore = allScore.reduce((sum,current) => sum + current ,0);
+    console.log(sumScore);
+
+    const solkoft = sumScore + leaderboard[0].TotalScore;
+    console.log("solkoft",solkoft);
+
+    await conn.query("UPDATE `leaderboard` SET `solkolf_score`= ? WHERE `FighterID` = ? AND `Fightertable` = ?",[solkoft,fighterID,tableID]);
 
     return res.status(200).json(leaderboard);
   } catch (error) {

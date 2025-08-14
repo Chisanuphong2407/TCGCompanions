@@ -26,7 +26,7 @@ export const Leaderboard = ({ navigation, route }) => {
   const itemPerPage = 10;
   const [page, setPage] = useState(0);
   const [Totalpage, setTotalpage] = useState(0);
-  const [round,setRound] = useState(0);
+  const [round, setRound] = useState(0);
 
   const getLeaderboard = async () => {
     try {
@@ -52,17 +52,16 @@ export const Leaderboard = ({ navigation, route }) => {
 
   const getRound = async () => {
     try {
-      const fetchRound = await fetch(`${IP}/api/getRound/${tableID}`,{
+      const fetchRound = await fetch(`${IP}/api/getRound/${tableID}`, {
         method: "GET",
         headers: {
-            "Content-Type": "application/json",
-          },
+          "Content-Type": "application/json",
+        },
       });
       const resultRound = await fetchRound.json();
       setRound(resultRound);
-
     } catch (error) {
-      Alert.alert("เกิดข้อผิดพลาด","แสดงตารางคะแนนไม่สำเร็จ");
+      Alert.alert("เกิดข้อผิดพลาด", "แสดงตารางคะแนนไม่สำเร็จ");
     }
   };
 
@@ -80,66 +79,78 @@ export const Leaderboard = ({ navigation, route }) => {
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
       <ScrollView>
         {/*table header*/}
-        <DataTable style={styles.table}>
-          <DataTable.Header style={styles.tableHeader}>
-            <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
-            <DataTable.Title style={styles.tableName}>
-              ผู้เข้าแข่งขัน
-            </DataTable.Title>
-            <DataTable.Title style={styles.tableNation}>เนชั่น</DataTable.Title>
-            <DataTable.Title style={styles.tableScore}>คะแนน</DataTable.Title>
-          </DataTable.Header>
+          <DataTable style={round == 5 ? styles.tableLast : styles.table}>
+            <DataTable.Header style={styles.tableHeader}>
+              <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
+              <DataTable.Title style={styles.tableName}>
+                ผู้เข้าแข่งขัน
+              </DataTable.Title>
+              <DataTable.Title style={styles.tableNation}>
+                เนชั่น
+              </DataTable.Title>
+              <DataTable.Title style={styles.tableScore}>คะแนน</DataTable.Title>
+              {round == 5 && (
+                <DataTable.Title style={styles.tableScore}>
+                  solkolf
+                </DataTable.Title>
+              )}
+            </DataTable.Header>
 
-          {/* table rows */}
-          {leaderboard.slice(from, to).length > 0 &&
-            leaderboard.slice(from, to).map((item, index) => {
-              return (
-                <DataTable.Row
-                  key={item.FighterID}
-                  style={index % 2 == 0 ? styles.cell1 : styles.cell0}
-                >
-                  <DataTable.Cell style={styles.tableNo}>
-                    {item.FighterID}
-                  </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableName}>
-                    {item.UserName}
-                  </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableNation}>
-                    {item.Nation}
-                  </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableScore}>
-                    {item.TotalScore}
-                  </DataTable.Cell>
-                </DataTable.Row>
-              );
-            })}
+            {/* table rows */}
+            {leaderboard.slice(from, to).length > 0 &&
+              leaderboard.slice(from, to).map((item, index) => {
+                return (
+                  <DataTable.Row
+                    key={item.FighterID}
+                    style={index % 2 == 0 ? styles.cell1 : styles.cell0}
+                  >
+                    <DataTable.Cell style={styles.tableNo}>
+                      {item.FighterID}
+                    </DataTable.Cell>
+                    <DataTable.Cell style={styles.tableName}>
+                      {item.UserName}
+                    </DataTable.Cell>
+                    <DataTable.Cell style={styles.tableNation}>
+                      {item.Nation}
+                    </DataTable.Cell>
+                    <DataTable.Cell style={styles.tableScore}>
+                      {item.TotalScore}
+                    </DataTable.Cell>
+                    {round == 5 && (
+                      <DataTable.Cell style={styles.tableScore}>
+                        {item.solkolf_score}
+                      </DataTable.Cell>
+                    )}
+                  </DataTable.Row>
+                );
+              })}
 
-          <DataTable.Pagination
-            page={page}
-            numberOfPages={Totalpage}
-            onPageChange={(page) => setPage(page)}
-            label={`${page + 1} of ${Totalpage}`}
-            numberOfItemsPerPage={itemPerPage}
-            showFastPaginationControls
-          />
-        </DataTable>
+            <DataTable.Pagination
+              page={page}
+              numberOfPages={Totalpage}
+              onPageChange={(page) => setPage(page)}
+              label={`${page + 1} of ${Totalpage}`}
+              numberOfItemsPerPage={itemPerPage}
+              showFastPaginationControls
+            />
+          </DataTable>
       </ScrollView>
       {round != 5 && (
         <TouchableOpacity
-        style={styles.nextButton}
-        onPress={() =>
-          navigation.navigate("Table", { tableID: leaderboard[0].Fightertable })
-        }
-      >
-        <Text style={styles.nextText}>สร้างตารางรอบถัดไป</Text>
-      </TouchableOpacity>
+          style={styles.nextButton}
+          onPress={() =>
+            navigation.navigate("Table", {
+              tableID: leaderboard[0].Fightertable,
+            })
+          }
+        >
+          <Text style={styles.nextText}>สร้างตารางรอบถัดไป</Text>
+        </TouchableOpacity>
       )}
       {round == 5 && (
-        <TouchableOpacity
-        style={styles.nextButton}
-      >
-        <Text style={styles.nextText}>เสร็จสิ้นการแข่งขัน</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.nextButton}>
+          <Text style={styles.nextText}>เสร็จสิ้นการแข่งขัน</Text>
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -171,12 +182,26 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: "70%",
     maxWidth: "90%",
-    margin: 10,
     borderWidth: 1,
     borderColor: "#d3d0d0",
     backgroundColor: "#f4f7fa",
     opacity: 0.8,
     borderRadius: 3,
+    overflow: "hidden",
+    alignSelf: "center",
+  },
+  tableLast: {
+    flex: 1,
+    minWidth: "60%",
+    maxWidth: "90%",
+    borderWidth: 1,
+    borderColor: "#d3d0d0",
+    backgroundColor: "#f4f7fa",
+    opacity: 0.8,
+    borderRadius: 3,
+    borderLeftWidth: 0,
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
     overflow: "hidden",
     alignSelf: "center",
   },
@@ -190,17 +215,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 1,
   },
   tableName: {
-    minWidth: "30%",
+    minWidth: "20%",
     maxWidth: "40%",
     justifyContent: "flex-start",
-    paddingLeft: 20,
+    paddingLeft: 10,
     marginHorizontal: 1,
   },
   tableNation: {
-    minWidth: "30%",
+    minWidth: "20%",
     maxWidth: "40%",
     justifyContent: "flex-start",
-    paddingLeft: 20,
+    paddingLeft: 10,
     marginHorizontal: 1,
   },
   tableScore: {
