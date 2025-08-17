@@ -252,7 +252,7 @@ export const Eventdetails = ({ navigation, route }) => {
         {isContestant && !isOwner && (
           <View style={styles.menu}>
             <Pressable style={styles.menubox} onPress={() => {
-              navigation.navigate("History",account);
+              navigation.navigate("History",{table,account});
             }}>
               <Clock color={"#176B87"} style={styles.menubut} />
             </Pressable>
@@ -276,7 +276,7 @@ export const Eventdetails = ({ navigation, route }) => {
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Text style={statusStyle}>{status}</Text>
         {isContestant && (
-          <TouchableOpacity style={styles.schedule}>
+          <TouchableOpacity style={styles.schedule} onPress={() => navigation.navigate("Pairing",{tableID :table})}>
             <Text style={styles.scheduleText}>ตารางการแข่งขัน</Text>
           </TouchableOpacity>
         )}

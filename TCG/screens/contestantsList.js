@@ -140,29 +140,23 @@ const styles = StyleSheet.create({
   },
   tableNo: {
     minWidth: "5%",
+    maxWidth: "7%",
     marginHorizontal: 5,
   },
   tableName: {
     minWidth: "25%",
+    maxWidth: "30%",
     marginHorizontal: 5,
   },
   tableNation: {
     minWidth: "20%",
+    maxWidth: "25%",
     marginHorizontal: 5,
   },
   tableArchtype: {
     minWidth: "15%",
+    maxWidth: "20%",
     marginHorizontal: 5,
-  },
-  menu: {
-    flexDirection: "row",
-    marginTop: 40,
-    padding: 20,
-    paddingBottom: 0,
-    justifyContent: "space-between",
-  },
-  icon: {
-    color: "#176b87",
   },
   table: {
     minWidth: "60%",
@@ -174,7 +168,7 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     borderRadius: 5,
     overflow: "hidden",
-    justifyContent: "space-evenly",
+    // justifyContent: "space-evenly",
   },
   manageEvent: {
     alignSelf: "flex-end",

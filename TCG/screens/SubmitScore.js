@@ -207,7 +207,7 @@ export const SubmitScore = ({ navigation, route }) => {
           {schedule.slice(from, to).length > 0 &&
             schedule.slice(from, to).map((item, index) => {
               return (
-                <DataTable.Row key={item.MatchID}>
+                <DataTable.Row key={item.MatchID} style={index % 2 == 0 ? styles.cell1 : styles.cell0}>
                   <DataTable.Cell style={styles.tableNameLeft}>
                     {item.fighter1stName}
                   </DataTable.Cell>
@@ -337,5 +337,11 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     fontSize: 18,
     color: "white",
+  },
+    cell1: {
+    backgroundColor: "#ddd",
+  },
+  cell0: {
+    backgroundColor: "#f4f7fa",
   },
 });

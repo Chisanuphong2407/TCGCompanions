@@ -20,45 +20,101 @@ import { UserPlus, X } from "react-native-feather";
 import { IP } from "../App";
 
 export const History = ({ route, navigation }) => {
-  const name = route.params;
+  const name = route.params.account;
+  const tableID = route.params.table;
+  const [userID, setUserID] = useState();
+  const [history, setHistory] = useState([]);
+
+  const getProfile = async () => {
+    // console.log(name);
+    try {
+      const profile = await fetch(`${IP}/api/getprofile/${name}`, {
+        method: "GET",
+      });
+
+      const resultProfile = await profile.json();
+
+      setUserID(resultProfile[0].UserID);
+    } catch (error) {
+      Alert.alert("เกิดข้อผิดพลาด", JSON.stringify(error));
+    }
+  };
+
+  const getHistory = async () => {
+    try {
+      const historyFetch = await fetch(`${IP}/api/getHistory`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fighterID: userID,
+          tableID: tableID,
+        }),
+      });
+
+      const resultHistory = await historyFetch.json();
+      setHistory(resultHistory);
+    } catch (error) {
+      Alert.alert("เกิดข้อผิดพลาด");
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getProfile();
+    console.log(userID);
+    getHistory();
+    console.log(history);
+  }, []);
+
   return (
     <View style={styles.container}>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
       <ScrollView>
         <Text style={styles.header}>ประวัติการแข่งขัน</Text>
-        <Text>รอบที่</Text>
-        <View style={styles.Alltable}>
-          <DataTable>
+        {history.length > 0 &&
+          history.map((item) => <Text>รอบที่ {item.Round}</Text>)}
+
+        <View>
+          <DataTable style={styles.Alltable}>
             {/*header */}
             <DataTable.Header>
-              <DataTable.Title style={styles.tableHeaderLeft}>
-                No.
-              </DataTable.Title>
-              <DataTable.Title style={styles.tableHeaderLeft}>
+              <DataTable.Title style={styles.tableNameHeader}>
                 ชื่อผู้เข้าแข่งขัน
               </DataTable.Title>
-              <DataTable.Title></DataTable.Title>
-              <DataTable.Title></DataTable.Title>
-              <DataTable.Title></DataTable.Title>
-              <DataTable.Title style={styles.tableHeaderRight}>
-                No.
+              <DataTable.Title style={styles.tableScoreHeader}>
+                คะแนน
               </DataTable.Title>
-              <DataTable.Title style={styles.tableHeaderRight}>
+              <DataTable.Title style={styles.dat}></DataTable.Title>
+              <DataTable.Title style={styles.tableScoreHeader}>
+                คะแนน
+              </DataTable.Title>
+              <DataTable.Title style={styles.tableNameHeader}>
                 ชื่อผู้เข้าแข่งขัน
               </DataTable.Title>
             </DataTable.Header>
             {/*row */}
-            <DataTable.Row>
-              <DataTable.Cell style={styles.tableHeaderLeft}>
-                testNo.
-              </DataTable.Cell>
-              <DataTable.Cell style={styles.tableHeaderLeft}>0</DataTable.Cell>
-              <DataTable.Cell>-</DataTable.Cell>
-              <DataTable.Cell style={styles.tableHeaderRight}>0</DataTable.Cell>
-              <DataTable.Cell style={styles.tableHeaderRight}>
-                testName
-              </DataTable.Cell>
-            </DataTable.Row>
+            {history.length > 0 &&
+              history.map((item, index) => {
+                return (
+                  <DataTable.Row key={item.MatchID}>
+                    <DataTable.Cell style={styles.tableNameHeader}>
+                      {item.firstName}
+                    </DataTable.Cell>
+                    <DataTable.Cell style={styles.tableScoreHeader}>
+                      {item.Fighter1st_Score}
+                    </DataTable.Cell>
+                    <DataTable.Cell style={styles.dat}>-</DataTable.Cell>
+                    <DataTable.Cell style={styles.tableScoreHeader}>
+                      {item.Fighter2nd_Score}
+                    </DataTable.Cell>
+                    <DataTable.Cell style={styles.tableNameHeader}>
+                      {item.secondName}
+                    </DataTable.Cell>
+                  </DataTable.Row>
+                );
+              })}
           </DataTable>
         </View>
       </ScrollView>
@@ -90,23 +146,36 @@ const styles = StyleSheet.create({
     opacity: 0.3,
   },
   Alltable: {
-    flex: 1,
+    flex: 0.8,
+    minWidth: "60%",
+    maxWidth: "95%",
+    margin: 10,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    backgroundColor: "#f4f7fa",
+    opacity: 0.8,
+    borderRadius: 5,
+    overflow: "hidden",
+    justifyContent: "space-evenly",
+  },
+  tableNameHeader: {
     justifyContent: "center",
+    // marginHorizontal: 2,
+    minWidth: "20%",
   },
-  tableWrap: {
-    flex: 1,
-    justifyContent: "space-around",
-  },
-  tableHeaderLeft: {
-    flex: 1,
-    justifyContent: "flex-start",
-    paddingHorizontal: 2,
-    maxWidth: 50,
+  tableScoreHeader: {
+    justifyContent: "center",
+    // marginHorizontal: 2,
+    minWidth: "10%",
   },
   tableHeaderRight: {
     flex: 1,
     justifyContent: "flex-end",
     paddingHorizontal: 2,
     maxWidth: 50,
+  },
+  dat: {
+    justifyContent: "center",
+    fontWeight: "bold",
   },
 });

@@ -157,7 +157,7 @@ export const contestants = ({ navigation, route }) => {
       <View>
         <Text style={styles.header}>ผู้เข้าแข่งขัน</Text>
       </View>
-      <ScrollView>
+      <ScrollView style={styles.Alltable}>
         {/*table header*/}
         <DataTable style={styles.table}>
           <DataTable.Header>
@@ -253,6 +253,10 @@ export const styles = StyleSheet.create({
     backgroundColor: "#F7FAFF",
     justifyContent: "center",
   },
+  Alltable: {
+    padding:5,
+    alignSelf:'center',
+  },
   header: {
     fontSize: 30,
     marginTop: 20,
@@ -262,19 +266,20 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
   },
   tableNo: {
-    minWidth: "5%",
-    marginHorizontal: 5,
+    width:"5%",
+    marginHorizontal: 1,
+    
   },
   tableName: {
-    minWidth: "25%",
-    marginHorizontal: 5,
+    width:"25%",
+    marginHorizontal: 1,
   },
   tableNation: {
-    minWidth: "20%",
+    width:"20%",
     marginHorizontal: 5,
   },
   tableArchtype: {
-    minWidth: "15%",
+    width:"15%",
     marginHorizontal: 5,
   },
   menu: {
@@ -288,7 +293,8 @@ export const styles = StyleSheet.create({
     color: "#176b87",
   },
   table: {
-    minWidth: "60%",
+    flex:1,
+    minWidth: "20%",
     maxWidth: "95%",
     margin: 10,
     borderWidth: 1,
@@ -297,7 +303,6 @@ export const styles = StyleSheet.create({
     opacity: 0.8,
     borderRadius: 5,
     overflow: "hidden",
-    justifyContent: "space-evenly",
   },
   manageEvent: {
     alignSelf: "flex-end",

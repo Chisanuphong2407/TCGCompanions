@@ -27,6 +27,7 @@ export const Leaderboard = ({ navigation, route }) => {
   const [page, setPage] = useState(0);
   const [Totalpage, setTotalpage] = useState(0);
   const [round, setRound] = useState(0);
+  const feature = ["","","","","",""];
 
   const getLeaderboard = async () => {
     try {
@@ -79,9 +80,9 @@ export const Leaderboard = ({ navigation, route }) => {
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
       <ScrollView>
         {/*table header*/}
-          <DataTable style={round == 5 ? styles.tableLast : styles.table}>
+          <DataTable style={styles.table}>
             <DataTable.Header style={styles.tableHeader}>
-              <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
+              {round == 5 ? <DataTable.Title style={styles.tableNo}>อันดับ</DataTable.Title>:<DataTable.Title style={styles.tableNo}>No.</DataTable.Title>}
               <DataTable.Title style={styles.tableName}>
                 ผู้เข้าแข่งขัน
               </DataTable.Title>
@@ -104,23 +105,26 @@ export const Leaderboard = ({ navigation, route }) => {
                     key={item.FighterID}
                     style={index % 2 == 0 ? styles.cell1 : styles.cell0}
                   >
-                    <DataTable.Cell style={styles.tableNo}>
+                    {round == 5 ? <DataTable.Cell style={styles.tableNo}>
+                      {index +1}
+                    </DataTable.Cell> : <DataTable.Cell style={styles.tableNo}>
                       {item.FighterID}
-                    </DataTable.Cell>
+                    </DataTable.Cell>}
+                    
                     <DataTable.Cell style={styles.tableName}>
                       {item.UserName}
                     </DataTable.Cell>
                     <DataTable.Cell style={styles.tableNation}>
                       {item.Nation}
                     </DataTable.Cell>
-                    <DataTable.Cell style={styles.tableScore}>
-                      {item.TotalScore}
-                    </DataTable.Cell>
                     {round == 5 && (
                       <DataTable.Cell style={styles.tableScore}>
                         {item.solkolf_score}
                       </DataTable.Cell>
                     )}
+                    <DataTable.Cell style={styles.tableScore}>
+                      {item.TotalScore}
+                    </DataTable.Cell>
                   </DataTable.Row>
                 );
               })}
@@ -190,29 +194,13 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignSelf: "center",
   },
-  tableLast: {
-    flex: 1,
-    minWidth: "60%",
-    maxWidth: "90%",
-    borderWidth: 1,
-    borderColor: "#d3d0d0",
-    backgroundColor: "#f4f7fa",
-    opacity: 0.8,
-    borderRadius: 3,
-    borderLeftWidth: 0,
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    overflow: "hidden",
-    alignSelf: "center",
-  },
   tableHeader: {
     backgroundColor: "#c9e2fa",
   },
   tableNo: {
     minWidth: "5%",
-    maxWidth: "7%",
+    maxWidth: "12%",
     justifyContent: "center",
-    marginHorizontal: 1,
   },
   tableName: {
     minWidth: "20%",

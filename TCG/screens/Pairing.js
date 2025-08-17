@@ -19,7 +19,7 @@ import { DataTable } from "react-native-paper";
 import { Users } from "react-native-feather";
 import { IP } from "../App";
 
-export const Pairing = () => {
+export const Pairing = ({ navigation, route }) => {
   const tableID = route.params.tableID;
   const [round, setRound] = useState(0);
   const [Totalpage, setTotalpage] = useState(0);
@@ -43,12 +43,16 @@ export const Pairing = () => {
 
   const getSchedule = async () => {
     try {
-      const fetchSchedule = await fetch(`${IP}`, {
-        method: "GET",
-      });
+      const fetchSchedule = await fetch(
+        `${IP}/api/getMatch/${tableID}/${round}`,
+        {
+          method: "GET",
+        }
+      );
 
       const resultSchedule = await fetchSchedule.json();
       setSchedule(resultSchedule);
+      setIsloading(false);
     } catch (error) {
       Alert.alert("เกิดข้อผิดพลาด", "");
     }
@@ -69,8 +73,9 @@ export const Pairing = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>ตารางการแข่งขัน</Text>
-      <Text>รอบที่: {round}</Text>
-      <ScrollView>
+      <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
+      <ScrollView style={styles.content}>
+        <Text>รอบที่: {round}</Text>
         {/*table header*/}
         <DataTable style={styles.table}>
           <DataTable.Header>
@@ -78,11 +83,9 @@ export const Pairing = () => {
               ผู้เข้าแข่งขัน
             </DataTable.Title>
             <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
-            <DataTable.Title></DataTable.Title>
             <DataTable.Title style={styles.tableVS}>
-              <Text>VS.</Text>
+              <Text style={styles.fontVS}>โต๊ะที่</Text>
             </DataTable.Title>
-            <DataTable.Title></DataTable.Title>
             <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
             <DataTable.Title style={styles.tableNameRight}>
               ผู้เข้าแข่งขัน
@@ -101,15 +104,13 @@ export const Pairing = () => {
                     {item.Fighter1st}
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableVS}>
-                    <Text>VS.</Text>
-                  </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableInput}>
+                    <Text style={styles.fontVS}>{index +1}</Text>
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNo}>
                     {item.Fighter2nd != 0 && item.Fighter2nd}
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNameRight}>
-                    {item.Fighter2nd != 0 ? "ชนะบาย": item.fighter2ndName}
+                    {item.Fighter2nd == 0 ? "ชนะบาย" : item.fighter2ndName}
                   </DataTable.Cell>
                 </DataTable.Row>
               );
@@ -125,11 +126,6 @@ export const Pairing = () => {
           />
         </DataTable>
       </ScrollView>
-      <Text>current 1stScore: {firstScore}</Text>
-      <Text>current 2ndScore: {secondScore}</Text>
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitText}>บันทึก</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -139,6 +135,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F7FAFF",
     justifyContent: "center",
+  },
+  content: {
+    margin: 10,
   },
   header: {
     fontSize: 30,
@@ -150,25 +149,26 @@ const styles = StyleSheet.create({
   },
   tableNo: {
     minWidth: "5%",
-    marginHorizontal: 3,
+    maxWidth: "7%",
+    marginHorizontal: 8,
     justifyContent: "center",
   },
   tableNameLeft: {
-    minWidth: "25%",
+    minWidth: "20%",
     marginHorizontal: 3,
     justifyContent: "flex-end",
   },
   tableNameRight: {
-    minWidth: "25%",
+    minWidth: "20%",
     marginHorizontal: 3,
     justifyContent: "flex-start",
   },
   tableVS: {
     minWidth: "15%",
-    justifyContent: "center",
     borderLeftWidth: 1,
     borderRightWidth: 1,
     borderColor: "#e0e0e0",
+    justifyContent: 'center'
   },
   fontVS: {
     fontWeight: "bold",
@@ -194,13 +194,6 @@ const styles = StyleSheet.create({
     bottom: -200,
     opacity: 0.3,
   },
-  icon: {
-    flexDirection: "row",
-    marginTop: 40,
-    padding: 20,
-    paddingBottom: 0,
-    justifyContent: "flex-end",
-  },
   header: {
     fontSize: 30,
     marginTop: 30,
@@ -212,18 +205,5 @@ const styles = StyleSheet.create({
   round: {
     marginLeft: 20,
     marginBottom: 10,
-  },
-  submitScore: {
-    alignSelf: "flex-end",
-    backgroundColor: "#176b87",
-    padding: 10,
-    borderRadius: 15,
-    margin: 20,
-    minWidth: 100,
-  },
-  submitScoreText: {
-    color: "white",
-    fontSize: 18,
-    textAlign: "center",
   },
 });

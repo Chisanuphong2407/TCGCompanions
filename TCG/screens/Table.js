@@ -218,7 +218,7 @@ export const Table = ({ route, navigation }) => {
           {schedule.slice(from, to).length > 0 &&
             schedule.slice(from, to).map((item, index) => {
               return (
-                <DataTable.Row key={item.MatchID}>
+                <DataTable.Row key={item.MatchID} style={index % 2 == 0 ? styles.cell1 : styles.cell0}>
                   <DataTable.Cell style={styles.tableNameLeft}>
                     {item.fighter1stName}
                   </DataTable.Cell>
@@ -355,5 +355,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     textAlign: "center",
+  },
+    cell1: {
+    backgroundColor: "#ddd",
+  },
+  cell0: {
+    backgroundColor: "#f4f7fa",
   },
 });
