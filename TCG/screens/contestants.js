@@ -1,8 +1,12 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, ScrollView } from "react-native";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, BackHandler } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   SafeAreaView,
@@ -107,6 +111,21 @@ export const contestants = ({ navigation, route }) => {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = async () => {
+        navigation.navigate("Eventdetails", EventID);
+        return true;
+      };
+
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+      };
+    }, [])
+  );
+
   useEffect(() => {
     fetchData();
   }, [isLoading]);
@@ -114,11 +133,12 @@ export const contestants = ({ navigation, route }) => {
   useEffect(() => {
     const socket = io(IP);
 
-    socket.on("refreshing", (refresh) => {
+    socket.on("fighter refreshing", (refresh) => {
       console.log("Received real-time contestant update:", refresh);
       setIsloading(refresh);
     });
   });
+
   useEffect(() => {
     if (account == owner) {
       setIsowner(true);
@@ -146,7 +166,7 @@ export const contestants = ({ navigation, route }) => {
                 Eventname,
                 owner,
                 EventID,
-                status
+                status,
               })
             }
           >
@@ -170,21 +190,17 @@ export const contestants = ({ navigation, route }) => {
                 เนชัน
               </DataTable.Title>
             )}
-            {isOwner && (
-              <DataTable.Title style={styles.tableArchtype}>
-                สายการเล่น
-              </DataTable.Title>
-            )}
           </DataTable.Header>
 
           {/* table rows */}
           {fighter.slice(from, to).length > 0 &&
             account &&
-            fighter.slice(from, to).map((item) => {
+            fighter.slice(from, to).map((item, index) => {
               const FighterID = item.FighterID;
               return (
                 <DataTable.Row
                   key={item.FighterID}
+                  style={index % 2 == 0 ? styles.cell1 : styles.cell0}
                   onPress={() => {
                     if (owner == account) {
                       navigation.navigate("ContestantDetail", {
@@ -193,7 +209,7 @@ export const contestants = ({ navigation, route }) => {
                         userID: item.UserID,
                         Eventname,
                         EventID,
-                        status
+                        status,
                       });
                     }
                   }}
@@ -207,11 +223,6 @@ export const contestants = ({ navigation, route }) => {
                   {isOwner && (
                     <DataTable.Cell style={styles.tableNation}>
                       {item.Nation}
-                    </DataTable.Cell>
-                  )}
-                  {isOwner && (
-                    <DataTable.Cell style={styles.tableArchtype}>
-                      {item.Archtype}
                     </DataTable.Cell>
                   )}
                 </DataTable.Row>
@@ -235,7 +246,7 @@ export const contestants = ({ navigation, route }) => {
               if (status == 0 || status == 1) {
                 eventBegin(EventID, navigation);
               } else if (status == 2) {
-                navigation.navigate("Fighterlist", { tableID ,EventID});
+                navigation.navigate("Fighterlist", { tableID, EventID });
               }
             }}
           >
@@ -254,8 +265,8 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   Alltable: {
-    padding:5,
-    alignSelf:'center',
+    padding: 5,
+    alignSelf: "center",
   },
   header: {
     fontSize: 30,
@@ -266,20 +277,16 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
   },
   tableNo: {
-    width:"5%",
-    marginHorizontal: 1,
-    
+    minWidth: "5%",
+    maxWidth: "10%",
+    marginHorizontal: 3,
   },
   tableName: {
-    width:"25%",
-    marginHorizontal: 1,
+    minWidth: "30%",
+    marginHorizontal: 3,
   },
   tableNation: {
-    width:"20%",
-    marginHorizontal: 5,
-  },
-  tableArchtype: {
-    width:"15%",
+    minWidth: "25%",
     marginHorizontal: 5,
   },
   menu: {
@@ -293,7 +300,7 @@ export const styles = StyleSheet.create({
     color: "#176b87",
   },
   table: {
-    flex:1,
+    flex: 1,
     minWidth: "20%",
     maxWidth: "95%",
     margin: 10,
@@ -303,6 +310,7 @@ export const styles = StyleSheet.create({
     opacity: 0.8,
     borderRadius: 5,
     overflow: "hidden",
+    justifyContent: "space-evenly",
   },
   manageEvent: {
     alignSelf: "flex-end",
@@ -324,5 +332,11 @@ export const styles = StyleSheet.create({
     right: -200,
     bottom: -200,
     opacity: 0.3,
+  },
+  cell1: {
+    backgroundColor: "#ddd",
+  },
+  cell0: {
+    backgroundColor: "#f4f7fa",
   },
 });

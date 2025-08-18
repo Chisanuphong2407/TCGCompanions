@@ -333,7 +333,7 @@ app.put("/api/updateprofile", async (req, res) => {
       console.log(payload);
       //สร้าง token
       genToken(payload);
-      io.emit("refreshing", true);
+      io.emit("fighter refreshing", true);
     }
   } catch (err) {
     console.error("เกิดข้อผิดพลาดในการแก้ไข:", err);
@@ -536,7 +536,7 @@ app.post("/api/apply", async (req, res) => {
         [fighterTable, fighterID, username, userID, nation, architype]
       );
     }
-
+    io.emit("fighter refreshing", true);
     // return res.json(userID[0].UserID);
 
     return res.status(201).send({ message: "สมัครสำเร็จ" });
@@ -561,7 +561,7 @@ app.delete(
 
       if (waived.affectedRows > 0) {
         console.log(waived);
-        io.emit("refreshing", true);
+        io.emit("fighter refreshing", true);
         return res.sendStatus(204);
       } else {
         return res
@@ -674,6 +674,21 @@ app.get("/api/getRound/:tableID", async (req, res) => {
       [tableID]
     );
     return res.status(200).json(round.length);
+  } catch (error) {
+    return res.status(404).json(error);
+  }
+});
+
+//ดึงสถิติทั้งหมดในการแข่งขัน
+app.get("/api/getAllMatchpart/:tableID", async (req, res) => {
+  const tableID = req.params.tableID;
+  try {
+    const [round] = await conn.query(
+      "SELECT `HistoryID`, `MatchID`, `Round`, `fightertable`, `Fighter1st`, `Fighter1st_Score`, `Fighter2nd`, `Fighter2nd_Score` FROM `match_participants` WHERE `fightertable` = ? GROUP BY Round",
+      [tableID]
+    );
+
+    return res.status(200).json(round);
   } catch (error) {
     return res.status(404).json(error);
   }
@@ -883,6 +898,21 @@ app.post("/api/getHistory", async (req, res) => {
       [tableID, fighterID, fighterID]
     );
     return res.status(200).json(history);
+  } catch (error) {
+    return res.status(404).json(error);
+  }
+});
+
+//ดึง EventID
+app.get("/api/getEventID/:tableID", async (req, res) => {
+  const tableID = req.params.tableID;
+  try {
+    const [EventID] = await conn.query(
+      "SELECT `EventID` FROM `event` WHERE `Fightertable` = ?",
+      [tableID]
+    );
+
+    return res.status(200).json(EventID[0].EventID);
   } catch (error) {
     return res.status(404).json(error);
   }

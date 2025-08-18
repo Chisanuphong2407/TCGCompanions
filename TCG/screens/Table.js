@@ -1,8 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView, BackHandler } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  useFocusEffect,
+  useNavigation,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   SafeAreaView,
@@ -89,23 +93,20 @@ export const Table = ({ route, navigation }) => {
       }
       console.log("match finish");
     } else {
-      const fetchboard = await fetch(
-        `${IP}/api/getLeaderboard/${tableID}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const fetchboard = await fetch(`${IP}/api/getLeaderboard/${tableID}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       const board = await fetchboard.json();
       console.log(board);
       board.sort((low, high) => high.TotalScore - low.TotalScore);
-      console.log("lens",fighterLength);
+      console.log("lens", fighterLength);
       for (let index = 0; index < fighterLength; index++) {
-        console.warn("Round:",index);
-        console.log("ID",board[index].FighterID);
+        console.warn("Round:", index);
+        console.log("ID", board[index].FighterID);
         if (index % 2 == 0) {
           fighter1st.push(board[index].FighterID);
         } else {
@@ -180,6 +181,25 @@ export const Table = ({ route, navigation }) => {
     }
   }, [schedule]);
 
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = async () => {
+        const EventID = await fetch(`${IP}/api/getEventID/${tableID}`, {
+          method: "GET",
+        });
+        const ID = await EventID.json();
+        navigation.navigate("Eventdetails", { EventID: ID });
+        return true;
+      };
+
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+      };
+    }, [])
+  );
+
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, fighterLength);
 
@@ -218,7 +238,10 @@ export const Table = ({ route, navigation }) => {
           {schedule.slice(from, to).length > 0 &&
             schedule.slice(from, to).map((item, index) => {
               return (
-                <DataTable.Row key={item.MatchID} style={index % 2 == 0 ? styles.cell1 : styles.cell0}>
+                <DataTable.Row
+                  key={item.MatchID}
+                  style={index % 2 == 0 ? styles.cell1 : styles.cell0}
+                >
                   <DataTable.Cell style={styles.tableNameLeft}>
                     {item.fighter1stName}
                   </DataTable.Cell>
@@ -356,7 +379,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: "center",
   },
-    cell1: {
+  cell1: {
     backgroundColor: "#ddd",
   },
   cell0: {

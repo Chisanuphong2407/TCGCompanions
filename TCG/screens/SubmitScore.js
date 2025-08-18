@@ -1,8 +1,8 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView ,BackHandler} from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer, useNavigation,useFocusEffect } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   SafeAreaView,
@@ -176,6 +176,25 @@ export const SubmitScore = ({ navigation, route }) => {
       }
     });
   }, [schedule]);
+
+useFocusEffect(
+    useCallback(() => {
+      const onBackPress = async () => {
+        const EventID = await fetch(`${IP}/api/getEventID/${tableID}`, {
+          method: "GET",
+        });
+        const ID = await EventID.json();
+        navigation.navigate("Eventdetails", { EventID: ID });
+        return true;
+      };
+
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+      };
+    }, [])
+  );
 
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, schedule.length);

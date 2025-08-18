@@ -157,6 +157,27 @@ export const Eventdetails = ({ navigation, route }) => {
     }
   };
 
+  const NavigationWay = async () => {
+    const getRound = await fetch(`${IP}/api/getRound/${table}`, {
+      method: "GET",
+    });
+
+    const resultRound = await getRound.json();
+
+    const getMatchpart = await fetch(`${IP}/api/getAllMatchpart/${table}`, {
+      method: "GET",
+    });
+
+    const resultMatchpart = await getMatchpart.json();
+    const MatchpartLen = resultMatchpart.length +1;
+
+    if(resultRound == resultMatchpart.length){
+      navigation.navigate("Fighterlist",{tableID: table});
+    }else{
+      navigation.navigate("SubmitScore",{tableID: table,round: MatchpartLen});
+    }
+  };
+
   useEffect(() => {
     fetchDetail();
 
@@ -222,7 +243,7 @@ export const Eventdetails = ({ navigation, route }) => {
                   address: address,
                   moredetail: moredetail,
                   closedate: closedate,
-                  status: statusNum
+                  status: statusNum,
                 });
               }}
               style={styles.menubox}
@@ -251,9 +272,12 @@ export const Eventdetails = ({ navigation, route }) => {
         )}
         {isContestant && !isOwner && (
           <View style={styles.menu}>
-            <Pressable style={styles.menubox} onPress={() => {
-              navigation.navigate("History",{table,account});
-            }}>
+            <Pressable
+              style={styles.menubox}
+              onPress={() => {
+                navigation.navigate("History", { table, account });
+              }}
+            >
               <Clock color={"#176B87"} style={styles.menubut} />
             </Pressable>
             <Pressable
@@ -276,7 +300,10 @@ export const Eventdetails = ({ navigation, route }) => {
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Text style={statusStyle}>{status}</Text>
         {isContestant && (
-          <TouchableOpacity style={styles.schedule} onPress={() => navigation.navigate("Pairing",{tableID :table})}>
+          <TouchableOpacity
+            style={styles.schedule}
+            onPress={() => navigation.navigate("Pairing", { tableID: table })}
+          >
             <Text style={styles.scheduleText}>ตารางการแข่งขัน</Text>
           </TouchableOpacity>
         )}
@@ -320,8 +347,8 @@ export const Eventdetails = ({ navigation, route }) => {
             onPress={() => {
               if (statusNum == 1) {
                 eventBegin(EventID, navigation);
-              } else if (statusNum == 2){
-                navigation.navigate("Fighterlist",{tableID: table})
+              } else if (statusNum == 2) {
+                NavigationWay();
               }
             }}
           >
@@ -337,7 +364,12 @@ export const Eventdetails = ({ navigation, route }) => {
             <TouchableOpacity
               onPress={() => {
                 console.log(EventID);
-                navigation.navigate("Apply", { EventID, eventName, table, account });
+                navigation.navigate("Apply", {
+                  EventID,
+                  eventName,
+                  table,
+                  account,
+                });
               }}
             >
               <Text style={styles.applyText}>สมัคร</Text>
