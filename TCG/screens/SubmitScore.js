@@ -1,8 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, ScrollView ,BackHandler} from "react-native";
+import { StyleSheet, Text, View, ScrollView, BackHandler } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NavigationContainer, useNavigation,useFocusEffect } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   SafeAreaView,
@@ -28,7 +32,6 @@ export const SubmitScore = ({ navigation, route }) => {
   const [Totalpage, setTotalpage] = useState(0);
   const [firstScore, setFirstscore] = useState([]);
   const [secondScore, setSecondscore] = useState([]);
-  const [byeCheck, setByecheck] = useState(false);
 
   const getSchedule = async () => {
     try {
@@ -60,14 +63,35 @@ export const SubmitScore = ({ navigation, route }) => {
 
   const handleSubmit = () => {
     try {
+      const scoreRegex = /^[0-9]{1,}$/;
+
+      const fighter1st = schedule.map((item) => {
+        return item.Fighter1st;
+      });
+
+      const fighter2nd = schedule.map((item) => {
+        return item.Fighter2nd;
+      });
+
+      const isFirstscoreValid = firstScore.every((item) =>
+        scoreRegex.test(item)
+      );
+      const isSecondscoreValid = secondScore.every((item) =>
+        scoreRegex.test(item)
+      );
+      console.log(firstScore.length,fighter1st.length);
+
       if (
-        (!firstScore ||
-          !secondScore ||
-          firstScore.indexOf(undefined) != -1 ||
-          secondScore.indexOf(undefined) != -1) &&
-        byeCheck
+        firstScore.length == 0 ||
+        secondScore.length == 0 ||
+        fighter1st.length != firstScore.length ||
+        fighter2nd.length != secondScore.length
       ) {
         Alert.alert("บันทึกไม่สำเร็จ", "โปรดกรอกข้อมูลให้ครบถ้วน");
+        return;
+      } else if (!isFirstscoreValid || !isSecondscoreValid) {
+        Alert.alert("บันทึกไม่สำเร็จ", "โปรดกรอกข้อมูลให้เป็นตัวเลข");
+        return;
       } else {
         Alert.alert(
           "ยืนยันการบันทึกข้อมูล",
@@ -86,6 +110,7 @@ export const SubmitScore = ({ navigation, route }) => {
       }
     } catch (error) {
       Alert.alert("บันทึกคะแนนไม่สำเร็จ", "โปรดลองอีกครั้ง");
+      console.log(error);
     }
   };
 
@@ -117,7 +142,7 @@ export const SubmitScore = ({ navigation, route }) => {
       const res = await submit.json();
 
       if (round == 5) {
-        schedule.forEach( async(item) => {
+        schedule.forEach(async (item) => {
           await fetch(`${IP}/api/solkoftSum`, {
             method: "POST",
             headers: {
@@ -125,18 +150,18 @@ export const SubmitScore = ({ navigation, route }) => {
             },
             body: JSON.stringify({
               tableID: tableID,
-              fighterID: item.Fighter1st
+              fighterID: item.Fighter1st,
             }),
           });
 
-                    await fetch(`${IP}/api/solkoftSum`, {
+          await fetch(`${IP}/api/solkoftSum`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
               tableID: tableID,
-              fighterID: item.Fighter2nd
+              fighterID: item.Fighter2nd,
             }),
           });
         });
@@ -172,28 +197,30 @@ export const SubmitScore = ({ navigation, route }) => {
         const newScore = [...firstScore];
         newScore[index] = 1;
         setFirstscore(newScore);
-        setByecheck(true);
       }
     });
   }, [schedule]);
 
-useFocusEffect(
+  useFocusEffect(
     useCallback(() => {
       const onBackPress = async () => {
         const EventID = await fetch(`${IP}/api/getEventID/${tableID}`, {
           method: "GET",
         });
         const ID = await EventID.json();
-        navigation.navigate("Eventdetails", { EventID: ID });
+        navigation.navigate("Eventdetails", ID);
         return true;
       };
 
-      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
 
       return () => {
-        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+        backHandler.remove();
       };
-    }, [])
+    }, [IP])
   );
 
   const from = page * itemPerPage;
@@ -226,7 +253,10 @@ useFocusEffect(
           {schedule.slice(from, to).length > 0 &&
             schedule.slice(from, to).map((item, index) => {
               return (
-                <DataTable.Row key={item.MatchID} style={index % 2 == 0 ? styles.cell1 : styles.cell0}>
+                <DataTable.Row
+                  key={item.MatchID}
+                  style={index % 2 == 0 ? styles.cell1 : styles.cell0}
+                >
                   <DataTable.Cell style={styles.tableNameLeft}>
                     {item.fighter1stName}
                   </DataTable.Cell>
@@ -357,7 +387,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "white",
   },
-    cell1: {
+  cell1: {
     backgroundColor: "#ddd",
   },
   cell0: {

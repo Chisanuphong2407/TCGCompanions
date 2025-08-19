@@ -918,6 +918,22 @@ app.get("/api/getEventID/:tableID", async (req, res) => {
   }
 });
 
+//เสร็จสิ้นการแข่งขัน
+app.put("/api/EventFinish/:tableID", async (req,res) => {
+  const tableID = req.params.tableID;
+  try {
+    const [finish] = await conn.query("UPDATE `event` SET `Status`= 3 WHERE `Fightertable` = ?",[tableID]);
+    if(finish.affectedRows > 0){
+      return res.status(200).json({message:"success"})
+    }else{
+      return res.status(400),json({message: "failed"})
+    }
+
+  } catch (error) {
+    return res.status(404).json(error);
+  }
+});
+
 server.listen(3000, function () {
   conn.query(
     "UPDATE `event` SET `Status` = 1 WHERE `CloseDate` <= CURRENT_DATE AND `Status` = 0  "

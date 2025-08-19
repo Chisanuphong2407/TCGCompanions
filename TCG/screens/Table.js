@@ -102,7 +102,20 @@ export const Table = ({ route, navigation }) => {
 
       const board = await fetchboard.json();
       console.log(board);
-      board.sort((low, high) => high.TotalScore - low.TotalScore);
+      board.sort((a, b) => {
+        if (a.TotalScore > b.TotalScore){
+          return -1;
+        }else if(a.TotalScore > b.TotalScore){
+          return 1
+        } else if (a.solkolf_score > b.solkolf_score){
+          return -1;
+        }else if (a.solkolf_score < b.solkolf_score){
+          return 1;
+        }
+
+        return 0;
+      });
+      
       console.log("lens", fighterLength);
       for (let index = 0; index < fighterLength; index++) {
         console.warn("Round:", index);
@@ -188,14 +201,14 @@ export const Table = ({ route, navigation }) => {
           method: "GET",
         });
         const ID = await EventID.json();
-        navigation.navigate("Eventdetails", { EventID: ID });
+        navigation.navigate("Eventdetails",ID);
         return true;
       };
 
-      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+      const backHandler = BackHandler.addEventListener("hardwareBackPress", onBackPress);
 
       return () => {
-        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+        backHandler.remove();
       };
     }, [])
   );

@@ -83,7 +83,7 @@ export const Eventdetails = ({ navigation, route }) => {
       } else if (item[0] && item[0].Status === 3) {
         setStatus("แข่งขันเสร็จสิ้น");
         setStatusstyle(styles.status3);
-        setStatusNum(2);
+        setStatusNum(3);
       }
       const data = await fetch(IP + "/api/edetails", {
         method: "POST",
@@ -169,12 +169,17 @@ export const Eventdetails = ({ navigation, route }) => {
     });
 
     const resultMatchpart = await getMatchpart.json();
-    const MatchpartLen = resultMatchpart.length +1;
 
-    if(resultRound == resultMatchpart.length){
-      navigation.navigate("Fighterlist",{tableID: table});
-    }else{
-      navigation.navigate("SubmitScore",{tableID: table,round: MatchpartLen});
+    const MatchpartLen = resultMatchpart.length;
+    if (MatchpartLen == 5) {
+      navigation.navigate("Leaderboard", { tableID: table });
+    } else if (resultRound == MatchpartLen) {
+      navigation.navigate("Fighterlist", { tableID: table });
+    } else {
+      navigation.navigate("SubmitScore", {
+        tableID: table,
+        round: MatchpartLen,
+      });
     }
   };
 

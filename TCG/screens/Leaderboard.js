@@ -1,8 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
-import React, { useEffect, useState, useCallback ,BackHandler} from "react";
+import { StyleSheet, Text, View, ScrollView, BackHandler } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NavigationContainer, useNavigation,useFocusEffect } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   SafeAreaView,
@@ -27,12 +31,6 @@ export const Leaderboard = ({ navigation, route }) => {
   const [page, setPage] = useState(0);
   const [Totalpage, setTotalpage] = useState(0);
   const [round, setRound] = useState(0);
-  const feature = [
-    { name: "ผู้เข้าแข่งขัน" },
-    { name: "เนชั่น" },
-    { name: "คะแนน" },
-    { name: "solkolf" },
-  ];
 
   const getLeaderboard = async () => {
     try {
@@ -47,7 +45,19 @@ export const Leaderboard = ({ navigation, route }) => {
       );
 
       const result = await leaderboardfetch.json();
-      result.sort((low, high) => high.TotalScore - low.TotalScore);
+      result.sort((a, b) => {
+        if (a.TotalScore > b.TotalScore) {
+          return -1;
+        } else if (a.TotalScore < b.TotalScore) {
+          return 1;
+        } else if (a.solkolf_score > b.solkolf_score) {
+          return -1;
+        } else if (a.solkolf_score < b.solkolf_score) {
+          return 1;
+        }
+
+        return 0;
+      });
       setLeaderboard(result);
       setTotalpage(Math.ceil(leaderboard.length / itemPerPage));
       setIsloading(false);
@@ -71,30 +81,60 @@ export const Leaderboard = ({ navigation, route }) => {
     }
   };
 
+  const eventFinish = async () => {
+    try {
+      const finishEvent = await fetch(`${IP}/api/EventFinish/${tableID}`, {
+        method: "PUT",
+      });
+      const finishResult = await finishEvent.json();
+      if (finishResult.message == "success") {
+        const fetchEventID = await fetch(`${IP}/api/getEventID/${tableID}`, {
+          method: "GET",
+        });
+        const eventID = await fetchEventID.json();
+        console.log(eventID);
+        Alert.alert(
+          "ดำเนินการเสร็จสิ้น",
+          "ท่านยังสามารถดูตารางคะแนนได้หลังการแข่งขันเสร็จสิ้น",
+          [
+            {
+              text: "ตกลง",
+              onPress: () => navigation.navigate("Eventdetails", eventID ),
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      Alert.alert("เกิดข้อผิดพลาด");
+    }
+  };
+
   useEffect(() => {
     getLeaderboard();
     getRound();
   }, [isLoading]);
 
-  useFocusEffect(() => {
-      useCallback(() => {
-        const onBackPress = async () => {
-          const EventID = await fetch(`${IP}/api/getEventID/${tableID}`, {
-            method: "GET",
-          });
-          const ID = await EventID.json();
-          navigation.navigate("Eventdetails", { EventID: ID });
-          return true;
-        };
-  
-        BackHandler.addEventListener("hardwareBackPress", onBackPress);
-  
-        return () => {
-          BackHandler.removeEventListener("hardwareBackPress", onBackPress);
-        };
-      }, [])
-    }
-    );
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = async () => {
+        const EventID = await fetch(`${IP}/api/getEventID/${tableID}`, {
+          method: "GET",
+        });
+        const ID = await EventID.json();
+        navigation.navigate("Eventdetails", ID);
+        return true;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
+
+      return () => {
+        backHandler.remove();
+      };
+    }, [IP])
+  );
 
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, leaderboard.length);
@@ -107,26 +147,24 @@ export const Leaderboard = ({ navigation, route }) => {
         {/*table header*/}
         <DataTable style={styles.table}>
           <DataTable.Header style={styles.tableHeader}>
-          {round == 5 ? (
-            <DataTable.Title style={styles.tableNo}>อันดับ</DataTable.Title>
-          ) : (
-            <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
-          )}
+            {round == 5 ? (
+              <DataTable.Title style={styles.tableNo}>อันดับ</DataTable.Title>
+            ) : (
+              <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
+            )}
             {/* {feature.map((title,index) => (
               <DataTable.Title key={index} style={index == 4 ? styles.cell0 : styles.cell1}>{title.name}</DataTable.Title>
             ))} */}
             <DataTable.Title style={styles.tableName}>
-                ผู้เข้าแข่งขัน
+              ผู้เข้าแข่งขัน
+            </DataTable.Title>
+            <DataTable.Title style={styles.tableNation}>เนชั่น</DataTable.Title>
+            <DataTable.Title style={styles.tableScore}>คะแนน</DataTable.Title>
+            {round == 5 && (
+              <DataTable.Title style={styles.tableSolkolf}>
+                solkolf
               </DataTable.Title>
-              <DataTable.Title style={styles.tableNation}>
-                เนชั่น
-              </DataTable.Title>
-              <DataTable.Title style={styles.tableScore}>คะแนน</DataTable.Title>
-              {round == 5 && (
-                <DataTable.Title style={styles.tableSolkolf}>
-                  solkolf
-                </DataTable.Title>
-              )}
+            )}
           </DataTable.Header>
 
           {/* table rows */}
@@ -188,7 +226,20 @@ export const Leaderboard = ({ navigation, route }) => {
         </TouchableOpacity>
       )}
       {round == 5 && (
-        <TouchableOpacity style={styles.nextButton}>
+        <TouchableOpacity
+          style={styles.nextButton}
+          onPress={() => {
+            Alert.alert("ยืนยันการจบการแข่งขัน", "",[
+              {
+                text: "ตกลง",
+                onPress: eventFinish,
+              },
+              {
+                text: "ยกเลิก",
+              },
+            ]);
+          }}
+        >
           <Text style={styles.nextText}>เสร็จสิ้นการแข่งขัน</Text>
         </TouchableOpacity>
       )}
