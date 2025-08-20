@@ -43,7 +43,7 @@ import { contestantsList } from "./screens/contestantsList";
 import { Leaderboard } from "./screens/Leaderboard";
 import { Pairing } from "./screens/Pairing";
 
-export const IP = "http://192.168.1.6:3000";
+export const IP = "http://192.168.1.10:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");

@@ -16,6 +16,7 @@ import {
   FlatList,
 } from "react-native";
 import { Trash2, Edit2, Users, Clock } from "react-native-feather";
+import { faRankingStar } from "@fortawesome/free-solid-svg-icons";
 import { IP } from "../App";
 import { eventBegin } from "./contestants";
 import io from "socket.io-client";
@@ -207,6 +208,7 @@ export const Eventdetails = ({ navigation, route }) => {
       <View style={styles.menu}>
         {status === "เปิดรับสมัคร" && isOwner && (
           <View style={styles.menu}>
+          <FontAwesomeIcon icon={faRankingStar} />
             <Pressable
               onPress={() => {
                 console.log("delete");
