@@ -232,13 +232,13 @@ app.post("/api/contestants", async (req, res) => {
 });
 
 //ค้นหากิจกรรมทั่วไป
-app.get("/api/search/:eventname", async (req, res) => {
+app.get("/api/search/:name", async (req, res) => {
   try {
-    const name = req.params.eventname;
+    const name = req.params.name;
     console.log(name);
     const [result] = await conn.query(
-      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE event.EventName LIKE ?",
-      [`%${name}%`]
+      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE event.EventName LIKE ? OR user.UserName LIKE ?",
+      [`%${name}%`,`%${name}%`]
     );
 
     console.log("result", result);
@@ -249,10 +249,10 @@ app.get("/api/search/:eventname", async (req, res) => {
 });
 
 //ค้นหากิจกรรมของฉัน
-app.get("/api/Mysearch/:eventname/:contestant", async (req, res) => {
+app.get("/api/Mysearch/:name/:contestant", async (req, res) => {
   try {
     console.log("fetch");
-    const name = req.params.eventname;
+    const name = req.params.name;
     const contestant = req.params.contestant;
     const [ID] = await conn.query(
       "SELECT `UserID` FROM `user` WHERE UserName = ?",
@@ -260,8 +260,8 @@ app.get("/api/Mysearch/:eventname/:contestant", async (req, res) => {
     );
 
     const [result] = await conn.query(
-      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fightertable INNER JOIN  user ON user.UserID = event.OwnerUserID WHERE contestants.UserID = ? AND event.EventName LIKE ?",
-      [ID[0].UserID, `%${name}%`]
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fightertable INNER JOIN  user ON user.UserID = event.OwnerUserID WHERE contestants.UserID = ? AND (event.EventName LIKE ? OR user.UserName LIKE ?)",
+      [ID[0].UserID, `%${name}%`,`%${name}%`]
     );
 
     console.log("result", result);
