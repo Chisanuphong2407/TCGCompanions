@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
-import React, { useEffect, useState, useCallback, BackHandler } from "react";
+import { StyleSheet, Text, View, ScrollView, BackHandler } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   NavigationContainer,

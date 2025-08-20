@@ -31,6 +31,8 @@ export const Leaderboard = ({ navigation, route }) => {
   const [page, setPage] = useState(0);
   const [Totalpage, setTotalpage] = useState(0);
   const [round, setRound] = useState(0);
+  const [owner, setOwner] = useState("");
+  const [account,setAccount] = useState();
 
   const getLeaderboard = async () => {
     try {
@@ -99,7 +101,7 @@ export const Leaderboard = ({ navigation, route }) => {
           [
             {
               text: "ตกลง",
-              onPress: () => navigation.navigate("Eventdetails", eventID ),
+              onPress: () => navigation.navigate("Eventdetails", eventID),
             },
           ]
         );
@@ -109,9 +111,39 @@ export const Leaderboard = ({ navigation, route }) => {
     }
   };
 
+  const getOwner = async () => {
+    try {
+      const eventID = await fetch(`${IP}/api/getEventID/${tableID}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const resultID = await eventID.json();
+
+      const eventDet = await fetch(`${IP}/api/edetails`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          EventID: resultID,
+        }),
+      });
+      const resultEvent = await eventDet.json();
+
+      setOwner((resultEvent[0].UserName).trim());
+
+      setAccount(await AsyncStorage.getItem("@vef"));
+    } catch (error) {
+      setIsloading(!isLoading);
+    }
+  };
+
   useEffect(() => {
     getLeaderboard();
     getRound();
+    getOwner();
   }, [isLoading]);
 
   useFocusEffect(
@@ -139,6 +171,9 @@ export const Leaderboard = ({ navigation, route }) => {
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, leaderboard.length);
 
+  console.log(owner == account);
+  console.log("account",account);
+  console.log(owner);
   return (
     <View style={styles.container}>
       <Text style={styles.header}>ตารางคะแนน</Text>
@@ -213,36 +248,36 @@ export const Leaderboard = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
-      {round != 5 && (
-        <TouchableOpacity
-          style={styles.nextButton}
-          onPress={() =>
-            navigation.navigate("Table", {
-              tableID: leaderboard[0].Fightertable,
-            })
-          }
-        >
-          <Text style={styles.nextText}>สร้างตารางรอบถัดไป</Text>
-        </TouchableOpacity>
-      )}
-      {round == 5 && (
-        <TouchableOpacity
-          style={styles.nextButton}
-          onPress={() => {
-            Alert.alert("ยืนยันการจบการแข่งขัน", "",[
-              {
-                text: "ตกลง",
-                onPress: eventFinish,
-              },
-              {
-                text: "ยกเลิก",
-              },
-            ]);
-          }}
-        >
-          <Text style={styles.nextText}>เสร็จสิ้นการแข่งขัน</Text>
-        </TouchableOpacity>
-      )}
+      {(owner == account) &&
+        (round != 5 ? (
+          <TouchableOpacity
+            style={styles.nextButton}
+            onPress={() =>
+              navigation.navigate("Table", {
+                tableID: leaderboard[0].Fightertable,
+              })
+            }
+          >
+            <Text style={styles.nextText}>สร้างตารางรอบถัดไป</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.nextButton}
+            onPress={() => {
+              Alert.alert("ยืนยันการจบการแข่งขัน", "", [
+                {
+                  text: "ตกลง",
+                  onPress: eventFinish,
+                },
+                {
+                  text: "ยกเลิก",
+                },
+              ]);
+            }}
+          >
+            <Text style={styles.nextText}>เสร็จสิ้นการแข่งขัน</Text>
+          </TouchableOpacity>
+        ))}
     </View>
   );
 };

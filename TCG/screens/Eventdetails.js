@@ -16,8 +16,7 @@ import {
   FlatList,
 } from "react-native";
 import { Trash2, Edit2, Users, Clock } from "react-native-feather";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRankingStar } from "@fortawesome/free-solid-svg-icons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { IP } from "../App";
 import { eventBegin } from "./contestants";
 import io from "socket.io-client";
@@ -209,7 +208,6 @@ export const Eventdetails = ({ navigation, route }) => {
       <View style={styles.menu}>
         {status === "เปิดรับสมัคร" && isOwner && (
           <View style={styles.menu}>
-          <FontAwesomeIcon icon={faRankingStar} />
             <Pressable
               onPress={() => {
                 console.log("delete");
@@ -277,6 +275,20 @@ export const Eventdetails = ({ navigation, route }) => {
               <Users color={"#176B87"} style={styles.menubut} />
             </Pressable>
           </View>
+        )}
+        {statusNum == 3 && (
+          <Pressable
+            onPress={() => {
+              navigation.navigate("Leaderboard", { tableID: table });
+            }}
+          >
+            <MaterialCommunityIcons
+              name="podium-gold"
+              size={25}
+              color="#176B87"
+              style={styles.menubut}
+            />
+          </Pressable>
         )}
         {isContestant && !isOwner && (
           <View style={styles.menu}>
@@ -502,6 +514,7 @@ export const styles = StyleSheet.create({
     maxHeight: 30,
     minWidth: 25,
     minHeight: 25,
+    marginHorizontal: 3,
   },
   menubox: {
     marginHorizontal: 10,
