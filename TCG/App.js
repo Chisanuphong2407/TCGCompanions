@@ -42,6 +42,7 @@ import { SubmitScore } from "./screens/SubmitScore";
 import { contestantsList } from "./screens/contestantsList";
 import { Leaderboard } from "./screens/Leaderboard";
 import { Pairing } from "./screens/Pairing";
+import { ForgetPass } from "./screens/ForgetPass";
 
 export const IP = "http://192.168.1.10:3000";
 
@@ -625,6 +626,24 @@ const App = () => {
           name="Pairing"
           component={Pairing}
           options={{ headerTitle: "" }}
+        />
+        <Stack.Screen
+          name="ForgetPass"
+          component={ForgetPass}
+          options={({ navigation }) => ({
+            headerTitle: "",
+            headerLeft: () => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.goBack();
+                  }}
+                >
+                  <X />
+                </TouchableOpacity>
+              );
+            },
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>

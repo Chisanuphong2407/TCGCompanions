@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
@@ -6,7 +8,17 @@ const http = require("http");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { json } = require("body-parser");
+const nodemailer = require("nodemailer");
 // const crypto = require("crypto");/
+
+//account ในการส่งเมล์
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.user,
+    pass: process.env.pass,
+  }
+})
 
 //Profile ไว้ query register
 const conn = mysql
@@ -19,9 +31,6 @@ const conn = mysql
   .promise();
 
 const app = express();
-
-// const secrKey = crypto.randomBytes(32).toString("hex");
-const secrKey = "hahaha";
 
 // Middleware
 app.use(cors());
@@ -87,8 +96,8 @@ app.post("/api/login", async (req, res) => {
   //สร้าง token
   const genToken = (payload) => {
     const expiresIn = "1h";
-    const token = jwt.sign(payload, secrKey, { expiresIn });
-    // console.log(secrKey);
+    const token = jwt.sign(payload, process.env.secrKey, { expiresIn });
+    // console.log(process.env.secrKey);
     return res.status(200).json(token);
   };
 
@@ -134,7 +143,7 @@ app.get("/api/profile/", async (req, res, next) => {
     // console.log({ token: authHeader });
     const authToken = authHeader.split(" ")[1];
     // console.log(authToken);
-    const user = jwt.verify(authToken, secrKey);
+    const user = jwt.verify(authToken, process.env.secrKey);
     return res.json(user.username);
   } catch (error) {
     return res.json(error);
@@ -293,7 +302,7 @@ app.put("/api/updateprofile", async (req, res) => {
 
     const genToken = (payload) => {
       const expiresIn = "1h";
-      const token = jwt.sign(payload, secrKey, { expiresIn });
+      const token = jwt.sign(payload, process.env.secrKey, { expiresIn });
       console.log(token);
       return res.status(200).json(token);
     };
@@ -933,6 +942,14 @@ app.put("/api/EventFinish/:tableID", async (req,res) => {
     return res.status(404).json(error);
   }
 });
+
+//ส่ง otp
+// app.post("/api/fotgetPassword", async (req,res) => {
+//   const email = req.body;
+//   const otp =Math.floor(100000 + Math.random() * 900000).toString();
+
+//   await saveOtpTodatabase
+// });
 
 server.listen(3000, function () {
   conn.query(
