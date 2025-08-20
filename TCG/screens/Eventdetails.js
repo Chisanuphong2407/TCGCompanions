@@ -16,6 +16,7 @@ import {
   FlatList,
 } from "react-native";
 import { Trash2, Edit2, Users, Clock } from "react-native-feather";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRankingStar } from "@fortawesome/free-solid-svg-icons";
 import { IP } from "../App";
 import { eventBegin } from "./contestants";
