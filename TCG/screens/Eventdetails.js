@@ -184,7 +184,7 @@ export const Eventdetails = ({ navigation, route }) => {
     } else {
       navigation.navigate("SubmitScore", {
         tableID: table,
-        round: MatchpartLen,
+        round: resultRound,
       });
     }
   };

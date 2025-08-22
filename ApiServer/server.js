@@ -202,11 +202,12 @@ app.get("/api/fetchmyevent/:contestant", async (req, res) => {
 
 //ข้อมูลกิจกรรม
 app.post("/api/edetails", async (req, res) => {
+  const eventID = req.body.EventID;
   try {
     console.log("start");
     const [details] = await conn.query(
       "SELECT event.Status, event.Fightertable,event.Condition,event.Rule,event.Time,event.Amount,DATE_FORMAT(event.CloseDate,'%d-%m-%Y')  AS CloseDate,event.MoreDetail,event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE event.EventID = ?",
-      [req.body.EventID]
+      [eventID]
     );
 
     return res.json(details);
@@ -932,13 +933,47 @@ app.put("/api/EventFinish/:tableID", async (req, res) => {
   }
 });
 
-//ส่ง otp
-// app.post("/api/fotgetPassword", async (req,res) => {
-//   const email = req.body;
-//   const otp =Math.floor(100000 + Math.random() * 900000).toString();
+//ส่งreset password
+app.post("/api/fotgetPassword", async (req, res) => {
+  const email = req.body.email;
+  try {
+    console.log(email);
+    const [DBemail] = await conn.query(
+      "SELECT Email,UserID FROM `user` WHERE `Email` = ?",
+      [email]
+    );
 
-//   await saveOtpTodatabase
-// });
+    console.log(DBemail[0].Email);
+
+    if (DBemail.length > 0) {
+      const token = jwt.sign({ email: email }, process.env.secrKey, {
+        expiresIn: "2m",
+      });
+      const resetUrl = `http://localhost:3000/api/reset-password?token=${token}`;
+
+      const mailOptions = {
+        to: email,
+        from: "TCG companion",
+        subject: "Password Reset",
+        text: `เรียน ${email},
+      
+      เราได้รับคำร้องขอรีเซ็ตรหัสผ่านสำหรับบัญชีของคุณกรุณาคลิกลิงก์ด้านล่างเพื่อดำเนินการตั้งรหัสผ่านใหม่
+      
+      ${resetUrl}
+      
+      หากคุณไม่ได้เป็นผู้ร้องขอ โปรดละเลยอีเมลฉบับนี้ รหัสผ่านของคุณจะยังคงเดิม`,
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log("send");
+      return res.status(200).json("success");
+    } else {
+      return res.status(404).json(error);
+    }
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+});
 
 server.listen(3000, function () {
   conn.query(

@@ -32,7 +32,8 @@ export const Leaderboard = ({ navigation, route }) => {
   const [Totalpage, setTotalpage] = useState(0);
   const [round, setRound] = useState(0);
   const [owner, setOwner] = useState("");
-  const [account,setAccount] = useState();
+  const [account, setAccount] = useState();
+  const [isFinish,setIsfinish] = useState(false);
 
   const getLeaderboard = async () => {
     try {
@@ -48,17 +49,9 @@ export const Leaderboard = ({ navigation, route }) => {
 
       const result = await leaderboardfetch.json();
       result.sort((a, b) => {
-        if (a.TotalScore > b.TotalScore) {
-          return -1;
-        } else if (a.TotalScore < b.TotalScore) {
-          return 1;
-        } else if (a.solkolf_score > b.solkolf_score) {
-          return -1;
-        } else if (a.solkolf_score < b.solkolf_score) {
-          return 1;
+        if (a.TotalScore != b.TotalScore) {
+          return b.TotalScore - a.TotalScore;
         }
-
-        return 0;
       });
       setLeaderboard(result);
       setTotalpage(Math.ceil(leaderboard.length / itemPerPage));
@@ -132,14 +125,17 @@ export const Leaderboard = ({ navigation, route }) => {
       });
       const resultEvent = await eventDet.json();
 
-      setOwner((resultEvent[0].UserName).trim());
+      if(resultEvent[0].Status == 3){
+        setIsfinish(true);
+      }
+
+      setOwner(resultEvent[0].UserName.trim());
 
       setAccount(await AsyncStorage.getItem("@vef"));
     } catch (error) {
       setIsloading(!isLoading);
     }
   };
-
   useEffect(() => {
     getLeaderboard();
     getRound();
@@ -172,7 +168,7 @@ export const Leaderboard = ({ navigation, route }) => {
   const to = Math.min((page + 1) * itemPerPage, leaderboard.length);
 
   console.log(owner == account);
-  console.log("account",account);
+  console.log("account", account);
   console.log(owner);
   return (
     <View style={styles.container}>
@@ -228,11 +224,11 @@ export const Leaderboard = ({ navigation, route }) => {
                   </DataTable.Cell>
                   {round == 5 && (
                     <DataTable.Cell style={styles.tableScore}>
-                      {item.solkolf_score}
+                    {item.TotalScore}
                     </DataTable.Cell>
                   )}
                   <DataTable.Cell style={styles.tableScore}>
-                    {item.TotalScore}
+                  {item.solkolf_score}
                   </DataTable.Cell>
                 </DataTable.Row>
               );
@@ -248,7 +244,7 @@ export const Leaderboard = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
-      {(owner == account) &&
+      {owner == account && !isFinish &&
         (round != 5 ? (
           <TouchableOpacity
             style={styles.nextButton}

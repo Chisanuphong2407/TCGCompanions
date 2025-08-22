@@ -44,7 +44,7 @@ import { Leaderboard } from "./screens/Leaderboard";
 import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
 
-export const IP = "http://192.168.1.12:3000";
+export const IP = "http://192.168.1.9:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
