@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
@@ -13,12 +13,12 @@ const nodemailer = require("nodemailer");
 
 //account ในการส่งเมล์
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
     user: process.env.user,
     pass: process.env.pass,
-  }
-})
+  },
+});
 
 //Profile ไว้ query register
 const conn = mysql
@@ -223,7 +223,7 @@ app.post("/api/contestants", async (req, res) => {
     console.log(fightertable);
     if (username) {
       const [contestants] = await conn.query(
-        "SELECT * FROM `contestants` WHERE FighterTable = ? AND UserName = ?",
+        "SELECT * FROM `contestants` WHERE FighterTable = ? AND UserName = ? AND isDelete = 0",
         [fightertable, username]
       );
       if (contestants.length > 0) {
@@ -231,7 +231,7 @@ app.post("/api/contestants", async (req, res) => {
       }
     }
     const [contestants] = await conn.query(
-      "SELECT * FROM `contestants` WHERE FighterTable = ?",
+      "SELECT * FROM `contestants` WHERE FighterTable = ? AND isDelete = 0",
       [fightertable]
     );
     return res.status(200).json(contestants);
@@ -247,7 +247,7 @@ app.get("/api/search/:name", async (req, res) => {
     console.log(name);
     const [result] = await conn.query(
       "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE event.EventName LIKE ? OR user.UserName LIKE ?",
-      [`%${name}%`,`%${name}%`]
+      [`%${name}%`, `%${name}%`]
     );
 
     console.log("result", result);
@@ -270,7 +270,7 @@ app.get("/api/Mysearch/:name/:contestant", async (req, res) => {
 
     const [result] = await conn.query(
       "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fightertable INNER JOIN  user ON user.UserID = event.OwnerUserID WHERE contestants.UserID = ? AND (event.EventName LIKE ? OR user.UserName LIKE ?)",
-      [ID[0].UserID, `%${name}%`,`%${name}%`]
+      [ID[0].UserID, `%${name}%`, `%${name}%`]
     );
 
     console.log("result", result);
@@ -497,7 +497,7 @@ app.post("/api/apply", async (req, res) => {
     let userID;
     let note;
     const [totalFighter] = await conn.query(
-      "SELECT * FROM `contestants` WHERE `Fightertable` = ?",
+      "SELECT * FROM `contestants` WHERE `Fightertable` = ? AND isDelete = 0",
       [fighterTable]
     );
 
@@ -536,33 +536,30 @@ app.post("/api/apply", async (req, res) => {
 });
 
 //สละสิทธิ์ ลบผู้เข้าแข่งขัน
-app.delete(
-  "/api/waive/table/:fightertable/userID/:username",
-  async (req, res) => {
-    try {
-      const fightertable = req.params.fightertable;
-      const username = req.params.username;
-      console.log(fightertable, username);
-      const [waived] = await conn.query(
-        "DELETE FROM `contestants` WHERE `UserName` = ? AND `FighterTable` = ?",
-        [username, fightertable]
-      );
+app.put("/api/waive", async (req, res) => {
+  try {
+    const fightertable = req.body.fightertable;
+    const username = req.body.username;
+    console.log(fightertable, username);
+    const [waived] = await conn.query(
+      "UPDATE `contestants` SET `isDelete`= 1 WHERE `UserName` = ? AND `FighterTable` = ?",
+      [username, fightertable]
+    );
 
-      if (waived.affectedRows > 0) {
-        console.log(waived);
-        io.emit("fighter refreshing", true);
-        return res.sendStatus(204);
-      } else {
-        return res
-          .status(400)
-          .json({ message: "ไม่พบผู้ใช้หรือตารางที่ต้องการสละสิทธิ์" });
-      }
-    } catch (error) {
-      console.log(error);
-      return res.status(400).json(error);
+    if (waived.affectedRows > 0) {
+      console.log(waived);
+      io.emit("fighter refreshing", true);
+      return res.sendStatus(204);
+    } else {
+      return res
+        .status(400)
+        .json({ message: "ไม่พบผู้ใช้หรือตารางที่ต้องการสละสิทธิ์" });
     }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json(error);
   }
-);
+});
 
 //ปิดรับวมัคร
 app.put("/api/close/:EventID", async (req, res) => {
@@ -593,7 +590,7 @@ app.get("/api/fetchcontestants/:table", async (req, res) => {
   console.log(tableID);
   try {
     const [data] = await conn.query(
-      "SELECT * FROM `contestants` WHERE `FighterTable` = ?",
+      "SELECT * FROM `contestants` WHERE `FighterTable` = ? AND isDelete = 0",
       [tableID]
     );
     console.log("result", data);
@@ -722,7 +719,7 @@ app.get("/api/createLeaderboard/:tableID", async (req, res) => {
   const tableID = req.params.tableID;
   try {
     const [contestant] = await conn.query(
-      "SELECT * FROM `contestants` WHERE Fightertable = ?",
+      "SELECT * FROM `contestants` WHERE Fightertable = ? AND isDelete = 0",
       [tableID]
     );
 
@@ -884,7 +881,10 @@ app.post("/api/getHistory", async (req, res) => {
   let fighterID;
 
   try {
-    const [fetchfighterID] = await conn.query("SELECT `FighterID`, `UserName`, `UserID` FROM `contestants` WHERE UserName = ?",[userName]);
+    const [fetchfighterID] = await conn.query(
+      "SELECT `FighterID`, `UserName`, `UserID` FROM `contestants` WHERE UserName = ?",
+      [userName]
+    );
 
     fighterID = fetchfighterID[0].FighterID;
 
@@ -915,16 +915,18 @@ app.get("/api/getEventID/:tableID", async (req, res) => {
 });
 
 //เสร็จสิ้นการแข่งขัน
-app.put("/api/EventFinish/:tableID", async (req,res) => {
+app.put("/api/EventFinish/:tableID", async (req, res) => {
   const tableID = req.params.tableID;
   try {
-    const [finish] = await conn.query("UPDATE `event` SET `Status`= 3 WHERE `Fightertable` = ?",[tableID]);
-    if(finish.affectedRows > 0){
-      return res.status(200).json({message:"success"})
-    }else{
-      return res.status(400),json({message: "failed"})
+    const [finish] = await conn.query(
+      "UPDATE `event` SET `Status`= 3 WHERE `Fightertable` = ?",
+      [tableID]
+    );
+    if (finish.affectedRows > 0) {
+      return res.status(200).json({ message: "success" });
+    } else {
+      return res.status(400), json({ message: "failed" });
     }
-
   } catch (error) {
     return res.status(404).json(error);
   }

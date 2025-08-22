@@ -67,7 +67,7 @@ export const ContestantDetail = ({ navigation, route }) => {
     try {
       console.log("del");
       const del = await fetch(`${IP}/api/waive/table/${table}/userID/${name}`, {
-        method: "DELETE",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
