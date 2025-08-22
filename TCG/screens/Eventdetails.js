@@ -128,12 +128,17 @@ export const Eventdetails = ({ navigation, route }) => {
 
   const deleteEvent = async () => {
     console.log("start del");
-    const deleteEvent = await fetch(IP + "/api/deleteEvent/" + EventID, {
-      method: "DELETE",
+    console.log(EventID);
+    const deleteEvent = await fetch(`${IP}/api/deleteEvent`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        EventID: EventID
+      })
     });
+
     const result = await deleteEvent.json();
     console.log(result);
   };

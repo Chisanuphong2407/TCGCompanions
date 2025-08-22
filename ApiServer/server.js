@@ -170,7 +170,7 @@ app.get("/api/fetchcreateevent/:owner", async (req, res) => {
     const owner = req.params.owner;
     console.log(owner);
     const [result] = await conn.query(
-      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,EVENT.isDelete FROM `event` INNER JOIN USER ON user.UserID = EVENT.OwnerUserID WHERE user.UserName = ?",
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,EVENT.isDelete FROM `event` INNER JOIN USER ON user.UserID = EVENT.OwnerUserID WHERE user.UserName = ? AND isDelete = 0",
       [owner]
     );
     console.log(result);
@@ -427,36 +427,16 @@ app.post("/api/createevent", async (req, res) => {
 });
 
 //ลบกิจกรรม
-app.delete("/api/deleteEvent/:EventID", async (req, res) => {
+app.put("/api/deleteEvent", async (req, res) => {
   try {
-    const ID = req.params.EventID;
-    const [fetchTable] = await conn.query(
-      "SELECT `Fightertable` FROM `event` WHERE EventID = ?",
-      [ID]
-    );
-    const table = fetchTable[0].Fightertable;
-
-    if (fetchTable.length === 0) {
-      return res.status(404).json({
-        message: "Event not found",
-        success: false,
-      });
-    }
+    const ID = req.body.EventID;
 
     const [delEvent] = await conn.query(
-      "DELETE from `event` WHERE EventID = ?",
+      "UPDATE event SET `isDelete`= 1  WHERE `EventID` = ?",
       [ID]
     );
-    const [delContestants] = await conn.query(
-      "DELETE FROM `contestants` WHERE `FighterTable` = ?",
-      [table]
-    );
-    const [delTable] = await conn.query(
-      "DELETE from `fightertable` WHERE table = ?",
-      [table]
-    );
 
-    if (delEvent.affectedRows > 0 && delTable.affectedRows > 0) {
+    if (delEvent.affectedRows > 0) {
       console.log("deleted");
       io.emit("refreshing", true);
       return res.status(204).send("ลบสำเร็จ");
@@ -632,7 +612,7 @@ app.post("/api/contestantprofile", async (req, res) => {
     const userID = req.body.userID;
 
     const [fetchuser] = await conn.query(
-      "SELECT `PhoneNumber`,`UserName` FROM `user` WHERE `UserID`= ?",
+      "SELECT `PhoneNumber`,`UserName`,userID FROM `user` WHERE `UserID`= ?",
       [userID]
     );
     // console.log(fetchuser.length);
@@ -899,13 +879,20 @@ app.post("/api/solkoftSum", async (req, res) => {
 
 //ดึงประวัติการแข่งขัน
 app.post("/api/getHistory", async (req, res) => {
-  const fighterID = req.body.fighterID;
+  const userName = req.body.account;
   const tableID = req.body.tableID;
+  let fighterID;
+
   try {
+    const [fetchfighterID] = await conn.query("SELECT `FighterID`, `UserName`, `UserID` FROM `contestants` WHERE UserName = ?",[userName]);
+
+    fighterID = fetchfighterID[0].FighterID;
+
     const [history] = await conn.query(
       "SELECT Round,`MatchID` ,`Fighter1st`,C1.UserName AS firstName, `Fighter1st_Score`, `Fighter2nd`,C2.UserName AS secondName, `Fighter2nd_Score` FROM `match_participants` JOIN contestants AS C1 ON C1.FighterID = Fighter1st JOIN contestants AS C2 ON C2.FighterID = match_participants.Fighter2nd WHERE match_participants.`fightertable` = ? AND (Fighter1st = ? OR Fighter2nd = ?)",
       [tableID, fighterID, fighterID]
     );
+    console.log(history);
     return res.status(200).json(history);
   } catch (error) {
     return res.status(404).json(error);

@@ -241,9 +241,9 @@ export const Editdetail = ({ navigation, route }) => {
             {showDatepicker && (
               <DateTimePicker
                 testID="dateTimePicker"
-                value={date} // ค่าเริ่มต้น
-                mode="date" //'date', 'time', หรือ 'datetime'
-                display="spinner" // 'default', 'spinner', 'calendar', 'clock'
+                value={date}
+                mode="date" 
+                display="spinner"
                 onChange={onChange}
                 minimumDate={minDate}
               />

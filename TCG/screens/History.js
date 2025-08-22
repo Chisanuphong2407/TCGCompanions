@@ -22,23 +22,8 @@ import { IP } from "../App";
 export const History = ({ route, navigation }) => {
   const name = route.params.account;
   const tableID = route.params.table;
-  const [userID, setUserID] = useState();
   const [history, setHistory] = useState([]);
 
-  const getProfile = async () => {
-    // console.log(name);
-    try {
-      const profile = await fetch(`${IP}/api/getprofile/${name}`, {
-        method: "GET",
-      });
-
-      const resultProfile = await profile.json();
-
-      setUserID(resultProfile[0].UserID);
-    } catch (error) {
-      Alert.alert("เกิดข้อผิดพลาด", JSON.stringify(error));
-    }
-  };
 
   const getHistory = async () => {
     try {
@@ -48,7 +33,7 @@ export const History = ({ route, navigation }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          fighterID: userID,
+          account: name,
           tableID: tableID,
         }),
       });
@@ -62,8 +47,6 @@ export const History = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    getProfile();
-    console.log(userID);
     getHistory();
     console.log(history);
   }, []);
@@ -76,47 +59,53 @@ export const History = ({ route, navigation }) => {
         {history.length > 0 &&
           history.map((item) => <Text>รอบที่ {item.Round}</Text>)}
 
-        <View>
-          <DataTable style={styles.Alltable}>
-            {/*header */}
-            <DataTable.Header>
-              <DataTable.Title style={styles.tableNameHeader}>
-                ชื่อผู้เข้าแข่งขัน
-              </DataTable.Title>
-              <DataTable.Title style={styles.tableScoreHeader}>
-                คะแนน
-              </DataTable.Title>
-              <DataTable.Title style={styles.dat}></DataTable.Title>
-              <DataTable.Title style={styles.tableScoreHeader}>
-                คะแนน
-              </DataTable.Title>
-              <DataTable.Title style={styles.tableNameHeader}>
-                ชื่อผู้เข้าแข่งขัน
-              </DataTable.Title>
-            </DataTable.Header>
-            {/*row */}
-            {history.length > 0 &&
-              history.map((item, index) => {
-                return (
-                  <DataTable.Row key={item.MatchID}>
-                    <DataTable.Cell style={styles.tableNameHeader}>
-                      {item.firstName}
-                    </DataTable.Cell>
-                    <DataTable.Cell style={styles.tableScoreHeader}>
-                      {item.Fighter1st_Score}
-                    </DataTable.Cell>
-                    <DataTable.Cell style={styles.dat}>-</DataTable.Cell>
-                    <DataTable.Cell style={styles.tableScoreHeader}>
-                      {item.Fighter2nd_Score}
-                    </DataTable.Cell>
-                    <DataTable.Cell style={styles.tableNameHeader}>
-                      {item.secondName}
-                    </DataTable.Cell>
-                  </DataTable.Row>
-                );
-              })}
-          </DataTable>
-        </View>
+        {history.length > 0 ? (
+          <View>
+            <DataTable style={styles.Alltable}>
+              {/*header */}
+              <DataTable.Header>
+                <DataTable.Title style={styles.tableNameHeader}>
+                  ชื่อผู้เข้าแข่งขัน
+                </DataTable.Title>
+                <DataTable.Title style={styles.tableScoreHeader}>
+                  คะแนน
+                </DataTable.Title>
+                <DataTable.Title style={styles.dat}></DataTable.Title>
+                <DataTable.Title style={styles.tableScoreHeader}>
+                  คะแนน
+                </DataTable.Title>
+                <DataTable.Title style={styles.tableNameHeader}>
+                  ชื่อผู้เข้าแข่งขัน
+                </DataTable.Title>
+              </DataTable.Header>
+              {/*row */}
+              {history.length > 0 &&
+                history.map((item, index) => {
+                  return (
+                    <DataTable.Row key={item.MatchID}>
+                      <DataTable.Cell style={styles.tableNameHeader}>
+                        {item.firstName}
+                      </DataTable.Cell>
+                      <DataTable.Cell style={styles.tableScoreHeader}>
+                        {item.Fighter1st_Score}
+                      </DataTable.Cell>
+                      <DataTable.Cell style={styles.dat}>-</DataTable.Cell>
+                      <DataTable.Cell style={styles.tableScoreHeader}>
+                        {item.Fighter2nd_Score}
+                      </DataTable.Cell>
+                      <DataTable.Cell style={styles.tableNameHeader}>
+                        {item.secondName}
+                      </DataTable.Cell>
+                    </DataTable.Row>
+                  );
+                })}
+            </DataTable>
+          </View>
+        ) : (
+          <Text style={styles.noContent}>
+            ยังไม่มีประวัติการแข่งขันในขณะนี้
+          </Text>
+        )}
       </ScrollView>
     </View>
   );
@@ -177,5 +166,11 @@ const styles = StyleSheet.create({
   dat: {
     justifyContent: "center",
     fontWeight: "bold",
+  },
+  noContent: {
+    flex: 3,
+    fontSize: 16,
+    opacity: 0.5,
+    textAlign:'center'
   },
 });
