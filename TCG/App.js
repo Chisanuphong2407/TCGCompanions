@@ -44,7 +44,7 @@ import { Leaderboard } from "./screens/Leaderboard";
 import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
 
-export const IP = "http://192.168.1.10:3000";
+export const IP = "http://192.168.1.12:3000";
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -107,6 +107,15 @@ const Home = ({ navigation }) => {
       const Efetch = await fetch(IP + "/api/events");
       const Edata = await Efetch.json();
       setIsloading(false);
+      Edata.sort((a, b) => {
+        if (a.Status < b.Status) {
+          return -1;
+        } else if (a.Status > b.Status) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
       setEvent(Edata);
       const vef = await AsyncStorage.getItem("@vef");
       // console.log(event);
@@ -128,6 +137,15 @@ const Home = ({ navigation }) => {
         },
       });
       const Cdata = await Cfetch.json();
+      Cdata.sort((a, b) => {
+        if (a.Status < b.Status) {
+          return -1;
+        } else if (a.Status > b.Status) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
       if (Cdata.length > 0) {
         setIsCreate(false);
       } else {
@@ -150,6 +168,15 @@ const Home = ({ navigation }) => {
         },
       });
       const mydata = await myfetch.json();
+      mydata.sort((a, b) => {
+        if (a.Status < b.Status) {
+          return -1;
+        } else if (a.Status > b.Status) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
       // console.log(Cdata.length);
       setEvent(mydata);
       setIsloading(false);

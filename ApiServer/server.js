@@ -155,9 +155,9 @@ app.get("/api/events", async (req, res) => {
   try {
     // console.log("Event");
     const [result] = await conn.query(
-      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID"
+      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName ,event.Status FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE isDelete = 0"
     );
-    // console.log(result);
+    console.log(result);
     return res.json(result);
   } catch (error) {
     console.log(error);
@@ -170,7 +170,7 @@ app.get("/api/fetchcreateevent/:owner", async (req, res) => {
     const owner = req.params.owner;
     console.log(owner);
     const [result] = await conn.query(
-      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName FROM `event` INNER JOIN USER ON user.UserID = EVENT.OwnerUserID WHERE user.UserName = ?",
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,EVENT.isDelete FROM `event` INNER JOIN USER ON user.UserID = EVENT.OwnerUserID WHERE user.UserName = ?",
       [owner]
     );
     console.log(result);
