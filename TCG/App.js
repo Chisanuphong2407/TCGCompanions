@@ -25,7 +25,7 @@ import {
   Image,
   FlatList,
 } from "react-native";
-import * as Linking from "expo-linking";
+import * as Link from "expo-linking";
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
@@ -48,24 +48,14 @@ import { Resetpassword } from "./screens/Resetpassword";
 
 export const IP = "http://192.168.1.6:3000";
 
-//รับลิ้งก์รีเซ็ตรหัสผ่านจากอีเมล์
-  const config = {
+const linking = {
+  prefixes: [Link.createURL("/"), "TCGCompanion://"],
+  config: {
     screens: {
-      Resetpassword: {
-        path: "Reset-password/:token",
-        parse: {
-          token: (token) => token,
-        },
-      },
-      Login: "Login",
+      Resetpassword: "Resetpassword/:token",
     },
-  };
-
-  //URL scheme
-  const linking = {
-    prefixes: ["TCGCompanion://"],
-    config,
-  };
+  },
+};
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -511,8 +501,27 @@ const Home = ({ navigation }) => {
 };
 
 const App = () => {
+  const [initialState, setInitialState] = useState();
+  const [isReady, setIsready] = useState(false);
+
+  useEffect(() => {
+    const handleInitialURL = async () => {
+      const url = await Link.getInitialURL();
+      if (url) {
+        const parsedState = Link.parse(url);
+        if (parsedState) {
+          setInitialState(parsedState);
+        }
+      }
+      setIsready(true);
+    };
+
+    if (isReady) {
+      handleInitialURL();
+    }
+  }, [isReady]);
   return (
-    <NavigationContainer linking={linking}>
+    <NavigationContainer initialState={initialState} linking={linking}>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
           name="Home"
@@ -694,7 +703,7 @@ const App = () => {
           })}
         />
         <Stack.Screen
-          name="Reset-password"
+          name="Resetpassword"
           component={Resetpassword}
           options={{ headerTitle: "" }}
         />

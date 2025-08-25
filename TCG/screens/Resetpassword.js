@@ -29,7 +29,7 @@ import {
 export const Resetpassword = ({navigation}) => {
     const route = useRoute();
     const token = route.params?.token;
-    console.log(token);
+    console.log("reset");
   return (
     <View>
       <Text>Resetpassword</Text>

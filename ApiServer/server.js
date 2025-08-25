@@ -945,11 +945,12 @@ app.post("/api/fotgetPassword", async (req, res) => {
 
     console.log(DBemail[0].Email);
 
+    console.log(req.headers.host);
     if (DBemail.length > 0) {
       const token = jwt.sign({ email: email }, process.env.secrKey, {
         expiresIn: "2m",
       });
-      const resetUrl = `TCGCompanion://Reset-password?token=${token}`;
+      const resetUrl = `http://192.168.1.6:3001/reset-password?token=${token}`;
 
       const mailOptions = {
         to: email,
