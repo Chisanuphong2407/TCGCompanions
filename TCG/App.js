@@ -25,6 +25,7 @@ import {
   Image,
   FlatList,
 } from "react-native";
+import * as Linking from "expo-linking";
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
@@ -43,8 +44,28 @@ import { contestantsList } from "./screens/contestantsList";
 import { Leaderboard } from "./screens/Leaderboard";
 import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
+import { Resetpassword } from "./screens/Resetpassword";
 
-export const IP = "http://192.168.1.9:3000";
+export const IP = "http://192.168.1.6:3000";
+
+//รับลิ้งก์รีเซ็ตรหัสผ่านจากอีเมล์
+  const config = {
+    screens: {
+      Resetpassword: {
+        path: "Reset-password/:token",
+        parse: {
+          token: (token) => token,
+        },
+      },
+      Login: "Login",
+    },
+  };
+
+  //URL scheme
+  const linking = {
+    prefixes: ["TCGCompanion://"],
+    config,
+  };
 
 const Home = ({ navigation }) => {
   const [search, setSearch] = useState("");
@@ -491,7 +512,7 @@ const Home = ({ navigation }) => {
 
 const App = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
           name="Home"
@@ -671,6 +692,11 @@ const App = () => {
               );
             },
           })}
+        />
+        <Stack.Screen
+          name="Reset-password"
+          component={Resetpassword}
+          options={{ headerTitle: "" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -949,19 +949,18 @@ app.post("/api/fotgetPassword", async (req, res) => {
       const token = jwt.sign({ email: email }, process.env.secrKey, {
         expiresIn: "2m",
       });
-      const resetUrl = `http://localhost:3000/api/reset-password?token=${token}`;
+      const resetUrl = `TCGCompanion://Reset-password?token=${token}`;
 
       const mailOptions = {
         to: email,
         from: "TCG companion",
         subject: "Password Reset",
-        text: `เรียน ${email},
-      
-      เราได้รับคำร้องขอรีเซ็ตรหัสผ่านสำหรับบัญชีของคุณกรุณาคลิกลิงก์ด้านล่างเพื่อดำเนินการตั้งรหัสผ่านใหม่
-      
-      ${resetUrl}
-      
-      หากคุณไม่ได้เป็นผู้ร้องขอ โปรดละเลยอีเมลฉบับนี้ รหัสผ่านของคุณจะยังคงเดิม`,
+        html: `
+        <p>เรียน ${email},</p>
+        <p>เราได้รับคำร้องขอรีเซ็ตรหัสผ่านสำหรับบัญชีของคุณ กรุณาคลิกลิงก์ด้านล่างเพื่อดำเนินการตั้งรหัสผ่านใหม่</p>
+          <a href="${resetUrl}">คลิกที่นี่เพื่อรีเซ็ตรหัสผ่าน</a>
+        <p>หากคุณไม่ได้เป็นผู้ร้องขอ โปรดละเลยอีเมลฉบับนี้ รหัสผ่านของคุณจะยังคงเดิม</p>
+        `,
       };
 
       await transporter.sendMail(mailOptions);
