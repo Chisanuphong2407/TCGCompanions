@@ -18,6 +18,36 @@ import { IP } from "../App";
 
 export const ForgetPass = ({ navigation }) => {
   const [email, setEmail] = useState("");
+  const [disabled, setDisabled] = useState(false);
+
+  const handleSend = async () => {
+    if (email) {
+      try {
+        console.log("sending");
+        const sendMail = await fetch(`${IP}/api/fotgetPassword`, {
+          method: "POST",
+          headers: {
+          "Content-Type": "application/json",
+        },
+          body: JSON.stringify({
+            email: email,
+          }),
+        });
+        
+        setDisabled(true);
+        setTimeout(() => setDisabled(false), 60000);
+
+        const result = await sendMail.json();
+        console.log(result)
+        // if(result)
+        console.log("sended");
+      } catch (error) {
+        Alert.alert("เกิดข้อผิดพลาด", "โปรดลองอีกครั้ง");
+      }
+    }else{
+      Alert.alert("","กรุณากรอกข้อมูลให้ครบถ้วน");
+    }
+  };
   return (
     <SafeAreaView style={styles.forgetScreen}>
       <Text style={styles.header}>ลืมรหัสผ่าน</Text>
@@ -31,8 +61,14 @@ export const ForgetPass = ({ navigation }) => {
             placeholder="Email"
           />
         </View>
-        <TouchableOpacity style={styles.send}>
-          <Text style={styles.sendText}>ส่งรหัส</Text>
+        <TouchableOpacity
+          style={styles.send}
+          onPress={handleSend}
+          disabled={disabled}
+        >
+          <Text style={disabled ? styles.sendedText : styles.sendText}>
+            ส่งรหัส
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -51,10 +87,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#e7e6e6",
     borderWidth: 1,
     borderRadius: 10,
-    marginBottom: 30
+    marginBottom: 30,
   },
   box: {
-    flex:0.8,
+    flex: 0.8,
     justifyContent: "center",
   },
   header: {
@@ -67,14 +103,22 @@ const styles = StyleSheet.create({
   },
   send: {
     alignItems: "center",
-    marginTop:30
+    marginTop: 30,
   },
   sendText: {
     fontSize: 18,
-    color: 'white',
+    color: "white",
     backgroundColor: "#176B87",
     padding: 12,
     paddingHorizontal: 30,
-    borderRadius: 30
-  }
+    borderRadius: 30,
+  },
+  sendedText: {
+    fontSize: 18,
+    color: "#000000",
+    backgroundColor: "#718c96",
+    padding: 12,
+    paddingHorizontal: 30,
+    borderRadius: 30,
+  },
 });

@@ -950,7 +950,7 @@ app.post("/api/fotgetPassword", async (req, res) => {
       const token = jwt.sign({ email: email }, process.env.secrKey, {
         expiresIn: "2m",
       });
-      const resetUrl = `http://192.168.1.6:3001/reset-password?token=${token}`;
+      const resetUrl = `http://192.168.1.3:3001/reset-password?token=${token}`;
 
       const mailOptions = {
         to: email,
@@ -968,7 +968,7 @@ app.post("/api/fotgetPassword", async (req, res) => {
       console.log("send");
       return res.status(200).json("success");
     } else {
-      return res.status(404).json(error);
+      return res.status(404).json("Email not found");
     }
   } catch (error) {
     return res.status(400).json(error);

@@ -25,7 +25,7 @@ import {
   Image,
   FlatList,
 } from "react-native";
-import * as Link from "expo-linking";
+import * as Linking from "expo-linking";
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
@@ -46,12 +46,13 @@ import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
 import { Resetpassword } from "./screens/Resetpassword";
 
-export const IP = "http://192.168.1.6:3000";
+export const IP = "http://192.168.1.3:3000";
 
 const linking = {
-  prefixes: [Link.createURL("/"), "TCGCompanion://"],
+  prefixes: [Linking.createURL("/")],
   config: {
     screens: {
+      Home: 'Home',
       Resetpassword: "Resetpassword/:token",
     },
   },
@@ -326,6 +327,7 @@ const Home = ({ navigation }) => {
       {/* แท็บบนสุด */}
       <View style={styles.TopTab}>
         {/* log in */}
+        {/* <Button title="Open Deep Link" onPress={() => navigation.navigate("Resetpassword",{event})} /> */}
         <TouchableOpacity onPress={handleProfile}>
           {isVisiblelogin ? (
             <Text style={styles.RightTab}>เข้าสู่ระบบ</Text>
@@ -500,28 +502,9 @@ const Home = ({ navigation }) => {
   );
 };
 
-const App = () => {
-  const [initialState, setInitialState] = useState();
-  const [isReady, setIsready] = useState(false);
-
-  useEffect(() => {
-    const handleInitialURL = async () => {
-      const url = await Link.getInitialURL();
-      if (url) {
-        const parsedState = Link.parse(url);
-        if (parsedState) {
-          setInitialState(parsedState);
-        }
-      }
-      setIsready(true);
-    };
-
-    if (isReady) {
-      handleInitialURL();
-    }
-  }, [isReady]);
+const App = () => {  
   return (
-    <NavigationContainer initialState={initialState} linking={linking}>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
           name="Home"
