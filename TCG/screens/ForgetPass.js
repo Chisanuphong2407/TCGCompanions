@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
@@ -19,35 +19,60 @@ import { IP } from "../App";
 export const ForgetPass = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [disabled, setDisabled] = useState(false);
+  const [isVisible, setIsvisible] = useState(false);
+  const [time, setTime] = useState(60);
+  const [isCountdown,setIscountdown] = useState(false);
 
   const handleSend = async () => {
     if (email) {
+      setEmail("");
+      setIsvisible(true);
+      setDisabled(true);
+      setIscountdown(true);
+      setTimeout(() => {
+        setDisabled(false);
+        setIsvisible(false);
+      }, 60000);
+
       try {
         console.log("sending");
         const sendMail = await fetch(`${IP}/api/fotgetPassword`, {
           method: "POST",
           headers: {
-          "Content-Type": "application/json",
-        },
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             email: email,
           }),
         });
-        
-        setDisabled(true);
-        setTimeout(() => setDisabled(false), 60000);
 
         const result = await sendMail.json();
-        console.log(result)
+        console.log(result);
         // if(result)
         console.log("sended");
       } catch (error) {
         Alert.alert("เกิดข้อผิดพลาด", "โปรดลองอีกครั้ง");
       }
-    }else{
-      Alert.alert("","กรุณากรอกข้อมูลให้ครบถ้วน");
+    } else {
+      Alert.alert("", "กรุณากรอกข้อมูลให้ครบถ้วน");
     }
   };
+
+  useEffect(() => {
+    let timer = null
+    if(isCountdown && time > 0){
+      timer = setInterval(() => {
+        setTime(time - 1)
+      },1000);
+    }else if (time == 0){
+      setIscountdown(false);
+      clearInterval(timer)
+    }
+
+    return () => clearInterval(timer)
+
+  },[isCountdown,time])
+
   return (
     <SafeAreaView style={styles.forgetScreen}>
       <Text style={styles.header}>ลืมรหัสผ่าน</Text>
@@ -70,6 +95,11 @@ export const ForgetPass = ({ navigation }) => {
             ส่งรหัส
           </Text>
         </TouchableOpacity>
+        {isVisible && (
+          <Text style={styles.resend}>
+            คุณสามารถส่งรหัสใหม่ได้ภายใน {time} วินาที
+          </Text>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -120,5 +150,11 @@ const styles = StyleSheet.create({
     padding: 12,
     paddingHorizontal: 30,
     borderRadius: 30,
+  },
+  resend: {
+    textDecorationLine: "underline",
+    color: "grey",
+    margin: 10,
+    textAlign: "center",
   },
 });

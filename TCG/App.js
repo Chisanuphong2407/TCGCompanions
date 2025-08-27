@@ -1,8 +1,8 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View ,BackHandler} from "react-native";
+import React, { useEffect, useState ,useCallback} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer, useNavigation,useFocusEffect } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import io from "socket.io-client";
 import {
@@ -46,7 +46,7 @@ import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
 import { Resetpassword } from "./screens/Resetpassword";
 
-export const IP = "http://192.168.1.3:3000";
+export const IP = "http://192.168.1.6:3000";
 
 const linking = {
   prefixes: [Linking.createURL("/")],
@@ -294,6 +294,32 @@ const Home = ({ navigation }) => {
     }
   }, [isLoading]);
 
+
+  useFocusEffect(
+      useCallback(() => {
+        const onBackPress = () => {
+         Alert.alert("ออกจากแอปพลิเคชั่น?","คุณต้องการออกจากแอป?",[
+          {
+            text: 'ยกเลิก',
+            style: 'cancel'
+          },{
+          text: 'ตกลง',
+          onPress: () => BackHandler.exitApp(),
+         }])
+          return true;
+        };
+  
+        const backHandler = BackHandler.addEventListener(
+          "hardwareBackPress",
+          onBackPress
+        );
+  
+        return () => {
+          backHandler.remove();
+        };
+      }, [IP])
+    );
+    
   //refresh หน้าเมื่ออัพเดตข้อมูล
   useEffect(() => {
     const socket = io(IP);

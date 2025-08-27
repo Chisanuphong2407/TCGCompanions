@@ -150,6 +150,20 @@ app.get("/api/profile/", async (req, res, next) => {
   }
 });
 
+//reset password authorize
+app.get("/api/getEmail/", async (req, res, next) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    // console.log({ token: authHeader });
+    const authToken = authHeader.split(" ")[1];
+    // console.log(authToken);
+    const user = jwt.verify(authToken, process.env.secrKey);
+    return res.json(user.email);
+  } catch (error) {
+    return res.json(error);
+  }
+});
+
 //fetch กิจกรรมทั่วไป
 app.get("/api/events", async (req, res) => {
   try {
@@ -948,9 +962,9 @@ app.post("/api/fotgetPassword", async (req, res) => {
     console.log(req.headers.host);
     if (DBemail.length > 0) {
       const token = jwt.sign({ email: email }, process.env.secrKey, {
-        expiresIn: "2m",
+        expiresIn: "5m",
       });
-      const resetUrl = `http://192.168.1.3:3001/reset-password?token=${token}`;
+      const resetUrl = `http://192.168.1.6:3001/reset-password?token=${token}`;
 
       const mailOptions = {
         to: email,
@@ -972,6 +986,24 @@ app.post("/api/fotgetPassword", async (req, res) => {
     }
   } catch (error) {
     return res.status(400).json(error);
+  }
+});
+
+app.post("/api/resetPassword", async (req, res) => {
+  const newpassword = req.body.newpass;
+  const email = req.body.email;
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newpassword, salt);
+
+  try {
+    await conn.query("UPDATE `user` SET `Password`= ? WHERE `Email` = ?", [
+      hashedPassword,
+      email,
+    ]);
+    return res.status(200).json("success");
+  } catch (error) {
+    res.status(400).json("failed");
   }
 });
 
