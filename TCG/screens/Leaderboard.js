@@ -339,6 +339,7 @@ const styles = StyleSheet.create({
     maxWidth: "15%",
     justifyContent: "center",
     marginHorizontal: 1,
+    fontWeight: "bold",
   },
   tableSolkolf: {
     minWidth: "10%",
