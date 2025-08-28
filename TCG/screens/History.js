@@ -81,7 +81,7 @@ export const History = ({ route, navigation }) => {
                   </DataTable.Header>
 
                   {/* rows */}
-                  <DataTable.Row>
+                  <DataTable.Row key={item.Round}>
                     <DataTable.Cell style={name == item.firstName ? styles.tableNameHeaderFocus :styles.tableNameHeader}>
                       <Text style={(name == item.firstName ? styles.focus: null)}>{item.firstName}</Text>
                     </DataTable.Cell>
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     minWidth: "60%",
     maxWidth: "100%",
     margin: 20,
-    marginBottom: 10,
+    marginBottom: 20,
     overflow: "hidden",
     justifyContent: "space-evenly",
     opacity: 0.8,
@@ -179,5 +179,9 @@ const styles = StyleSheet.create({
   },
   focus: {
     fontWeight: 'bold'
+  },
+  Round: {
+    fontSize: 18,
+    fontWeight:'bold'
   }
 });

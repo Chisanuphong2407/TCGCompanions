@@ -312,8 +312,9 @@ export const Eventdetails = ({ navigation, route }) => {
             <MaterialCommunityIcons
               name="podium-gold"
               size={25}
+              marginHorizontal={20}
               color="#176B87"
-              style={styles.menubut}
+              style={styles.menubutLeaderboard}
             />
           </Pressable>
         )}
@@ -542,6 +543,13 @@ export const styles = StyleSheet.create({
     minWidth: 25,
     minHeight: 25,
     marginHorizontal: 3,
+  },
+  menubutLeaderboard: {
+    maxWidth: 30,
+    maxHeight: 30,
+    minWidth: 25,
+    minHeight: 25,
+    marginHorizontal: 13,
   },
   menubox: {
     marginHorizontal: 10,
