@@ -181,8 +181,8 @@ export const contestants = ({ navigation, route }) => {
         {/*table header*/}
         <DataTable style={styles.table}>
           <DataTable.Header>
-            <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
-            <DataTable.Title style={styles.tableName}>
+            <DataTable.Title style={isOwner? styles.tableNo:styles.tableNoContestants}>No.</DataTable.Title>
+            <DataTable.Title style={isOwner? styles.tableName : styles.tableNameContestants}>
               ชื่อผู้เข้าแข่งขัน
             </DataTable.Title>
             {isOwner && (
@@ -214,10 +214,10 @@ export const contestants = ({ navigation, route }) => {
                     }
                   }}
                 >
-                  <DataTable.Cell style={styles.tableNo}>
+                  <DataTable.Cell style={isOwner? styles.tableNo:styles.tableNoContestants}>
                     {item.FighterID}
                   </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableName}>
+                  <DataTable.Cell style={isOwner? styles.tableName : styles.tableNameContestants}>
                     {item.UserName}
                   </DataTable.Cell>
                   {isOwner && (
@@ -281,9 +281,20 @@ export const styles = StyleSheet.create({
     maxWidth: "10%",
     marginHorizontal: 3,
   },
+  tableNoContestants: {
+    minWidth: "10%",
+    maxWidth: '30%',
+    marginHorizontal: 3,
+    justifyContent:'center'
+  },
   tableName: {
     minWidth: "30%",
     marginHorizontal: 3,
+  },
+  tableNameContestants: {
+    minWidth: "30%",
+    marginHorizontal: 3,
+    justifyContent: 'center'
   },
   tableNation: {
     minWidth: "25%",

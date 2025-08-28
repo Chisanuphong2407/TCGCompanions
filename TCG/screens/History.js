@@ -20,10 +20,9 @@ import { UserPlus, X } from "react-native-feather";
 import { IP } from "../App";
 
 export const History = ({ route, navigation }) => {
-  const name = route.params.account;
+  const name = route.params.account.trim();
   const tableID = route.params.table;
   const [history, setHistory] = useState([]);
-
 
   const getHistory = async () => {
     try {
@@ -47,8 +46,11 @@ export const History = ({ route, navigation }) => {
   };
 
   useEffect(() => {
+    // console.log(name);
+    // console.log(tableID);
     getHistory();
     console.log(history);
+    console.log(history.length);
   }, []);
 
   return (
@@ -56,51 +58,48 @@ export const History = ({ route, navigation }) => {
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
       <ScrollView>
         <Text style={styles.header}>ประวัติการแข่งขัน</Text>
-        {history.length > 0 &&
-          history.map((item) => <Text>รอบที่ {item.Round}</Text>)}
-
         {history.length > 0 ? (
-          <View>
-            <DataTable style={styles.Alltable}>
-              {/*header */}
-              <DataTable.Header>
-                <DataTable.Title style={styles.tableNameHeader}>
-                  ชื่อผู้เข้าแข่งขัน
-                </DataTable.Title>
-                <DataTable.Title style={styles.tableScoreHeader}>
-                  คะแนน
-                </DataTable.Title>
-                <DataTable.Title style={styles.dat}></DataTable.Title>
-                <DataTable.Title style={styles.tableScoreHeader}>
-                  คะแนน
-                </DataTable.Title>
-                <DataTable.Title style={styles.tableNameHeader}>
-                  ชื่อผู้เข้าแข่งขัน
-                </DataTable.Title>
-              </DataTable.Header>
-              {/*row */}
-              {history.length > 0 &&
-                history.map((item, index) => {
-                  return (
-                    <DataTable.Row key={item.MatchID}>
-                      <DataTable.Cell style={styles.tableNameHeader}>
-                        {item.firstName}
-                      </DataTable.Cell>
-                      <DataTable.Cell style={styles.tableScoreHeader}>
-                        {item.Fighter1st_Score}
-                      </DataTable.Cell>
-                      <DataTable.Cell style={styles.dat}>-</DataTable.Cell>
-                      <DataTable.Cell style={styles.tableScoreHeader}>
-                        {item.Fighter2nd_Score}
-                      </DataTable.Cell>
-                      <DataTable.Cell style={styles.tableNameHeader}>
-                        {item.secondName}
-                      </DataTable.Cell>
-                    </DataTable.Row>
-                  );
-                })}
-            </DataTable>
-          </View>
+          <DataTable>
+            {history.map((item, index) => {
+              return (
+                <View style={styles.Alltable}>
+                  <Text style={styles.Round}>รอบที่ {item.Round}</Text>
+                  <DataTable.Header>
+                    <DataTable.Title style={styles.tableNameHeader}>
+                      ชื่อผู้เข้าแข่งขัน
+                    </DataTable.Title>
+                    <DataTable.Title style={styles.tableScoreHeader}>
+                      คะแนน
+                    </DataTable.Title>
+                    <DataTable.Title style={styles.dat}></DataTable.Title>
+                    <DataTable.Title style={styles.tableScoreHeader}>
+                      คะแนน
+                    </DataTable.Title>
+                    <DataTable.Title style={styles.tableNameHeader}>
+                      ชื่อผู้เข้าแข่งขัน
+                    </DataTable.Title>
+                  </DataTable.Header>
+
+                  {/* rows */}
+                  <DataTable.Row>
+                    <DataTable.Cell style={name == item.firstName ? styles.tableNameHeaderFocus :styles.tableNameHeader}>
+                      <Text style={(name == item.firstName ? styles.focus: null)}>{item.firstName}</Text>
+                    </DataTable.Cell>
+                    <DataTable.Cell style={name == item.firstName ? styles.tableScoreHeaderFocus :styles.tableScoreHeader}>
+                      <Text style={(name == item.firstName ? styles.focus: null)}>{item.Fighter1st_Score}</Text>
+                    </DataTable.Cell>
+                    <DataTable.Cell style={styles.dat}> - </DataTable.Cell>
+                    <DataTable.Cell style={name == item.secondName ? styles.tableScoreHeaderFocus :styles.tableScoreHeader}>
+                      <Text style={(name == item.secondName ? styles.focus: null)}>{item.Fighter2nd_Score}</Text>
+                    </DataTable.Cell>
+                    <DataTable.Cell style={name == item.secondName ? styles.tableNameHeaderFocus :styles.tableNameHeader}>
+                      <Text style={(name == item.secondName ? styles.focus: null)}>{item.secondName}</Text>
+                    </DataTable.Cell>
+                  </DataTable.Row>
+                </View>
+              );
+            })}
+          </DataTable>
         ) : (
           <Text style={styles.noContent}>
             ยังไม่มีประวัติการแข่งขันในขณะนี้
@@ -115,7 +114,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F7FAFF",
-    padding: 20,
     justifyContent: "center",
   },
   header: {
@@ -132,36 +130,42 @@ const styles = StyleSheet.create({
     height: 600,
     right: -200,
     bottom: -200,
-    opacity: 0.3,
+    opacity: 0.1,
   },
   Alltable: {
-    flex: 0.8,
+    flex: 1,
     minWidth: "60%",
-    maxWidth: "95%",
-    margin: 10,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-    backgroundColor: "#f4f7fa",
-    opacity: 0.8,
-    borderRadius: 5,
+    maxWidth: "100%",
+    margin: 20,
+    marginBottom: 10,
     overflow: "hidden",
     justifyContent: "space-evenly",
+    opacity: 0.8,
   },
   tableNameHeader: {
     justifyContent: "center",
     // marginHorizontal: 2,
     minWidth: "20%",
   },
+  tableNameHeaderFocus: {
+    justifyContent: "center",
+    // marginHorizontal: 2,
+    minWidth: "20%",
+    backgroundColor:"#ddd",
+    opacity:0.8
+  },
   tableScoreHeader: {
     justifyContent: "center",
     // marginHorizontal: 2,
     minWidth: "10%",
   },
-  tableHeaderRight: {
-    flex: 1,
-    justifyContent: "flex-end",
-    paddingHorizontal: 2,
-    maxWidth: 50,
+  tableScoreHeaderFocus: {
+    justifyContent: "center",
+    // marginHorizontal: 2,
+    minWidth: "10%",
+    fontWeight: 'bold',
+    backgroundColor: '#ddd',
+    opacity:0.8
   },
   dat: {
     justifyContent: "center",
@@ -171,6 +175,9 @@ const styles = StyleSheet.create({
     flex: 3,
     fontSize: 16,
     opacity: 0.5,
-    textAlign:'center'
+    textAlign: "center",
   },
+  focus: {
+    fontWeight: 'bold'
+  }
 });

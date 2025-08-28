@@ -204,7 +204,7 @@ app.get("/api/fetchmyevent/:contestant", async (req, res) => {
     );
 
     const [result] = await conn.query(
-      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fightertable INNER JOIN  user ON user.UserID = event.OwnerUserID WHERE contestants.UserID = ?",
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fightertable INNER JOIN  user ON user.UserID = event.OwnerUserID WHERE contestants.UserID = ? AND isDelete = 0",
       [ID[0].UserID]
     );
     console.log(result);
@@ -964,7 +964,7 @@ app.post("/api/fotgetPassword", async (req, res) => {
       const token = jwt.sign({ email: email }, process.env.secrKey, {
         expiresIn: "5m",
       });
-      const resetUrl = `http://192.168.1.6:3001/reset-password?token=${token}`;
+      const resetUrl = `http://192.168.1.3:3001/reset-password?token=${token}`;
 
       const mailOptions = {
         to: email,

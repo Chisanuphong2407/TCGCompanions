@@ -1,8 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
-import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View, ScrollView, BackHandler } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   SafeAreaView,
@@ -135,8 +139,8 @@ export const Eventdetails = ({ navigation, route }) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        EventID: EventID
-      })
+        EventID: EventID,
+      }),
     });
 
     const result = await deleteEvent.json();
@@ -207,6 +211,24 @@ export const Eventdetails = ({ navigation, route }) => {
   useEffect(() => {
     availableMenu();
   }, [item]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = async () => {
+        navigation.navigate("Home");
+        return true;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
+
+      return () => {
+        backHandler.remove();
+      };
+    }, [IP])
+  );
 
   return (
     <ScrollView style={styles.container}>

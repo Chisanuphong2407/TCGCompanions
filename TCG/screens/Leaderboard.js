@@ -33,7 +33,7 @@ export const Leaderboard = ({ navigation, route }) => {
   const [round, setRound] = useState(0);
   const [owner, setOwner] = useState("");
   const [account, setAccount] = useState();
-  const [isFinish,setIsfinish] = useState(false);
+  const [isFinish, setIsfinish] = useState(false);
 
   const getLeaderboard = async () => {
     try {
@@ -125,7 +125,7 @@ export const Leaderboard = ({ navigation, route }) => {
       });
       const resultEvent = await eventDet.json();
 
-      if(resultEvent[0].Status == 3){
+      if (resultEvent[0].Status == 3) {
         setIsfinish(true);
       }
 
@@ -190,7 +190,7 @@ export const Leaderboard = ({ navigation, route }) => {
               ผู้เข้าแข่งขัน
             </DataTable.Title>
             <DataTable.Title style={styles.tableNation}>เนชั่น</DataTable.Title>
-            <DataTable.Title style={styles.tableScore}>คะแนน</DataTable.Title>
+            <DataTable.Title style={styles.tableScore}><Text style={styles.scoreText}>คะแนน</Text></DataTable.Title>
             {round == 5 && (
               <DataTable.Title style={styles.tableSolkolf}>
                 solkolf
@@ -224,11 +224,11 @@ export const Leaderboard = ({ navigation, route }) => {
                   </DataTable.Cell>
                   {round == 5 && (
                     <DataTable.Cell style={styles.tableScore}>
-                    {item.TotalScore}
+                      <Text style={styles.scoreText}>{item.TotalScore}</Text>
                     </DataTable.Cell>
                   )}
-                  <DataTable.Cell style={styles.tableScore}>
-                  {item.solkolf_score}
+                  <DataTable.Cell style={styles.tableSolkolf}>
+                    {item.solkolf_score}
                   </DataTable.Cell>
                 </DataTable.Row>
               );
@@ -244,7 +244,8 @@ export const Leaderboard = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
-      {owner == account && !isFinish &&
+      {owner == account &&
+        !isFinish &&
         (round != 5 ? (
           <TouchableOpacity
             style={styles.nextButton}
@@ -316,7 +317,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#c9e2fa",
   },
   tableNo: {
-    minWidth: "5%",
+    minWidth: "12%",
     maxWidth: "12%",
     justifyContent: "center",
   },
@@ -339,7 +340,7 @@ const styles = StyleSheet.create({
     maxWidth: "15%",
     justifyContent: "center",
     marginHorizontal: 1,
-    fontWeight: "bold",
+    // backgroundColor: '#b3b2b2'
   },
   tableSolkolf: {
     minWidth: "10%",
@@ -367,5 +368,8 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     textAlign: "center",
+  },
+  scoreText: {
+    fontWeight: "bold",
   },
 });

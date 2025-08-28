@@ -168,7 +168,6 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     borderRadius: 5,
     overflow: "hidden",
-    // justifyContent: "space-evenly",
   },
   manageEvent: {
     alignSelf: "flex-end",

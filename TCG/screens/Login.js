@@ -69,7 +69,7 @@ export const Login = ({ navigation }) => {
       </View>
       <View style={styles.inputBox}>
         <View style={styles.Box}>
-          <User size={1} margin={10} />
+          <User margin={10} />
           <TextInput
             placeholder="Username"
             value={username}
@@ -77,7 +77,7 @@ export const Login = ({ navigation }) => {
           />
         </View>
         <View style={styles.Box}>
-          <Lock size={1} margin={10} />
+          <Lock margin={10} />
           <TextInput
             placeholder="Password"
             value={password}
@@ -156,14 +156,10 @@ export const styles = StyleSheet.create({
     marginRight: 30,
   },
   Box: {
-    flex: 1,
-    borderRadius: 25,
-    padding: 5,
-    paddingLeft: 10,
-    marginTop: 5,
-    marginBottom: 5,
-    backgroundColor: "#EFEFEF",
     flexDirection: "row",
+    backgroundColor: "#e7e6e6",
+    borderRadius: 25,
+    marginBottom: 10,
   },
   LogBut: {
     flex: 0.1,
