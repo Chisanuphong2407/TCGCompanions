@@ -313,8 +313,8 @@ export const SubmitScore = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
-      <Text>current 1stScore: {firstScore}</Text>
-      <Text>current 2ndScore: {secondScore}</Text>
+      {/* <Text>current 1stScore: {firstScore}</Text> */}
+      {/* <Text>current 2ndScore: {secondScore}</Text> */}
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitText}>บันทึก</Text>
       </TouchableOpacity>
