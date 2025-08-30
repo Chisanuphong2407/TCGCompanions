@@ -964,7 +964,7 @@ app.post("/api/fotgetPassword", async (req, res) => {
       const token = jwt.sign({ email: email }, process.env.secrKey, {
         expiresIn: "5m",
       });
-      const resetUrl = `http://192.168.1.7:3001/reset-password?token=${token}`;
+      const resetUrl = `http://192.168.1.9:3001/reset-password?token=${token}`;
 
       const mailOptions = {
         to: email,
@@ -1001,6 +1001,22 @@ app.post("/api/resetPassword", async (req, res) => {
       hashedPassword,
       email,
     ]);
+
+    const mailOptions = {
+      to: email,
+      from: "TCG companion",
+      subject: "Reset password Successful",
+      html: `
+        <p>เรียน ${email},</p>
+        <p>รหัสผ่านของท่านได้ถูกรีเซ็ตแล้ว</p>
+
+        <p>ท่านสามารถเข้าสู่ระบบใหม่ได้ด้วยรหัสผ่านใหม่ของท่านได้หลังจากได้รับข้อความนี้</p>
+        `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    
+    console.log("reset successful");
     return res.status(200).json("success");
   } catch (error) {
     res.status(400).json("failed");

@@ -424,7 +424,7 @@ export const Eventdetails = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
         )}
-      {isContestant && (
+      {isContestant && (statusNum == 0 || statusNum == 1) (
         <View style={styles.waive}>
           <TouchableOpacity
             onPress={() => {

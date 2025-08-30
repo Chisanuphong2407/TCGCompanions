@@ -32,7 +32,7 @@ export const Leaderboard = ({ navigation, route }) => {
   const [Totalpage, setTotalpage] = useState(0);
   const [round, setRound] = useState(0);
   const [owner, setOwner] = useState("");
-  const [account, setAccount] = useState();
+  const [account, setAccount] = useState("");
   const [isFinish, setIsfinish] = useState(false);
 
   const getLeaderboard = async () => {
@@ -129,7 +129,7 @@ export const Leaderboard = ({ navigation, route }) => {
         setIsfinish(true);
       }
 
-      setOwner(resultEvent[0].UserName.trim());
+      setOwner(resultEvent[0].UserName);
 
       setAccount(await AsyncStorage.getItem("@vef"));
     } catch (error) {
@@ -167,9 +167,9 @@ export const Leaderboard = ({ navigation, route }) => {
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, leaderboard.length);
 
-  console.log(owner == account);
   console.log("account", account);
   console.log(owner);
+  console.log(owner.trim() == account.trim());
   return (
     <View style={styles.container}>
       <Text style={styles.header}>ตารางคะแนน</Text>
@@ -244,7 +244,7 @@ export const Leaderboard = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
-      {owner == account &&
+      {owner.trim() == account.trim() &&
         !isFinish &&
         (round != 5 ? (
           <TouchableOpacity
