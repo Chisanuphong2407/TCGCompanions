@@ -1,8 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View ,BackHandler} from "react-native";
-import React, { useEffect, useState ,useCallback} from "react";
+import { StyleSheet, Text, View, BackHandler } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NavigationContainer, useNavigation,useFocusEffect } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import io from "socket.io-client";
 import {
@@ -46,13 +50,13 @@ import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
 import { Resetpassword } from "./screens/Resetpassword";
 
-export const IP = "http://192.168.1.9:3000";
+export const IP = "http://192.168.1.11:3000";
 
 const linking = {
   prefixes: [Linking.createURL("/")],
   config: {
     screens: {
-      Home: 'Home',
+      Home: "Home",
       Resetpassword: "Resetpassword/:token",
     },
   },
@@ -119,6 +123,7 @@ const Home = ({ navigation }) => {
       const Efetch = await fetch(IP + "/api/events");
       const Edata = await Efetch.json();
       setIsloading(false);
+      setPmenu(styles.Menu);
       Edata.sort((a, b) => {
         if (a.Status < b.Status) {
           return -1;
@@ -158,7 +163,13 @@ const Home = ({ navigation }) => {
           return 0;
         }
       });
-      if (Cdata.length > 0) {
+      let count = 0;
+      Cdata.map((item) => {
+        if (item.Status == 0 || item.Status == 1 || item.Status == 2) {
+          count = count + 1;
+        }
+      });
+      if (count > 0) {
         setIsCreate(false);
       } else {
         setIsCreate(true);
@@ -180,6 +191,7 @@ const Home = ({ navigation }) => {
         },
       });
       const mydata = await myfetch.json();
+      console.log(mydata);
       mydata.sort((a, b) => {
         if (a.Status < b.Status) {
           return -1;
@@ -189,11 +201,14 @@ const Home = ({ navigation }) => {
           return 0;
         }
       });
-      // console.log(Cdata.length);
+
       setEvent(mydata);
+
       setIsloading(false);
       console.log(mydata);
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const onSearch = async () => {
@@ -245,20 +260,21 @@ const Home = ({ navigation }) => {
     }
   };
   //สร้าง item ไว้แสดงกิจกรรม
-  const Item = ({ EventID, UserName, EventName, Address }) => (
+  const Item = ({ EventID, UserName, EventName, Address ,Status}) => (
     <TouchableOpacity
       onPress={() => {
         // console.log(EventID);
         navigation.navigate("Eventdetails", EventID);
       }}
     >
-      <View style={styles.item}>
+      <View style={Status == 0 ? styles.item:(Status < 3 ? styles.racingItem:styles.finishItem)}>
         <Text style={styles.title}>{UserName}</Text>
         <Text style={styles.EventName}>{EventName}</Text>
         <View style={styles.Address}>
           <MapPin size={0.1} opacity={0.25} />
           <Text style={styles.Addresstext}>{Address}</Text>
         </View>
+          {/* <Text style={styles.Addresstext}>{Status}</Text> */}
       </View>
     </TouchableOpacity>
   );
@@ -294,32 +310,33 @@ const Home = ({ navigation }) => {
     }
   }, [isLoading]);
 
-
   useFocusEffect(
-      useCallback(() => {
-        const onBackPress = () => {
-         Alert.alert("ออกจากแอปพลิเคชั่น?","คุณต้องการออกจากแอป?",[
+    useCallback(() => {
+      const onBackPress = () => {
+        Alert.alert("ออกจากแอปพลิเคชั่น?", "คุณต้องการออกจากแอป?", [
           {
-            text: 'ยกเลิก',
-            style: 'cancel'
-          },{
-          text: 'ตกลง',
-          onPress: () => BackHandler.exitApp(),
-         }])
-          return true;
-        };
-  
-        const backHandler = BackHandler.addEventListener(
-          "hardwareBackPress",
-          onBackPress
-        );
-  
-        return () => {
-          backHandler.remove();
-        };
-      }, [IP])
-    );
-    
+            text: "ยกเลิก",
+            style: "cancel",
+          },
+          {
+            text: "ตกลง",
+            onPress: () => BackHandler.exitApp(),
+          },
+        ]);
+        return true;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
+
+      return () => {
+        backHandler.remove();
+      };
+    }, [IP])
+  );
+
   //refresh หน้าเมื่ออัพเดตข้อมูล
   useEffect(() => {
     const socket = io(IP);
@@ -470,6 +487,7 @@ const Home = ({ navigation }) => {
                   UserName={item.UserName}
                   EventName={item.EventName}
                   Address={item.Address}
+                  Status={item.Status}
                 />
               )}
               keyExtractor={(item) => item.EventID}
@@ -528,7 +546,7 @@ const Home = ({ navigation }) => {
   );
 };
 
-const App = () => {  
+const App = () => {
   return (
     <NavigationContainer linking={linking}>
       <Stack.Navigator initialRouteName="Home">
@@ -813,6 +831,22 @@ const styles = StyleSheet.create({
   },
   item: {
     backgroundColor: "#EEF5FF",
+    borderColor: "#86B6F6",
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  finishItem: {
+    backgroundColor: "#5d82a8",
+    borderColor: "#79a5de",
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  racingItem: {
+    backgroundColor: "#aec3e1",
     borderColor: "#86B6F6",
     borderWidth: 1,
     padding: 10,

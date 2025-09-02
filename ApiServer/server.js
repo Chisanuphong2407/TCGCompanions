@@ -184,7 +184,7 @@ app.get("/api/fetchcreateevent/:owner", async (req, res) => {
     const owner = req.params.owner;
     console.log(owner);
     const [result] = await conn.query(
-      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,EVENT.isDelete FROM `event` INNER JOIN USER ON user.UserID = EVENT.OwnerUserID WHERE user.UserName = ? AND isDelete = 0",
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,EVENT.isDelete,EVENT.Status FROM `event` INNER JOIN USER ON user.UserID = EVENT.OwnerUserID WHERE user.UserName = ? AND isDelete = 0",
       [owner]
     );
     console.log(result);
@@ -204,7 +204,7 @@ app.get("/api/fetchmyevent/:contestant", async (req, res) => {
     );
 
     const [result] = await conn.query(
-      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fightertable INNER JOIN  user ON user.UserID = event.OwnerUserID WHERE contestants.UserID = ? AND isDelete = 0",
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants',EVENT.Status FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fightertable INNER JOIN  user ON user.UserID = event.OwnerUserID WHERE contestants.UserID = ? AND EVENT.isDelete = 0",
       [ID[0].UserID]
     );
     console.log(result);
@@ -964,7 +964,7 @@ app.post("/api/fotgetPassword", async (req, res) => {
       const token = jwt.sign({ email: email }, process.env.secrKey, {
         expiresIn: "5m",
       });
-      const resetUrl = `http://192.168.1.9:3001/reset-password?token=${token}`;
+      const resetUrl = `http://192.168.1.11:3001/reset-password?token=${token}`;
 
       const mailOptions = {
         to: email,
@@ -989,6 +989,7 @@ app.post("/api/fotgetPassword", async (req, res) => {
   }
 });
 
+//รีเซ็ตรหัส
 app.post("/api/resetPassword", async (req, res) => {
   const newpassword = req.body.newpass;
   const email = req.body.email;

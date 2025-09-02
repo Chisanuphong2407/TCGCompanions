@@ -35,8 +35,10 @@ export const Table = ({ route, navigation }) => {
   const fighter2nd = [];
   const [isLoading, setIsloading] = useState(true);
   const [schedule, setSchedule] = useState([]);
+  const [account, setAccount] = useState("");
 
   const fetchAllFighter = async () => {
+    setAccount(await AsyncStorage.getItem("@vef"));
     try {
       const fetchFighter = await fetch(
         `${IP}/api/fetchcontestants/${tableID}`,
@@ -103,56 +105,98 @@ export const Table = ({ route, navigation }) => {
       const board = await fetchboard.json();
       console.log(board);
       board.sort((a, b) => {
-        if (a.TotalScore > b.TotalScore){
+        if (a.TotalScore > b.TotalScore) {
           return -1;
-        }else if(a.TotalScore > b.TotalScore){
-          return 1
-        } else if (a.solkolf_score > b.solkolf_score){
+        } else if (a.TotalScore > b.TotalScore) {
+          return 1;
+        } else if (a.solkolf_score > b.solkolf_score) {
           return -1;
-        }else if (a.solkolf_score < b.solkolf_score){
+        } else if (a.solkolf_score < b.solkolf_score) {
           return 1;
         }
 
         return 0;
       });
-      
-      console.log("lens", fighterLength);
-      for (let index = 0; index < fighterLength; index++) {
-        console.warn("Round:", index);
-        console.log("ID", board[index].FighterID);
-        if (index % 2 == 0) {
-          fighter1st.push(board[index].FighterID);
+
+      setFighter(board);
+
+      //match แบบไม่ซ้ำคู่
+      const fetchHistory = await fetch(`${IP}/api/getHistory`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          account: account,
+          tableID: tableID,
+        }),
+      });
+
+      const history = await fetchHistory.json();
+      let i = 0;
+      while (i < fighter.length) {
+        console.warn("Fighter", fighter.length);
+        if(fighter.length - i < 2){
+          console.log("เศษ");
+          break;
+        }
+
+        const currentFighter = fighter[i];
+        const nextFighter = fighter[i+1];
+
+        const hasFight = history.some((history) => {
+          return (history.firstName == currentFighter &&
+            history.secondName == nextFighter) ||
+            (history.firstName == nextFighter &&
+              history.secondName == currentFighter);
+        });
+
+        if (hasFight) {
+          continue;
         } else {
-          fighter2nd.push(board[index].FighterID);
+          fighter1st.push(currentFighter.FighterID);
+          fighter2nd.push(nextFighter.FighterID);
+          fighter.splice(0,2);
+          console.log(fighter);
         }
       }
-      if (fighter1st.length > fighter2nd.length) {
-        fighter2nd.push(0);
-      }
+
+      // for (let index = 0; index < fighterLength; index++) {
+      //   console.warn("Round:", index);
+      //   console.log("ID", board[index].FighterID);
+      //   if (index % 2 == 0) {
+      //     fighter1st.push(board[index].FighterID);
+      //   } else {
+      //     fighter2nd.push(board[index].FighterID);
+      //   }
+      // }
+      // if (fighter1st.length > fighter2nd.length) {
+      //   fighter2nd.push(0);
+      // }
       console.log("match finish");
     }
 
-    const insert = await fetch(`${IP}/api/insertTable`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        Fightertable: tableID,
-        fighter1st: fighter1st,
-        fighter2nd: fighter2nd,
-      }),
-    });
+    //   const insert = await fetch(`${IP}/api/insertTable`, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       Fightertable: tableID,
+    //       fighter1st: fighter1st,
+    //       fighter2nd: fighter2nd,
+    //     }),
+    //   });
 
-    const res = await insert.json();
-    if (res.message == "failed") {
-      Alert.alert("เกิดข้อผิดพลาด", "กรุณาลองใหม่อีกครั้ง");
-    } else {
-      Alert.alert("สร้างตารางสำเร็จ");
-      console.log("1stround", res.round);
-      const thisRound = res.round;
-      setRound(thisRound);
-    }
+    //   const res = await insert.json();
+    //   if (res.message == "failed") {
+    //     Alert.alert("เกิดข้อผิดพลาด", "กรุณาลองใหม่อีกครั้ง");
+    //   } else {
+    //     Alert.alert("สร้างตารางสำเร็จ");
+    //     console.log("1stround", res.round);
+    //     const thisRound = res.round;
+    //     setRound(thisRound);
+    //   }
   };
 
   const getSchedule = async () => {
@@ -189,6 +233,8 @@ export const Table = ({ route, navigation }) => {
   }, [round]);
 
   useEffect(() => {
+    console.log(fighter1st);
+    console.log(fighter2nd);
     if (schedule !== null) {
       console.log("schedule :", schedule);
     }
@@ -201,11 +247,14 @@ export const Table = ({ route, navigation }) => {
           method: "GET",
         });
         const ID = await EventID.json();
-        navigation.navigate("Eventdetails",ID);
+        navigation.navigate("Eventdetails", ID);
         return true;
       };
 
-      const backHandler = BackHandler.addEventListener("hardwareBackPress", onBackPress);
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
 
       return () => {
         backHandler.remove();
