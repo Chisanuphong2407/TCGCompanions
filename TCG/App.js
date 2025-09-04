@@ -30,6 +30,7 @@ import {
   FlatList,
 } from "react-native";
 import * as Linking from "expo-linking";
+import * as Notifications from "expo-notifications";
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
@@ -50,7 +51,7 @@ import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
 import { Resetpassword } from "./screens/Resetpassword";
 
-export const IP = "http://192.168.1.6:3000";
+export const IP = "http://192.168.1.13:3000";
 
 const linking = {
   prefixes: [Linking.createURL("/")],
@@ -115,6 +116,15 @@ const Home = ({ navigation }) => {
       console.log(error);
     }
   };
+
+  // กำหนดว่าการแจ้งเตือนจะแสดงอย่างไรเมื่อแอปกำลังทำงานอยู่
+  Notifications.setNotificationHandler({
+    handleNotifications: async () => ({
+      shouldShowAlert:true,
+      shouldPalysound:false,
+      shouldsetBadge:false,
+    }),
+  })
 
   //query event ออกมา
   const fetchEvent = async () => {
@@ -310,6 +320,17 @@ const Home = ({ navigation }) => {
     }
   }, [isLoading]);
 
+  //ขอสิทธิ์การแจ้งเตือน
+  useEffect(() => {
+    const requestPermission = async () => {
+      const status = await Notifications.requestPermissionsAsync();
+      if(status != "granted"){
+        Alert.alert("ไม่สามารถรับการแจ้งเตือนได้");
+      }
+    } 
+    requestPermission();
+  },[]);
+
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -343,7 +364,18 @@ const Home = ({ navigation }) => {
 
     socket.on("connect", () => {
       console.log("Connected to server");
+      registerUser();
+
     });
+    
+    const registerUser = async() => {
+      const user = await AsyncStorage.getItem("@vef");
+      if(!user){
+        console.log("User not found");
+        return;
+      }
+
+    }
 
     socket.on("refreshing", (refresh) => {
       console.log("Received real-time event update:", refresh);

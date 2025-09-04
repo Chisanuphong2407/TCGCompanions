@@ -32,6 +32,7 @@ const conn = mysql
 
 const app = express();
 
+const user = new Map();
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -43,8 +44,8 @@ const io = socketIo(server, {
   },
 });
 
-io.on("Connection", async (socket) => {
-  console.log(`Connected:${socket.id}`);
+io.on("Connect", async (socket) => {
+  console.log("connected");
   const refresh = true;
   socket.emit("refreshing", refresh);
 

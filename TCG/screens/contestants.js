@@ -118,7 +118,10 @@ export const contestants = ({ navigation, route }) => {
         return true;
       };
 
-      const backHandler = BackHandler.addEventListener("hardwareBackPress", onBackPress);
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
 
       return () => {
         backHandler.remove();
@@ -177,68 +180,88 @@ export const contestants = ({ navigation, route }) => {
       <View>
         <Text style={styles.header}>ผู้เข้าแข่งขัน</Text>
       </View>
-      <ScrollView style={styles.Alltable}>
-        {/*table header*/}
-        <DataTable style={styles.table}>
-          <DataTable.Header>
-            <DataTable.Title style={isOwner? styles.tableNo:styles.tableNoContestants}>No.</DataTable.Title>
-            <DataTable.Title style={isOwner? styles.tableName : styles.tableNameContestants}>
-              ชื่อผู้เข้าแข่งขัน
-            </DataTable.Title>
-            {isOwner && (
-              <DataTable.Title style={styles.tableNation}>
-                เนชัน
+      {fighter.length == 0 ? (
+        <View style={styles.empty}>
+          <Text style={styles.emptyText}>ไม่มีผู้เข้าแข่งขันในขณะนี้</Text>
+        </View>
+      ) : (
+        <ScrollView style={styles.Alltable}>
+          {/*table header*/}
+          <DataTable style={styles.table}>
+            <DataTable.Header>
+              <DataTable.Title
+                style={isOwner ? styles.tableNo : styles.tableNoContestants}
+              >
+                No.
               </DataTable.Title>
-            )}
-          </DataTable.Header>
+              <DataTable.Title
+                style={isOwner ? styles.tableName : styles.tableNameContestants}
+              >
+                ชื่อผู้เข้าแข่งขัน
+              </DataTable.Title>
+              {isOwner && (
+                <DataTable.Title style={styles.tableNation}>
+                  เนชัน
+                </DataTable.Title>
+              )}
+            </DataTable.Header>
 
-          {/* table rows */}
-          {fighter.slice(from, to).length > 0 &&
-            account &&
-            fighter.slice(from, to).map((item, index) => {
-              const FighterID = item.FighterID;
-              return (
-                <DataTable.Row
-                  key={item.FighterID}
-                  style={index % 2 == 0 ? styles.cell1 : styles.cell0}
-                  onPress={() => {
-                    if (owner == account) {
-                      navigation.navigate("ContestantDetail", {
-                        FighterID,
-                        tableID,
-                        userID: item.UserID,
-                        Eventname,
-                        EventID,
-                        status,
-                      });
-                    }
-                  }}
-                >
-                  <DataTable.Cell style={isOwner? styles.tableNo:styles.tableNoContestants}>
-                    {item.FighterID}
-                  </DataTable.Cell>
-                  <DataTable.Cell style={isOwner? styles.tableName : styles.tableNameContestants}>
-                    {item.UserName}
-                  </DataTable.Cell>
-                  {isOwner && (
-                    <DataTable.Cell style={styles.tableNation}>
-                      {item.Nation}
+            {/* table rows */}
+            {fighter.slice(from, to).length > 0 &&
+              account &&
+              fighter.slice(from, to).map((item, index) => {
+                const FighterID = item.FighterID;
+                return (
+                  <DataTable.Row
+                    key={item.FighterID}
+                    style={index % 2 == 0 ? styles.cell1 : styles.cell0}
+                    onPress={() => {
+                      if (owner == account) {
+                        navigation.navigate("ContestantDetail", {
+                          FighterID,
+                          tableID,
+                          userID: item.UserID,
+                          Eventname,
+                          EventID,
+                          status,
+                        });
+                      }
+                    }}
+                  >
+                    <DataTable.Cell
+                      style={
+                        isOwner ? styles.tableNo : styles.tableNoContestants
+                      }
+                    >
+                      {item.FighterID}
                     </DataTable.Cell>
-                  )}
-                </DataTable.Row>
-              );
-            })}
+                    <DataTable.Cell
+                      style={
+                        isOwner ? styles.tableName : styles.tableNameContestants
+                      }
+                    >
+                      {item.UserName}
+                    </DataTable.Cell>
+                    {isOwner && (
+                      <DataTable.Cell style={styles.tableNation}>
+                        {item.Nation}
+                      </DataTable.Cell>
+                    )}
+                  </DataTable.Row>
+                );
+              })}
 
-          <DataTable.Pagination
-            page={page}
-            numberOfPages={Totalpage}
-            onPageChange={(page) => setPage(page)}
-            label={`${page + 1} of ${Totalpage}`}
-            numberOfItemsPerPage={itemPerPage}
-            showFastPaginationControls
-          />
-        </DataTable>
-      </ScrollView>
+            <DataTable.Pagination
+              page={page}
+              numberOfPages={Totalpage}
+              onPageChange={(page) => setPage(page)}
+              label={`${page + 1} of ${Totalpage}`}
+              numberOfItemsPerPage={itemPerPage}
+              showFastPaginationControls
+            />
+          </DataTable>
+        </ScrollView>
+      )}
       {status != 3 && owner == account && (
         <View style={styles.manageEvent}>
           <TouchableOpacity
@@ -283,9 +306,9 @@ export const styles = StyleSheet.create({
   },
   tableNoContestants: {
     minWidth: "10%",
-    maxWidth: '30%',
+    maxWidth: "30%",
     marginHorizontal: 3,
-    justifyContent:'center'
+    justifyContent: "center",
   },
   tableName: {
     minWidth: "30%",
@@ -294,7 +317,7 @@ export const styles = StyleSheet.create({
   tableNameContestants: {
     minWidth: "30%",
     marginHorizontal: 3,
-    justifyContent: 'center'
+    justifyContent: "center",
   },
   tableNation: {
     minWidth: "25%",
@@ -349,5 +372,14 @@ export const styles = StyleSheet.create({
   },
   cell0: {
     backgroundColor: "#f4f7fa",
+  },
+  emptyText: {
+    fontSize: 20,
+    alignSelf:'center',
+    opacity:0.6
+  },
+  empty: {
+    flex: 1,
+    justifyContent:'center',
   },
 });
