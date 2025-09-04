@@ -120,83 +120,99 @@ export const Table = ({ route, navigation }) => {
 
       setFighter(board);
 
-      //match แบบไม่ซ้ำคู่
-      const fetchHistory = await fetch(`${IP}/api/getHistory`, {
+      if (fighter.length >= 12) {
+        //match แบบไม่ซ้ำคู่
+        let i = 1;
+        while (fighter.length > 0) {
+          console.log(i);
+          console.warn("Fighter", fighter.length);
+          if (fighter.length < 2) {
+           fighter1st.push(fighter[0].FighterID);
+           fighter2nd.push(0);
+            break;
+          }
+
+          const currentFighter = fighter[0];
+          const nextFighter = fighter[i];
+
+          const fetchHistory = await fetch(`${IP}/api/getHistory`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              account: currentFighter.UserName,
+              tableID: tableID,
+            }),
+          });
+
+          const history = await fetchHistory.json();
+          console.log(history);
+
+          const hasFight = history.some((history) => {
+            return (
+              (history.firstName == currentFighter.UserName &&
+                history.secondName == nextFighter.UserName) ||
+              (history.firstName == nextFighter.UserName &&
+                history.secondName == currentFighter.UserName)
+            );
+          });
+
+          console.log(hasFight);
+          if (hasFight) {
+            i++;
+            continue;
+          } else {
+            fighter1st.push(currentFighter.FighterID);
+            fighter2nd.push(nextFighter.FighterID);
+            fighter.splice(0, 1);
+            fighter.splice(i - 1, 1);
+            i = 1;
+            console.log(fighter);
+          }
+        }
+        console.log(fighter1st);
+        console.log(fighter2nd);
+      } else {
+        //จับแบบซ้ำคู่ได้
+        for (let index = 0; index < fighterLength; index++) {
+          console.warn("Round:", index);
+          console.log("ID", board[index].FighterID);
+          if (index % 2 == 0) {
+            fighter1st.push(board[index].FighterID);
+          } else {
+            fighter2nd.push(board[index].FighterID);
+          }
+        }
+        if (fighter1st.length > fighter2nd.length) {
+          fighter2nd.push(0);
+        }
+      }
+
+      console.log("match finish");
+    }
+
+      const insert = await fetch(`${IP}/api/insertTable`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          account: account,
-          tableID: tableID,
+          Fightertable: tableID,
+          fighter1st: fighter1st,
+          fighter2nd: fighter2nd,
         }),
       });
 
-      const history = await fetchHistory.json();
-      let i = 0;
-      while (i < fighter.length) {
-        console.warn("Fighter", fighter.length);
-        if(fighter.length - i < 2){
-          console.log("เศษ");
-          break;
-        }
-
-        const currentFighter = fighter[i];
-        const nextFighter = fighter[i+1];
-
-        const hasFight = history.some((history) => {
-          return (history.firstName == currentFighter &&
-            history.secondName == nextFighter) ||
-            (history.firstName == nextFighter &&
-              history.secondName == currentFighter);
-        });
-
-        if (hasFight) {
-          continue;
-        } else {
-          fighter1st.push(currentFighter.FighterID);
-          fighter2nd.push(nextFighter.FighterID);
-          fighter.splice(0,2);
-          console.log(fighter);
-        }
+      const res = await insert.json();
+      if (res.message == "failed") {
+        Alert.alert("เกิดข้อผิดพลาด", "กรุณาลองใหม่อีกครั้ง");
+      } else {
+        Alert.alert("สร้างตารางสำเร็จ");
+        console.log("1stround", res.round);
+        const thisRound = res.round;
+        setRound(thisRound);
       }
-
-      // for (let index = 0; index < fighterLength; index++) {
-      //   console.warn("Round:", index);
-      //   console.log("ID", board[index].FighterID);
-      //   if (index % 2 == 0) {
-      //     fighter1st.push(board[index].FighterID);
-      //   } else {
-      //     fighter2nd.push(board[index].FighterID);
-      //   }
-      // }
-      // if (fighter1st.length > fighter2nd.length) {
-      //   fighter2nd.push(0);
-      // }
-      console.log("match finish");
-    }
-
-    //   const insert = await fetch(`${IP}/api/insertTable`, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       Fightertable: tableID,
-    //       fighter1st: fighter1st,
-    //       fighter2nd: fighter2nd,
-    //     }),
-    //   });
-
-    //   const res = await insert.json();
-    //   if (res.message == "failed") {
-    //     Alert.alert("เกิดข้อผิดพลาด", "กรุณาลองใหม่อีกครั้ง");
-    //   } else {
-    //     Alert.alert("สร้างตารางสำเร็จ");
-    //     console.log("1stround", res.round);
-    //     const thisRound = res.round;
-    //     setRound(thisRound);
-    //   }
   };
 
   const getSchedule = async () => {
@@ -233,8 +249,6 @@ export const Table = ({ route, navigation }) => {
   }, [round]);
 
   useEffect(() => {
-    console.log(fighter1st);
-    console.log(fighter2nd);
     if (schedule !== null) {
       console.log("schedule :", schedule);
     }

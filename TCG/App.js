@@ -50,7 +50,7 @@ import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
 import { Resetpassword } from "./screens/Resetpassword";
 
-export const IP = "http://192.168.1.11:3000";
+export const IP = "http://192.168.1.6:3000";
 
 const linking = {
   prefixes: [Linking.createURL("/")],
