@@ -110,11 +110,12 @@ export const Editdetail = ({ navigation, route }) => {
           address: address,
           closedate: sendText,
           moredetail: moredetail,
+          eventID:eventID,
         }),
       });
       const result = await submitevent.json();
       console.log(result[0]);
-      if (result[0].affectedRows === 1) {
+      if (result[0].affectedRows === 1 || result[0].warningStatus == 0) {
         Alert.alert(
           "แก้ไขสำเร็จ",
           "สามารถแก้ไขรายละเอียดได้ที่ กิจกรรมที่ฉันสร้าง > เลือกกิจกรรมที่ต้องการ",

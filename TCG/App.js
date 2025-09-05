@@ -1,6 +1,12 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, BackHandler } from "react-native";
-import React, { useEffect, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useContext,
+  createContext,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   NavigationContainer,
@@ -30,7 +36,9 @@ import {
   FlatList,
 } from "react-native";
 import * as Linking from "expo-linking";
-import * as Notifications from "expo-notifications";
+import Toast from "react-native-toast-message";
+import { deleteNoti, newMatchNoti,checkContestants,playSound } from "./assets/ToastComponent";
+import { Toastconfig } from "./assets/Toastconfig";
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
 import { Eventdetails } from "./screens/Eventdetails";
@@ -51,7 +59,8 @@ import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
 import { Resetpassword } from "./screens/Resetpassword";
 
-export const IP = "http://192.168.1.13:3000";
+export const IP = "http://192.168.1.3:3000";
+export const socketContext = createContext(null);
 
 const linking = {
   prefixes: [Linking.createURL("/")],
@@ -76,7 +85,7 @@ const Home = ({ navigation }) => {
   const [ismyMenu, setIsmyMenu] = useState(true);
   const [iscmenu, setIscmenu] = useState(true);
   const [isCreateEvent, setIsCreate] = useState(false);
-  const [user, setUser] = useState();
+  const [user, setUser] = useState("");
   const [searchStyle, setSearchStyle] = useState(styles.Search);
 
   //verify token
@@ -116,15 +125,6 @@ const Home = ({ navigation }) => {
       console.log(error);
     }
   };
-
-  // กำหนดว่าการแจ้งเตือนจะแสดงอย่างไรเมื่อแอปกำลังทำงานอยู่
-  Notifications.setNotificationHandler({
-    handleNotifications: async () => ({
-      shouldShowAlert:true,
-      shouldPalysound:false,
-      shouldsetBadge:false,
-    }),
-  })
 
   //query event ออกมา
   const fetchEvent = async () => {
@@ -270,21 +270,29 @@ const Home = ({ navigation }) => {
     }
   };
   //สร้าง item ไว้แสดงกิจกรรม
-  const Item = ({ EventID, UserName, EventName, Address ,Status}) => (
+  const Item = ({ EventID, UserName, EventName, Address, Status }) => (
     <TouchableOpacity
       onPress={() => {
         // console.log(EventID);
         navigation.navigate("Eventdetails", EventID);
       }}
     >
-      <View style={Status == 0 ? styles.item:(Status < 3 ? styles.racingItem:styles.finishItem)}>
+      <View
+        style={
+          Status == 0
+            ? styles.item
+            : Status < 3
+            ? styles.racingItem
+            : styles.finishItem
+        }
+      >
         <Text style={styles.title}>{UserName}</Text>
         <Text style={styles.EventName}>{EventName}</Text>
         <View style={styles.Address}>
           <MapPin size={0.1} opacity={0.25} />
           <Text style={styles.Addresstext}>{Address}</Text>
         </View>
-          {/* <Text style={styles.Addresstext}>{Status}</Text> */}
+        {/* <Text style={styles.Addresstext}>{Status}</Text> */}
       </View>
     </TouchableOpacity>
   );
@@ -320,16 +328,47 @@ const Home = ({ navigation }) => {
     }
   }, [isLoading]);
 
-  //ขอสิทธิ์การแจ้งเตือน
+  //refresh หน้าเมื่ออัพเดตข้อมูล
   useEffect(() => {
-    const requestPermission = async () => {
-      const status = await Notifications.requestPermissionsAsync();
-      if(status != "granted"){
-        Alert.alert("ไม่สามารถรับการแจ้งเตือนได้");
+    const newSocket = io(IP);
+
+    newSocket.on("connect", () => {
+      console.log("Connected to server");
+      registerUser();
+    });
+
+    const registerUser = async () => {
+      const user = await AsyncStorage.getItem("@vef");
+      if (!user) {
+        console.log("User not found");
+        return;
       }
-    } 
-    requestPermission();
-  },[]);
+    };
+
+    newSocket.on("refreshing", (refresh) => {
+      console.log("Received real-time event update:", refresh);
+      setIsloading(refresh);
+    });
+
+    newSocket.on("disconnect", () => {
+      console.log("Disconnected from server");
+    });
+
+    newSocket.on("connect_error", (err) => {
+      console.error("WebSocket connection error:", err.message);
+      console.error("Error description:", err.description); // อาจมีข้อมูลเพิ่มเติม
+      console.error("Error context:", err.context); // อาจมีข้อมูลเพิ่มเติม
+    });
+
+    newSocket.on("matched", (table) => {
+      checkContestants(navigation,table);
+      console.log("Matched");
+      });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -358,51 +397,12 @@ const Home = ({ navigation }) => {
     }, [IP])
   );
 
-  //refresh หน้าเมื่ออัพเดตข้อมูล
-  useEffect(() => {
-    const socket = io(IP);
-
-    socket.on("connect", () => {
-      console.log("Connected to server");
-      registerUser();
-
-    });
-    
-    const registerUser = async() => {
-      const user = await AsyncStorage.getItem("@vef");
-      if(!user){
-        console.log("User not found");
-        return;
-      }
-
-    }
-
-    socket.on("refreshing", (refresh) => {
-      console.log("Received real-time event update:", refresh);
-      setIsloading(refresh);
-    });
-
-    socket.on("disconnect", () => {
-      console.log("Disconnected from server");
-    });
-
-    socket.on("connect_error", (err) => {
-      console.error("WebSocket connection error:", err.message);
-      console.error("Error description:", err.description); // อาจมีข้อมูลเพิ่มเติม
-      console.error("Error context:", err.context); // อาจมีข้อมูลเพิ่มเติม
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
   return (
     <SafeAreaView style={styles.container}>
       {/* แท็บบนสุด */}
       <View style={styles.TopTab}>
         {/* log in */}
-        {/* <Button title="Open Deep Link" onPress={() => navigation.navigate("Resetpassword",{event})} /> */}
+        <Button title="notification" onPress={newMatchNoti} />
         <TouchableOpacity onPress={handleProfile}>
           {isVisiblelogin ? (
             <Text style={styles.RightTab}>เข้าสู่ระบบ</Text>
@@ -579,195 +579,197 @@ const Home = ({ navigation }) => {
 };
 
 const App = () => {
+  
   return (
-    <NavigationContainer linking={linking}>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
-          name="Home"
-          component={Home}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{
-            headerTitle: "",
-            headerLeft: () => {
-              const navigation = useNavigation();
-              return (
-                <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-                  <X margin={10} color="#176B87" />
-                </TouchableOpacity>
-              );
-            },
-            headerBackVisible: false,
-          }}
-        />
-        <Stack.Screen
-          name="Regis"
-          component={Register}
-          options={{
-            headerTitle: "",
-            headerBackVisible: false,
-            headerLeft: () => {
-              const navigation = useNavigation();
-              return (
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                  <X margin={10} color="#176B87" />
-                </TouchableOpacity>
-              );
-            },
-          }}
-        />
-        <Stack.Screen
-          name="Eventdetails"
-          component={Eventdetails}
-          options={({ navigation }) => ({
-            headerTitle: "",
-            headerLeft: () => {
-              return (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("Home");
-                  }}
-                >
-                  <ArrowLeft />
-                </TouchableOpacity>
-              );
-            },
-          })}
-        />
-        <Stack.Screen
-          name="MyProfile"
-          component={MyProfile}
-          options={{
-            headerTitle: "",
-            headerBackVisible: false,
-            headerLeft: () => {
-              const navigation = useNavigation();
-              return (
-                <TouchableOpacity
-                  onPress={() =>
-                    Alert.alert(
-                      "ละทิ้งการเปลี่ยนแปลง",
-                      "หากยืนยัน การเปลี่ยนแปลงนี้จะหายไป",
-                      [
-                        {
-                          text: "ยืนยัน",
-                          style: "default",
-                          onPress: () => {
-                            navigation.goBack();
+      <NavigationContainer linking={linking}>
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen
+            name="Home"
+            component={Home}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{
+              headerTitle: "",
+              headerLeft: () => {
+                const navigation = useNavigation();
+                return (
+                  <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+                    <X margin={10} color="#176B87" />
+                  </TouchableOpacity>
+                );
+              },
+              headerBackVisible: false,
+            }}
+          />
+          <Stack.Screen
+            name="Regis"
+            component={Register}
+            options={{
+              headerTitle: "",
+              headerBackVisible: false,
+              headerLeft: () => {
+                const navigation = useNavigation();
+                return (
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <X margin={10} color="#176B87" />
+                  </TouchableOpacity>
+                );
+              },
+            }}
+          />
+          <Stack.Screen
+            name="Eventdetails"
+            component={Eventdetails}
+            options={({ navigation }) => ({
+              headerTitle: "",
+              headerLeft: () => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate("Home");
+                    }}
+                  >
+                    <ArrowLeft />
+                  </TouchableOpacity>
+                );
+              },
+            })}
+          />
+          <Stack.Screen
+            name="MyProfile"
+            component={MyProfile}
+            options={{
+              headerTitle: "",
+              headerBackVisible: false,
+              headerLeft: () => {
+                const navigation = useNavigation();
+                return (
+                  <TouchableOpacity
+                    onPress={() =>
+                      Alert.alert(
+                        "ละทิ้งการเปลี่ยนแปลง",
+                        "หากยืนยัน การเปลี่ยนแปลงนี้จะหายไป",
+                        [
+                          {
+                            text: "ยืนยัน",
+                            style: "default",
+                            onPress: () => {
+                              navigation.goBack();
+                            },
                           },
-                        },
-                        {
-                          text: "ยกเลิก",
-                          style: "cancel",
-                        },
-                      ]
-                    )
-                  }
-                >
-                  <X size={5} />
-                </TouchableOpacity>
-              );
-            },
-          }}
-        />
-        <Stack.Screen
-          name="RePassword"
-          component={RePassword}
-          options={{ headerTitle: "" }}
-        />
-        <Stack.Screen
-          name="CreateEvent"
-          component={CreateEvent}
-          options={{ headerTitle: "" }}
-        />
-        <Stack.Screen
-          name="Editdetail"
-          component={Editdetail}
-          options={{ headerTitle: "" }}
-        />
-        <Stack.Screen
-          name="Apply"
-          component={Apply}
-          options={{ headerTitle: "" }}
-        />
-        <Stack.Screen
-          name="contestants"
-          component={contestants}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="AddFighter"
-          component={AddFighter}
-          options={{ headerTitle: "" }}
-        />
-        <Stack.Screen
-          name="ContestantDetail"
-          component={ContestantDetail}
-          options={{ headerTitle: "" }}
-        />
-        <Stack.Screen
-          name="Fighterlist"
-          component={Fighterlist}
-          options={{ headerTitle: "" }}
-        />
-        <Stack.Screen
-          name="History"
-          component={History}
-          options={{ headerTitle: "" }}
-        />
-        <Stack.Screen
-          name="Table"
-          component={Table}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="SubmitScore"
-          component={SubmitScore}
-          options={{ headerTitle: "" }}
-        />
-        <Stack.Screen
-          name="contestantsList"
-          component={contestantsList}
-          options={{ headerTitle: "" }}
-        />
-        <Stack.Screen
-          name="Leaderboard"
-          component={Leaderboard}
-          options={{ headerTitle: "" }}
-        />
-        <Stack.Screen
-          name="Pairing"
-          component={Pairing}
-          options={{ headerTitle: "" }}
-        />
-        <Stack.Screen
-          name="ForgetPass"
-          component={ForgetPass}
-          options={({ navigation }) => ({
-            headerTitle: "",
-            headerLeft: () => {
-              return (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.goBack();
-                  }}
-                >
-                  <X />
-                </TouchableOpacity>
-              );
-            },
-          })}
-        />
-        <Stack.Screen
-          name="Resetpassword"
-          component={Resetpassword}
-          options={{ headerTitle: "" }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+                          {
+                            text: "ยกเลิก",
+                            style: "cancel",
+                          },
+                        ]
+                      )
+                    }
+                  >
+                    <X size={5} />
+                  </TouchableOpacity>
+                );
+              },
+            }}
+          />
+          <Stack.Screen
+            name="RePassword"
+            component={RePassword}
+            options={{ headerTitle: "" }}
+          />
+          <Stack.Screen
+            name="CreateEvent"
+            component={CreateEvent}
+            options={{ headerTitle: "" }}
+          />
+          <Stack.Screen
+            name="Editdetail"
+            component={Editdetail}
+            options={{ headerTitle: "" }}
+          />
+          <Stack.Screen
+            name="Apply"
+            component={Apply}
+            options={{ headerTitle: "" }}
+          />
+          <Stack.Screen
+            name="contestants"
+            component={contestants}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="AddFighter"
+            component={AddFighter}
+            options={{ headerTitle: "" }}
+          />
+          <Stack.Screen
+            name="ContestantDetail"
+            component={ContestantDetail}
+            options={{ headerTitle: "" }}
+          />
+          <Stack.Screen
+            name="Fighterlist"
+            component={Fighterlist}
+            options={{ headerTitle: "" }}
+          />
+          <Stack.Screen
+            name="History"
+            component={History}
+            options={{ headerTitle: "" }}
+          />
+          <Stack.Screen
+            name="Table"
+            component={Table}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="SubmitScore"
+            component={SubmitScore}
+            options={{ headerTitle: "" }}
+          />
+          <Stack.Screen
+            name="contestantsList"
+            component={contestantsList}
+            options={{ headerTitle: "" }}
+          />
+          <Stack.Screen
+            name="Leaderboard"
+            component={Leaderboard}
+            options={{ headerTitle: "" }}
+          />
+          <Stack.Screen
+            name="Pairing"
+            component={Pairing}
+            options={{ headerTitle: "" }}
+          />
+          <Stack.Screen
+            name="ForgetPass"
+            component={ForgetPass}
+            options={({ navigation }) => ({
+              headerTitle: "",
+              headerLeft: () => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.goBack();
+                    }}
+                  >
+                    <X />
+                  </TouchableOpacity>
+                );
+              },
+            })}
+          />
+          <Stack.Screen
+            name="Resetpassword"
+            component={Resetpassword}
+            options={{ headerTitle: "" }}
+          />
+        </Stack.Navigator>
+        <Toast config={Toastconfig} />
+      </NavigationContainer>
   );
 };
 

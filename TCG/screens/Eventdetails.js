@@ -19,6 +19,7 @@ import {
   Image,
   FlatList,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import { Trash2, Edit2, Users, Clock } from "react-native-feather";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { IP } from "../App";
@@ -35,7 +36,6 @@ export const Eventdetails = ({ navigation, route }) => {
   const [isOwner, setIsowner] = useState(false);
   const owner = item[0] && item[0].UserName;
   const [account, setAccount] = useState(null);
-
   const [eventName, setEventName] = useState();
   const [condition, setCondition] = useState();
   const [rule, setRule] = useState();
@@ -424,7 +424,7 @@ export const Eventdetails = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
         )}
-      {isContestant && (statusNum == 0 || statusNum == 1) (
+      {isContestant && (statusNum == 0 || statusNum == 1) && (
         <View style={styles.waive}>
           <TouchableOpacity
             onPress={() => {

@@ -32,7 +32,6 @@ const conn = mysql
 
 const app = express();
 
-const user = new Map();
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -237,6 +236,7 @@ app.post("/api/contestants", async (req, res) => {
     const fightertable = req.body.fightertable;
     const username = req.body.username;
     console.log(fightertable);
+    console.log(username);
     if (username) {
       const [contestants] = await conn.query(
         "SELECT * FROM `contestants` WHERE FighterTable = ? AND UserName = ? AND isDelete = 0",
@@ -481,7 +481,7 @@ app.put("/api/editevent", async (req, res) => {
     const UserID = user[0].UserID;
 
     const update = await conn.query(
-      "UPDATE `event` SET `EventName`= ?,`Condition`= ?,`Time`= ?,`Amount`= ?,`Address`= ?,`CloseDate`= ?,`MoreDetail`= ? WHERE OwnerUserID = ?",
+      "UPDATE `event` SET `EventName`= ?,`Condition`= ?,`Time`= ?,`Amount`= ?,`Address`= ?,`CloseDate`= ?,`MoreDetail`= ? WHERE OwnerUserID = ? AND EventID = ?",
       [
         req.body.eventname,
         req.body.condition,
@@ -491,6 +491,7 @@ app.put("/api/editevent", async (req, res) => {
         req.body.closedate,
         req.body.moredetail,
         UserID,
+        req.body.eventID,
       ]
     );
     io.emit("refreshing", true);
@@ -722,6 +723,7 @@ app.post("/api/insertTable", async (req, res) => {
       }
     }
 
+    io.emit("matched",table);
     return res
       .status(200)
       .json({ message: "success", round: round.length + 1 });
