@@ -137,13 +137,22 @@ export const Editdetail = ({ navigation, route }) => {
 
   const closeEvent = async () => {
     try {
-      const closeE = await fetch(IP + `/api/close/${eventID}`, {
+      const contestant = await fetch(`${IP}/api/fetchcontestants/${table}`,{
+        methos:'GET'
+      })
+      const contResult = await contestant.json();
+      if(contResult.lenght > 0){
+       const closeE = await fetch(IP + `/api/close/${eventID}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
       });
-      const result = await closeE.json();
+      const result = await closeE.json(); 
+      }else{
+        Alert.alert("ปิดรับสมัครไม่สำเร็จ","เนื่องจากยังไม่มีผู้ลงสมัครแข่งขัน");
+      }
+      
       // console.log(result.message);
       if (result.message === "ปิดรับสมัครเสร็จสิ้น") {
         Alert.alert(result.message, "ท่านสามารถเริ่มการแข่งขันได้ทันที", [

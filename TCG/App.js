@@ -37,7 +37,13 @@ import {
 } from "react-native";
 import * as Linking from "expo-linking";
 import Toast from "react-native-toast-message";
-import { deleteNoti, newMatchNoti,checkContestants,playSound } from "./assets/ToastComponent";
+import {
+  deleteNoti,
+  newMatchNoti,
+  checkContestants,
+  playSound,
+  ToastComponent,
+} from "./assets/ToastComponent";
 import { Toastconfig } from "./assets/Toastconfig";
 import { Login } from "./screens/Login";
 import { Register } from "./screens/Register";
@@ -59,8 +65,8 @@ import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
 import { Resetpassword } from "./screens/Resetpassword";
 
-export const IP = "http://192.168.1.3:3000";
-export const socketContext = createContext(null);
+export const IP = "http://192.168.1.11:3000";
+export const SocketContext = createContext(null);
 
 const linking = {
   prefixes: [Linking.createURL("/")],
@@ -87,6 +93,7 @@ const Home = ({ navigation }) => {
   const [isCreateEvent, setIsCreate] = useState(false);
   const [user, setUser] = useState("");
   const [searchStyle, setSearchStyle] = useState(styles.Search);
+  const socket = useContext(SocketContext);
 
   //verify token
   const verify = async () => {
@@ -319,56 +326,41 @@ const Home = ({ navigation }) => {
   };
 
   useEffect(() => {
-    if (pMenu === styles.Menu) {
-      fetchEvent();
-    } else if (cMenu === styles.Menu) {
-      fetchCEvent();
-    } else if (myMenu === styles.Menu) {
-      fetchMyEvent();
+    if (isLoading == true) {
+      if (pMenu === styles.Menu) {
+        fetchEvent();
+      } else if (cMenu === styles.Menu) {
+        fetchCEvent();
+      } else if (myMenu === styles.Menu) {
+        fetchMyEvent();
+      }
     }
   }, [isLoading]);
 
   //refresh หน้าเมื่ออัพเดตข้อมูล
   useEffect(() => {
-    const newSocket = io(IP);
-
-    newSocket.on("connect", () => {
-      console.log("Connected to server");
-      registerUser();
-    });
-
-    const registerUser = async () => {
-      const user = await AsyncStorage.getItem("@vef");
-      if (!user) {
-        console.log("User not found");
-        return;
-      }
-    };
-
-    newSocket.on("refreshing", (refresh) => {
-      console.log("Received real-time event update:", refresh);
-      setIsloading(refresh);
-    });
-
-    newSocket.on("disconnect", () => {
-      console.log("Disconnected from server");
-    });
-
-    newSocket.on("connect_error", (err) => {
-      console.error("WebSocket connection error:", err.message);
-      console.error("Error description:", err.description); // อาจมีข้อมูลเพิ่มเติม
-      console.error("Error context:", err.context); // อาจมีข้อมูลเพิ่มเติม
-    });
-
-    newSocket.on("matched", (table) => {
-      checkContestants(navigation,table);
-      console.log("Matched");
+    if (socket) {
+      socket.on("refreshing", (refresh) => {
+        console.log("Received real-time event update:", refresh);
+        setIsloading(refresh);
       });
 
-    return () => {
-      newSocket.disconnect();
-    };
-  }, []);
+      socket.on("disconnect", () => {
+        console.log("Disconnected from server");
+      });
+
+      socket.on("connect_error", (err) => {
+        console.error("WebSocket connection error:", err.message);
+        console.error("Error description:", err.description); // อาจมีข้อมูลเพิ่มเติม
+        console.error("Error context:", err.context); // อาจมีข้อมูลเพิ่มเติม
+      });
+
+      return () => {
+        socket.off("refreshing");
+        socket.off("matched");
+      };
+    }
+  }, [socket]);
 
   useFocusEffect(
     useCallback(() => {
@@ -397,12 +389,13 @@ const Home = ({ navigation }) => {
     }, [IP])
   );
 
+  ToastComponent();
   return (
     <SafeAreaView style={styles.container}>
       {/* แท็บบนสุด */}
       <View style={styles.TopTab}>
         {/* log in */}
-        <Button title="notification" onPress={newMatchNoti} />
+        {/* <Button title="notification" onPress={deleteNoti} /> */}
         <TouchableOpacity onPress={handleProfile}>
           {isVisiblelogin ? (
             <Text style={styles.RightTab}>เข้าสู่ระบบ</Text>
@@ -579,8 +572,32 @@ const Home = ({ navigation }) => {
 };
 
 const App = () => {
-  
+  const [socket, setSocket] = useState();
+
+  useEffect(() => {
+    const newSocket = io(IP);
+    setSocket(newSocket);
+
+    newSocket.on("connect", () => {
+      console.log("Connected to server");
+      registerUser();
+    });
+
+    const registerUser = async () => {
+      const user = await AsyncStorage.getItem("@vef");
+      if (!user) {
+        console.log("User not found");
+        return;
+      }
+    };
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
+
   return (
+    <SocketContext.Provider value={socket}>
       <NavigationContainer linking={linking}>
         <Stack.Navigator initialRouteName="Home">
           <Stack.Screen
@@ -737,7 +754,7 @@ const App = () => {
           <Stack.Screen
             name="Leaderboard"
             component={Leaderboard}
-            options={{ headerTitle: "" }}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="Pairing"
@@ -770,6 +787,7 @@ const App = () => {
         </Stack.Navigator>
         <Toast config={Toastconfig} />
       </NavigationContainer>
+    </SocketContext.Provider>
   );
 };
 

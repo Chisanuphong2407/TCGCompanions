@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, ScrollView, BackHandler } from "react-native";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   NavigationContainer,
@@ -23,6 +23,7 @@ import io from "socket.io-client";
 import { DataTable } from "react-native-paper";
 import { UserPlus, X } from "react-native-feather";
 import { IP } from "../App";
+import { SocketContext } from "../App";
 
 export const eventBegin = (EventID, navigation) => {
   const statusChange = async () => {
@@ -89,6 +90,7 @@ export const contestants = ({ navigation, route }) => {
   const [isLoading, setIsloading] = useState(true);
   const [Totalpage, setTotalpage] = useState(0);
   const [isOwner, setIsowner] = useState(false);
+  const socket = useContext(SocketContext);
 
   const fetchData = async () => {
     try {
@@ -134,13 +136,13 @@ export const contestants = ({ navigation, route }) => {
   }, [isLoading]);
 
   useEffect(() => {
-    const socket = io(IP);
-
-    socket.on("fighter refreshing", (refresh) => {
-      console.log("Received real-time contestant update:", refresh);
-      setIsloading(refresh);
-    });
-  });
+    if (socket) {
+      socket.on("fighter refreshing", (refresh) => {
+        console.log("Received real-time contestant update:", refresh);
+        setIsloading(refresh);
+      });
+    }
+  }, [socket]);
 
   useEffect(() => {
     if (account == owner) {
@@ -152,6 +154,7 @@ export const contestants = ({ navigation, route }) => {
   const to = Math.min((page + 1) * itemPerPage, fighter.length);
 
   console.log(status);
+
   return (
     <SafeAreaView style={styles.container}>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
@@ -262,7 +265,7 @@ export const contestants = ({ navigation, route }) => {
           </DataTable>
         </ScrollView>
       )}
-      {status != 3 && owner == account && (
+      {status != 3 && owner == account && fighter.length > 0 &&(
         <View style={styles.manageEvent}>
           <TouchableOpacity
             onPress={() => {
@@ -375,11 +378,11 @@ export const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 20,
-    alignSelf:'center',
-    opacity:0.6
+    alignSelf: "center",
+    opacity: 0.6,
   },
   empty: {
     flex: 1,
-    justifyContent:'center',
+    justifyContent: "center",
   },
 });

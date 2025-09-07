@@ -553,10 +553,10 @@ app.post("/api/apply", async (req, res) => {
 });
 
 //สละสิทธิ์ ลบผู้เข้าแข่งขัน
-app.put("/api/waive", async (req, res) => {
+app.put("/api/waive/table/:fightertable/userID/:username", async (req, res) => {
   try {
-    const fightertable = req.body.fightertable;
-    const username = req.body.username;
+    const fightertable = req.params.fightertable;
+    const username = req.params.username;
     console.log(fightertable, username);
     const [waived] = await conn.query(
       "UPDATE `contestants` SET `isDelete`= 1 WHERE `UserName` = ? AND `FighterTable` = ?",
@@ -566,6 +566,7 @@ app.put("/api/waive", async (req, res) => {
     if (waived.affectedRows > 0) {
       console.log(waived);
       io.emit("fighter refreshing", true);
+      io.emit("Deleted",username,fightertable);
       return res.sendStatus(204);
     } else {
       return res

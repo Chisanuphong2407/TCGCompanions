@@ -174,76 +174,89 @@ export const Leaderboard = ({ navigation, route }) => {
     <View style={styles.container}>
       <Text style={styles.header}>ตารางคะแนน</Text>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
+
       <ScrollView>
-        {/*table header*/}
-        <DataTable style={styles.table}>
-          <DataTable.Header style={styles.tableHeader}>
-            {round == 5 ? (
-              <DataTable.Title style={styles.tableNo}>อันดับ</DataTable.Title>
-            ) : (
-              <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
-            )}
-            {/* {feature.map((title,index) => (
+              {/*table header*/}
+              <DataTable style={styles.table}>
+                <DataTable.Header style={styles.tableHeader}>
+                  {round == 5 ? (
+                    <DataTable.Title style={styles.tableNo}>
+                      อันดับ
+                    </DataTable.Title>
+                  ) : (
+                    <DataTable.Title style={styles.tableNo}>
+                      No.
+                    </DataTable.Title>
+                  )}
+                  {/* {feature.map((title,index) => (
               <DataTable.Title key={index} style={index == 4 ? styles.cell0 : styles.cell1}>{title.name}</DataTable.Title>
             ))} */}
-            <DataTable.Title style={styles.tableName}>
-              ผู้เข้าแข่งขัน
-            </DataTable.Title>
-            <DataTable.Title style={styles.tableNation}>เนชั่น</DataTable.Title>
-            <DataTable.Title style={styles.tableScore}><Text style={styles.scoreText}>คะแนน</Text></DataTable.Title>
-            {round == 5 && (
-              <DataTable.Title style={styles.tableSolkolf}>
-                solkolf
-              </DataTable.Title>
-            )}
-          </DataTable.Header>
-
-          {/* table rows */}
-          {leaderboard.slice(from, to).length > 0 &&
-            leaderboard.slice(from, to).map((item, index) => {
-              return (
-                <DataTable.Row
-                  key={item.FighterID}
-                  style={index % 2 == 0 ? styles.cell1 : styles.cell0}
-                >
-                  {round == 5 ? (
-                    <DataTable.Cell style={styles.tableNo}>
-                      {index + 1}
-                    </DataTable.Cell>
-                  ) : (
-                    <DataTable.Cell style={styles.tableNo}>
-                      {item.FighterID}
-                    </DataTable.Cell>
-                  )}
-
-                  <DataTable.Cell style={styles.tableName}>
-                    {item.UserName}
-                  </DataTable.Cell>
-                  <DataTable.Cell style={styles.tableNation}>
-                    {item.Nation}
-                  </DataTable.Cell>
+                  <DataTable.Title style={styles.tableName}>
+                    ผู้เข้าแข่งขัน
+                  </DataTable.Title>
+                  <DataTable.Title style={styles.tableNation}>
+                    เนชั่น
+                  </DataTable.Title>
                   {round == 5 && (
-                    <DataTable.Cell style={styles.tableScore}>
-                      <Text style={styles.scoreText}>{item.TotalScore}</Text>
-                    </DataTable.Cell>
+                    <DataTable.Title style={styles.tableSolkolf}>
+                      solkolf
+                    </DataTable.Title>
                   )}
-                  <DataTable.Cell style={styles.tableSolkolf}>
-                    {item.solkolf_score}
-                  </DataTable.Cell>
-                </DataTable.Row>
-              );
-            })}
+                  <DataTable.Title style={styles.tableScore}>
+                    <Text style={styles.scoreText}>คะแนนรวม</Text>
+                  </DataTable.Title>
+                </DataTable.Header>
 
-          <DataTable.Pagination
-            page={page}
-            numberOfPages={Totalpage}
-            onPageChange={(page) => setPage(page)}
-            label={`${page + 1} of ${Totalpage}`}
-            numberOfItemsPerPage={itemPerPage}
-            showFastPaginationControls
-          />
-        </DataTable>
+                {/* table rows */}
+                {leaderboard.slice(from, to).length > 0 &&
+                  leaderboard.slice(from, to).map((item, index) => {
+                    return (
+                      <DataTable.Row
+                        key={item.FighterID}
+                        style={index % 2 == 0 ? styles.cell1 : styles.cell0}
+                      >
+                        {round == 5 ? (
+                          <DataTable.Cell style={styles.tableNo}>
+                            {index + 1}
+                          </DataTable.Cell>
+                        ) : (
+                          <DataTable.Cell style={styles.tableNo}>
+                            {item.FighterID}
+                          </DataTable.Cell>
+                        )}
+
+                        <DataTable.Cell style={styles.tableName}>
+                          {item.UserName}
+                        </DataTable.Cell>
+                        <DataTable.Cell style={styles.tableNation}>
+                          {item.Nation}
+                        </DataTable.Cell>
+                        <DataTable.Cell style={styles.tableSolkolf}>
+                          {item.solkolf_score}
+                        </DataTable.Cell>
+                        {round == 5 && (
+                          <DataTable.Cell style={styles.tableScore}>
+                            <Text style={styles.scoreText}>
+                              {item.TotalScore}
+                            </Text>
+                          </DataTable.Cell>
+                        )}
+                      </DataTable.Row>
+                    );
+                  })}
+
+                <DataTable.Pagination
+                  page={page}
+                  numberOfPages={Totalpage}
+                  onPageChange={(page) => setPage(page)}
+                  label={`${page + 1} of ${Totalpage}`}
+                  numberOfItemsPerPage={itemPerPage}
+                  showFastPaginationControls
+                />
+              </DataTable>
+
       </ScrollView>
+
       {owner.trim() == account.trim() &&
         !isFinish &&
         (round != 5 ? (
@@ -287,7 +300,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 30,
-    marginTop: 20,
+    marginTop: 100,
     alignSelf: "center",
     fontWeight: "bold",
     color: "#176B87",
@@ -303,22 +316,21 @@ const styles = StyleSheet.create({
   },
   table: {
     flex: 1,
-    minWidth: "70%",
+    minWidth: "65%",
     maxWidth: "90%",
     borderWidth: 1,
     borderColor: "#d3d0d0",
     backgroundColor: "#f4f7fa",
     opacity: 0.8,
     borderRadius: 3,
-    overflow: "hidden",
     alignSelf: "center",
   },
   tableHeader: {
     backgroundColor: "#c9e2fa",
   },
   tableNo: {
-    minWidth: "12%",
-    maxWidth: "12%",
+    minWidth: "11%",
+    maxWidth: "10%",
     justifyContent: "center",
   },
   tableName: {
@@ -336,8 +348,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 1,
   },
   tableScore: {
-    minWidth: "10%",
-    maxWidth: "15%",
+    minWidth: "15%",
+    maxWidth: "20%",
     justifyContent: "center",
     marginHorizontal: 1,
     // backgroundColor: '#b3b2b2'
