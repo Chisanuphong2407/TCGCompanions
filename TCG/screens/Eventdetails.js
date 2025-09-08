@@ -281,6 +281,7 @@ export const Eventdetails = ({ navigation, route }) => {
                   moredetail: moredetail,
                   closedate: closedate,
                   status: statusNum,
+                  table:table
                 });
               }}
               style={styles.menubox}

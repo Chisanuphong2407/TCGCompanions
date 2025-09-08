@@ -40,6 +40,7 @@ export const Editdetail = ({ navigation, route }) => {
   const [selectText, setSelectText] = useState(route.params.closedate);
   const [sendText, setSendtext] = useState();
   const status = route.params.status;
+  const tableID = route.params.table;
 
   // console.log(isNaN(amount));
   const minDate = new Date();
@@ -110,7 +111,7 @@ export const Editdetail = ({ navigation, route }) => {
           address: address,
           closedate: sendText,
           moredetail: moredetail,
-          eventID:eventID,
+          eventID: eventID,
         }),
       });
       const result = await submitevent.json();
@@ -137,32 +138,40 @@ export const Editdetail = ({ navigation, route }) => {
 
   const closeEvent = async () => {
     try {
-      const contestant = await fetch(`${IP}/api/fetchcontestants/${table}`,{
-        methos:'GET'
-      })
-      const contResult = await contestant.json();
-      if(contResult.lenght > 0){
-       const closeE = await fetch(IP + `/api/close/${eventID}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const contestant = await fetch(`${IP}/api/fetchcontestants/${tableID}`, {
+        methos: "GET",
       });
-      const result = await closeE.json(); 
-      }else{
-        Alert.alert("ปิดรับสมัครไม่สำเร็จ","เนื่องจากยังไม่มีผู้ลงสมัครแข่งขัน");
-      }
-      
-      // console.log(result.message);
-      if (result.message === "ปิดรับสมัครเสร็จสิ้น") {
-        Alert.alert(result.message, "ท่านสามารถเริ่มการแข่งขันได้ทันที", [
-          {
-            text: "ok",
-            onPress: () => navigation.navigate("Eventdetails", eventID),
+      const contResult = await contestant.json();
+
+      console.log(contResult);
+      if (contResult.length > 0) {
+        const closeE = await fetch(IP + `/api/close`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
           },
-        ]);
+          body: JSON.stringify({
+            EventID: eventID,
+          }),
+        });
+
+        const result = await closeE.json();
+        // console.log(result.message);
+        if (result.message === "ปิดรับสมัครเสร็จสิ้น") {
+          Alert.alert(result.message, "ท่านสามารถเริ่มการแข่งขันได้ทันที", [
+            {
+              text: "ok",
+              onPress: () => navigation.navigate("Eventdetails", eventID),
+            },
+          ]);
+        } else {
+          Alert.alert(result.message, "กรุณาลองอีกครั้ง");
+        }
       } else {
-        Alert.alert(result.message, "กรุณาลองอีกครั้ง");
+        Alert.alert(
+          "ปิดรับสมัครไม่สำเร็จ",
+          "เนื่องจากยังไม่มีผู้ลงสมัครแข่งขัน"
+        );
       }
     } catch (error) {
       console.log(error);
@@ -252,7 +261,7 @@ export const Editdetail = ({ navigation, route }) => {
               <DateTimePicker
                 testID="dateTimePicker"
                 value={date}
-                mode="date" 
+                mode="date"
                 display="spinner"
                 onChange={onChange}
                 minimumDate={minDate}

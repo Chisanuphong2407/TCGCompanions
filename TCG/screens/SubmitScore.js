@@ -32,6 +32,7 @@ export const SubmitScore = ({ navigation, route }) => {
   const [Totalpage, setTotalpage] = useState(0);
   const [firstScore, setFirstscore] = useState([]);
   const [secondScore, setSecondscore] = useState([]);
+  const [byeCheck, setByecheck] = useState(false);
 
   const getSchedule = async () => {
     try {
@@ -69,7 +70,7 @@ export const SubmitScore = ({ navigation, route }) => {
         return item.Fighter1st;
       });
 
-      const fighter2nd = schedule.map((item) => {
+      let fighter2nd = schedule.map((item) => {
         return item.Fighter2nd;
       });
 
@@ -79,11 +80,20 @@ export const SubmitScore = ({ navigation, route }) => {
       const isSecondscoreValid = secondScore.every((item) =>
         scoreRegex.test(item)
       );
-      console.log(firstScore.length,fighter1st.length);
+
+      fighter2nd = fighter2nd.filter((item) => item != 0);
+      console.log(fighter2nd);
+      const isFirstBlank = firstScore.some((item) => item == "");
+      const isSecondBlank = secondScore.some((item) => item == "");
+      console.log(isFirstBlank);
+      console.log(isSecondBlank);
+      console.log("len", firstScore.length, fighter1st.length);
+      console.log("len", secondScore.length, fighter2nd.length);
+      console.log(secondScore, fighter2nd);
 
       if (
-        firstScore.length == 0 ||
-        secondScore.length == 0 ||
+       ( firstScore.length == 0 || isFirstBlank ) ||
+        (secondScore.length == 0 || isSecondBlank) ||
         fighter1st.length != firstScore.length ||
         fighter2nd.length != secondScore.length
       ) {
@@ -196,6 +206,7 @@ export const SubmitScore = ({ navigation, route }) => {
       if (item.Fighter2nd == 0) {
         const newScore = [...firstScore];
         newScore[index] = 1;
+        setByecheck(true);
         setFirstscore(newScore);
       }
     });
@@ -313,8 +324,8 @@ export const SubmitScore = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
-      {/* <Text>current 1stScore: {firstScore}</Text> */}
-      {/* <Text>current 2ndScore: {secondScore}</Text> */}
+      {/* <Text>current 1stScore: {firstScore}</Text>
+      <Text>current 2ndScore: {secondScore}</Text> */}
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitText}>บันทึก</Text>
       </TouchableOpacity>

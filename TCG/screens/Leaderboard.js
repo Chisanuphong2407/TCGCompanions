@@ -232,12 +232,12 @@ export const Leaderboard = ({ navigation, route }) => {
                           {item.Nation}
                         </DataTable.Cell>
                         <DataTable.Cell style={styles.tableSolkolf}>
-                          {item.solkolf_score}
+                        {item.TotalScore}
                         </DataTable.Cell>
                         {round == 5 && (
                           <DataTable.Cell style={styles.tableScore}>
                             <Text style={styles.scoreText}>
-                              {item.TotalScore}
+                            {item.solkolf_score}
                             </Text>
                           </DataTable.Cell>
                         )}

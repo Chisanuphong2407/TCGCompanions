@@ -56,9 +56,9 @@ export const History = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
-      <ScrollView>
-        <Text style={styles.header}>ประวัติการแข่งขัน</Text>
-        {history.length > 0 ? (
+      <Text style={styles.header}>ประวัติการแข่งขัน</Text>
+      {history.length > 0 ? (
+        <ScrollView>
           <DataTable>
             {history.map((item, index) => {
               return (
@@ -82,30 +82,72 @@ export const History = ({ route, navigation }) => {
 
                   {/* rows */}
                   <DataTable.Row key={item.Round}>
-                    <DataTable.Cell style={name == item.firstName ? styles.tableNameHeaderFocus :styles.tableNameHeader}>
-                      <Text style={(name == item.firstName ? styles.focus: null)}>{item.firstName}</Text>
+                    <DataTable.Cell
+                      style={
+                        name == item.firstName
+                          ? styles.tableNameHeaderFocus
+                          : styles.tableNameHeader
+                      }
+                    >
+                      <Text
+                        style={name == item.firstName ? styles.focus : null}
+                      >
+                        {item.firstName}
+                      </Text>
                     </DataTable.Cell>
-                    <DataTable.Cell style={name == item.firstName ? styles.tableScoreHeaderFocus :styles.tableScoreHeader}>
-                      <Text style={(name == item.firstName ? styles.focus: null)}>{item.Fighter1st_Score}</Text>
+                    <DataTable.Cell
+                      style={
+                        name == item.firstName
+                          ? styles.tableScoreHeaderFocus
+                          : styles.tableScoreHeader
+                      }
+                    >
+                      <Text
+                        style={name == item.firstName ? styles.focus : null}
+                      >
+                        {item.Fighter1st_Score}
+                      </Text>
                     </DataTable.Cell>
                     <DataTable.Cell style={styles.dat}> - </DataTable.Cell>
-                    <DataTable.Cell style={name == item.secondName ? styles.tableScoreHeaderFocus :styles.tableScoreHeader}>
-                      <Text style={(name == item.secondName ? styles.focus: null)}>{item.Fighter2nd_Score}</Text>
+                    <DataTable.Cell
+                      style={
+                        name == item.secondName
+                          ? styles.tableScoreHeaderFocus
+                          : styles.tableScoreHeader
+                      }
+                    >
+                      <Text
+                        style={name == item.secondName ? styles.focus : null}
+                      >
+                        {item.Fighter2nd_Score}
+                      </Text>
                     </DataTable.Cell>
-                    <DataTable.Cell style={name == item.secondName ? styles.tableNameHeaderFocus :styles.tableNameHeader}>
-                      <Text style={(name == item.secondName ? styles.focus: null)}>{item.secondName}</Text>
+                    <DataTable.Cell
+                      style={
+                        name == item.secondName
+                          ? styles.tableNameHeaderFocus
+                          : styles.tableNameHeader
+                      }
+                    >
+                      <Text
+                        style={name == item.secondName ? styles.focus : null}
+                      >
+                        {item.secondName}
+                      </Text>
                     </DataTable.Cell>
                   </DataTable.Row>
                 </View>
               );
             })}
           </DataTable>
-        ) : (
-          <Text style={styles.noContent}>
+        </ScrollView>
+      ) : (
+        <View style={styles.noContent}>
+          <Text style={styles.noContentText}>
             ยังไม่มีประวัติการแข่งขันในขณะนี้
           </Text>
-        )}
-      </ScrollView>
+        </View>
+      )}
     </View>
   );
 };
@@ -122,7 +164,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontWeight: "bold",
     color: "#176B87",
-    marginBottom: 20,
   },
   bgIMG: {
     position: "absolute",
@@ -151,8 +192,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     // marginHorizontal: 2,
     minWidth: "20%",
-    backgroundColor:"#ddd",
-    opacity:0.8
+    backgroundColor: "#ddd",
+    opacity: 0.8,
   },
   tableScoreHeader: {
     justifyContent: "center",
@@ -163,25 +204,29 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     // marginHorizontal: 2,
     minWidth: "10%",
-    fontWeight: 'bold',
-    backgroundColor: '#ddd',
-    opacity:0.8
+    fontWeight: "bold",
+    backgroundColor: "#ddd",
+    opacity: 0.8,
   },
   dat: {
     justifyContent: "center",
     fontWeight: "bold",
   },
   noContent: {
-    flex: 3,
-    fontSize: 16,
-    opacity: 0.5,
-    textAlign: "center",
+    flex: 1,
+    justifyContent: "center",
+    // borderWidth: 1,
+  },
+  noContentText: {
+    fontSize: 20,
+    alignSelf: "center",
+    opacity: 0.6,
   },
   focus: {
-    fontWeight: 'bold'
+    fontWeight: "bold",
   },
   Round: {
     fontSize: 18,
-    fontWeight:'bold'
-  }
+    fontWeight: "bold",
+  },
 });
