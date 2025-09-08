@@ -40,7 +40,7 @@ export const CreateEvent = ({ navigation }) => {
 
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 1);
-  // date.setDate(minDate.getDate());
+  date.setDate(minDate.getDate());
   //onchange handle
   const onChange = (event, selectDate) => {
     console.log("re rendered");

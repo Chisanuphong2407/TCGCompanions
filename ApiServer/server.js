@@ -204,7 +204,7 @@ app.get("/api/fetchmyevent/:contestant", async (req, res) => {
     );
 
     const [result] = await conn.query(
-      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants',EVENT.Status FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fightertable INNER JOIN  user ON user.UserID = event.OwnerUserID WHERE contestants.UserID = ? AND EVENT.isDelete = 0",
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants',EVENT.Status FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fightertable INNER JOIN  user ON user.UserID = event.OwnerUserID WHERE contestants.UserID = ? AND EVENT.isDelete = 0 GROUP BY EVENT.EventID",
       [ID[0].UserID]
     );
     console.log(result);
@@ -262,7 +262,7 @@ app.get("/api/search/:name", async (req, res) => {
     const name = req.params.name;
     console.log(name);
     const [result] = await conn.query(
-      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE event.EventName LIKE ? OR user.UserName LIKE ?",
+      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName ,event.Status FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE (event.EventName LIKE ? OR user.UserName LIKE ?) AND isDelete = 0",
       [`%${name}%`, `%${name}%`]
     );
 
@@ -285,7 +285,7 @@ app.get("/api/Mysearch/:name/:contestant", async (req, res) => {
     );
 
     const [result] = await conn.query(
-      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fightertable INNER JOIN  user ON user.UserID = event.OwnerUserID WHERE contestants.UserID = ? AND (event.EventName LIKE ? OR user.UserName LIKE ?)",
+      "SELECT EVENT.EventID,EVENT.EventName,EVENT.Address,user.UserName,EVENT.Status ,contestants.UserName AS 'contestants' FROM `event`INNER JOIN contestants ON contestants.FighterTable = event.Fightertable INNER JOIN  user ON user.UserID = event.OwnerUserID WHERE contestants.UserID = ? AND (event.EventName LIKE ? OR user.UserName LIKE ?) AND isDelete = 0",
       [ID[0].UserID, `%${name}%`, `%${name}%`]
     );
 
@@ -553,18 +553,19 @@ app.post("/api/apply", async (req, res) => {
 });
 
 //สละสิทธิ์ ลบผู้เข้าแข่งขัน
-app.put("/api/waive/table/:fightertable/userID/:username", async (req, res) => {
+app.put("/api/waive", async (req, res) => {
   try {
-    const fightertable = req.params.fightertable;
-    const username = req.params.username;
+    const fightertable = req.body.fightertable;
+    const username = req.body.username;
     console.log(fightertable, username);
     const [waived] = await conn.query(
       "UPDATE `contestants` SET `isDelete`= 1 WHERE `UserName` = ? AND `FighterTable` = ?",
       [username, fightertable]
     );
 
+    console.log("waived",waived.affectedRows);
     if (waived.affectedRows > 0) {
-      console.log(waived);
+      console.log("waived");
       io.emit("fighter refreshing", true);
       io.emit("Deleted",username,fightertable);
       return res.sendStatus(204);

@@ -149,11 +149,15 @@ export const Eventdetails = ({ navigation, route }) => {
 
   const waive = async () => {
     try {
-      await fetch(`${IP}/api/waive/table/${table}/userID/${account}`, {
-        method: "DELETE",
+      await fetch(`${IP}/api/waive`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          fightertable: table,
+          username:account
+        })
       });
 
       Alert.alert(
@@ -387,7 +391,11 @@ export const Eventdetails = ({ navigation, route }) => {
       </View>
       <View style={styles.head}>
         <Text style={styles.header}>รายละเอียดอื่นๆ:</Text>
-        <Text style={styles.content}>{moredetail}</Text>
+        {moredetail ? (
+          <Text style={styles.content}>{moredetail}</Text>
+        ) : (
+          <Text style={styles.content}> - </Text>
+        )}
       </View>
       {(status === "ปิดรับสมัคร" || status === "กำลังแข่งขัน") && isOwner && (
         <View style={styles.eventBegin}>
@@ -404,7 +412,7 @@ export const Eventdetails = ({ navigation, route }) => {
           </Pressable>
         </View>
       )}
-      {status === "เปิดรับสมัคร" &&
+      {status === "เปิดรับสมัคร" ?  (
         account !== null &&
         !isOwner &&
         !isContestant && (
@@ -423,8 +431,10 @@ export const Eventdetails = ({ navigation, route }) => {
               <Text style={styles.applyText}>สมัคร</Text>
             </TouchableOpacity>
           </View>
-        )}
-      {isContestant && (statusNum == 0 || statusNum == 1) && (
+        )):
+        <View></View>
+        }
+     {isContestant && (statusNum == 0 || statusNum == 1) && (
         <View style={styles.waive}>
           <TouchableOpacity
             onPress={() => {
@@ -452,6 +462,7 @@ export const Eventdetails = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
       )}
+      
     </ScrollView>
   );
 };

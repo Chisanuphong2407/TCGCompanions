@@ -153,8 +153,6 @@ export const contestants = ({ navigation, route }) => {
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, fighter.length);
 
-  console.log(status);
-
   return (
     <SafeAreaView style={styles.container}>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />

@@ -66,11 +66,15 @@ export const ContestantDetail = ({ navigation, route }) => {
   const handleDelete = async () => {
     try {
       console.log("del");
-      const del = await fetch(`${IP}/api/waive/table/${table}/userID/${name}`, {
+      const del = await fetch(`${IP}/api/waive`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          fightertable: table,
+          username: name
+        })
       });
       if (del.ok) {
         Alert.alert("ลบสำเร็จ");
