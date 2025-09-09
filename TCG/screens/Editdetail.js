@@ -185,7 +185,9 @@ export const Editdetail = ({ navigation, route }) => {
         <View style={{ margin: 20, marginTop: 0 }}>
           <Text style={styles.header}>แก้ไขกิจกรรม</Text>
           <View>
-            <Text style={styles.topic}>ชื่อกิจกรรม :</Text>
+            <Text style={styles.topic}>
+              <Text style={styles.mustHave}>* </Text>ชื่อกิจกรรม :
+            </Text>
             <TextInput
               style={styles.inputBox}
               placeholder="ตั้งชื่อกิจกรรมของท่าน"
@@ -194,7 +196,9 @@ export const Editdetail = ({ navigation, route }) => {
             />
           </View>
           <View>
-            <Text style={styles.topic}>เงื่อนไขการแข่งขัน :</Text>
+            <Text style={styles.topic}>
+              <Text style={styles.mustHave}>* </Text>เงื่อนไขการแข่งขัน :
+            </Text>
             <TextInput
               style={styles.inputBox}
               placeholder="เช่น แข่งเดี่ยว เป็นต้น"
@@ -208,7 +212,8 @@ export const Editdetail = ({ navigation, route }) => {
           </View>
           <View>
             <Text style={styles.topic}>
-              เวลาในการแข่งขันแต่ละรอบ{" (นาที)"} :
+              <Text style={styles.mustHave}>* </Text>เวลาในการแข่งขันแต่ละรอบ
+              {" (นาที)"} :
             </Text>
             <TextInput
               style={styles.inputBoxTime}
@@ -219,7 +224,10 @@ export const Editdetail = ({ navigation, route }) => {
             />
           </View>
           <View>
-            <Text style={styles.topic}>จำนวนที่เปิดรับ{" (คน,ทีม)"} :</Text>
+            <Text style={styles.topic}>
+              <Text style={styles.mustHave}>* </Text>จำนวนที่เปิดรับ{" (คน,ทีม)"}{" "}
+              :
+            </Text>
             <TextInput
               style={styles.inputBox}
               placeholder="จำนวนที่เปิดรับ"
@@ -229,7 +237,9 @@ export const Editdetail = ({ navigation, route }) => {
             />
           </View>
           <View>
-            <Text style={styles.topic}>สถานที่จัด :</Text>
+            <Text style={styles.topic}>
+              <Text style={styles.mustHave}>* </Text>สถานที่จัด :
+            </Text>
             <TextInput
               style={styles.inputBox}
               placeholder="สถานที่จัดกิจกรรมของท่าน"
@@ -248,7 +258,9 @@ export const Editdetail = ({ navigation, route }) => {
             />
           </View>
           <View>
-            <Text style={styles.topic}>วันปิดรับสมัคร :</Text>
+            <Text style={styles.topic}>
+              <Text style={styles.mustHave}>* </Text>วันปิดรับสมัคร :
+            </Text>
             <TouchableOpacity onPress={showDatepick}>
               <TextInput
                 style={styles.inputBox}
@@ -392,5 +404,9 @@ const styles = StyleSheet.create({
     padding: 15,
     margin: 20,
     fontSize: 16,
+  },
+  mustHave: {
+    color: "red",
+    fontWeight:'300'
   },
 });

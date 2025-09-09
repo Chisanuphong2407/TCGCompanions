@@ -83,8 +83,9 @@ export const SubmitScore = ({ navigation, route }) => {
 
       fighter2nd = fighter2nd.filter((item) => item != 0);
       console.log(fighter2nd);
-      const isFirstBlank = firstScore.some((item) => item == "");
-      const isSecondBlank = secondScore.some((item) => item == "");
+      
+      const isFirstBlank = firstScore.some((item) => item === "");
+      const isSecondBlank = secondScore.some((item) => item === "" || item === undefined);
       console.log(isFirstBlank);
       console.log(isSecondBlank);
       console.log("len", firstScore.length, fighter1st.length);

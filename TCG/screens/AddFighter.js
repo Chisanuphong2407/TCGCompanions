@@ -119,21 +119,21 @@ export const AddFighter = ({ navigation, route }) => {
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
       <View>
         <Text style={styles.header}>{Eventname}</Text>
-        <Text style={styles.topic}>ชื่อผู้เข้าแข่งขัน:</Text>
+        <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>ชื่อผู้เข้าแข่งขัน:</Text>
         <TextInput
           placeholder="กรอกข้อมูลของท่าน"
           value={name}
           onChangeText={setName}
           style={styles.input}
         />
-        <Text style={styles.topic}>โทรศัพท์:</Text>
+        <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>โทรศัพท์:</Text>
         <TextInput
           placeholder="กรอกข้อมูลของท่าน"
           value={phone}
           onChangeText={setPhone}
           style={styles.input}
         />
-        <Text style={styles.topic}>เนชั่นที่ใช้ในการแข่งขัน:</Text>
+        <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>เนชั่นที่ใช้ในการแข่งขัน:</Text>
         <RadioButton.Group
           onValueChange={handleRadiobutton}
           value={selectNation}
@@ -182,7 +182,7 @@ export const AddFighter = ({ navigation, route }) => {
           </TouchableOpacity>
         </RadioButton.Group>
         <View>
-          <Text style={styles.topic}>สายที่ใช้ในการแข่งขัน</Text>
+          <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>สายที่ใช้ในการแข่งขัน</Text>
           <TextInput
             placeholder="กรอกข้อมูลของท่าน"
             value={architype}
@@ -247,4 +247,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     minWidth: 100,
   },
+  mustHave: {
+    color:'red',
+    fontWeight:'300'
+  }
 });
