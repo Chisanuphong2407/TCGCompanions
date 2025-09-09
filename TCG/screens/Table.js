@@ -29,7 +29,7 @@ export const Table = ({ route, navigation }) => {
   const [fighterLength, setFighterlength] = useState(0);
   const [round, setRound] = useState(0);
   const [Totalpage, setTotalpage] = useState(0);
-  const itemPerPage = 10;
+  const itemPerPage = 8;
   const [page, setPage] = useState(0);
   const fighter1st = [];
   const fighter2nd = [];
@@ -74,6 +74,7 @@ export const Table = ({ route, navigation }) => {
 
     const result = await getRound.json();
     console.log("get round", result);
+
     if (result == 0) {
       await fetch(`${IP}/api/createLeaderboard/${tableID}`);
 
@@ -103,23 +104,17 @@ export const Table = ({ route, navigation }) => {
       });
 
       const board = await fetchboard.json();
-      console.log(board);
-      board.sort((a, b) => {
+      const boardSort = board.sort((a, b) => {
         if (a.TotalScore > b.TotalScore) {
           return -1;
         } else if (a.TotalScore > b.TotalScore) {
-          return 1;
-        } else if (a.solkolf_score > b.solkolf_score) {
-          return -1;
-        } else if (a.solkolf_score < b.solkolf_score) {
           return 1;
         }
 
         return 0;
       });
-
-      setFighter(board);
-
+      console.log("sort",boardSort)
+      setFighter(boardSort);
       if (fighter.length >= 12) {
         //match แบบไม่ซ้ำคู่
         let i = 1;
@@ -127,8 +122,8 @@ export const Table = ({ route, navigation }) => {
           console.log(i);
           console.warn("Fighter", fighter.length);
           if (fighter.length < 2) {
-           fighter1st.push(fighter[0].FighterID);
-           fighter2nd.push(0);
+            fighter1st.push(fighter[0].FighterID);
+            fighter2nd.push(0);
             break;
           }
 
@@ -158,7 +153,9 @@ export const Table = ({ route, navigation }) => {
             );
           });
 
-          console.log(hasFight);
+          console.log("fight",hasFight);
+                      console.log("current",currentFighter.FighterID)
+            console.log("next",nextFighter.FighterID)
           if (hasFight) {
             i++;
             continue;
@@ -168,7 +165,7 @@ export const Table = ({ route, navigation }) => {
             fighter.splice(0, 1);
             fighter.splice(i - 1, 1);
             i = 1;
-            console.log(fighter);
+            // console.log("All",fighter);
           }
         }
         console.log(fighter1st);
@@ -192,27 +189,27 @@ export const Table = ({ route, navigation }) => {
       console.log("match finish");
     }
 
-      const insert = await fetch(`${IP}/api/insertTable`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          Fightertable: tableID,
-          fighter1st: fighter1st,
-          fighter2nd: fighter2nd,
-        }),
-      });
+    // const insert = await fetch(`${IP}/api/insertTable`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     Fightertable: tableID,
+    //     fighter1st: fighter1st,
+    //     fighter2nd: fighter2nd,
+    //   }),
+    // });
 
-      const res = await insert.json();
-      if (res.message == "failed") {
-        Alert.alert("เกิดข้อผิดพลาด", "กรุณาลองใหม่อีกครั้ง");
-      } else {
-        Alert.alert("สร้างตารางสำเร็จ");
-        console.log("1stround", res.round);
-        const thisRound = res.round;
-        setRound(thisRound);
-      }
+    // const res = await insert.json();
+    // if (res.message == "failed") {
+    //   Alert.alert("เกิดข้อผิดพลาด", "กรุณาลองใหม่อีกครั้ง");
+    // } else {
+    //   Alert.alert("สร้างตารางสำเร็จ");
+    //   console.log("1stround", res.round);
+    //   const thisRound = res.round;
+    //   setRound(thisRound);
+    // }
   };
 
   const getSchedule = async () => {
@@ -236,23 +233,19 @@ export const Table = ({ route, navigation }) => {
   useEffect(() => {
     if (fighterLength == 0) {
       fetchAllFighter();
-    } else {
+    } else if (!isLoading == true) {
       match();
     }
+    console.log(isLoading);
+    console.log(fighterLength);
   }, [isLoading, fighterLength]);
 
   useEffect(() => {
-    if (round !== null) {
+    if (round !== 0) {
       console.log("round (updated in useEffect):", round);
       getSchedule();
     }
   }, [round]);
-
-  useEffect(() => {
-    if (schedule !== null) {
-      console.log("schedule :", schedule);
-    }
-  }, [schedule]);
 
   useFocusEffect(
     useCallback(() => {

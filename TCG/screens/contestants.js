@@ -263,7 +263,7 @@ export const contestants = ({ navigation, route }) => {
           </DataTable>
         </ScrollView>
       )}
-      {status != 3 && owner == account && fighter.length > 0 &&(
+      {status != 3 && owner == account && fighter.length > 3 &&(
         <View style={styles.manageEvent}>
           <TouchableOpacity
             onPress={() => {

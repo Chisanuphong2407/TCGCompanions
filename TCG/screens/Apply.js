@@ -91,15 +91,13 @@ export const Apply = ({ navigation, route }) => {
     const res = await result.json();
 
     if (res.message === "สมัครสำเร็จ") {
+      navigation.navigate("Eventdetails", EventID);
       Alert.alert(
         "สมัครสำเร็จ",
         "ท่านสามารถตรวจสอบตารางการแข่งขันได้ที่ กิจกรรมของฉัน > กิจกรรมที่ท่านสมัคร > ตารางการแข่งขัน",
         [
           {
             text: "ตกลง",
-            onPress: () => {
-              navigation.navigate("Eventdetails", EventID);
-            },
           },
         ]
       );

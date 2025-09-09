@@ -45,6 +45,7 @@ export const Eventdetails = ({ navigation, route }) => {
   const [moredetail, setMoredetail] = useState();
   const [closedate, setClosedate] = useState();
   const [table, setTable] = useState();
+  const [contestants, setContestants] = useState([]);
 
   const [isContestant, setIscontestant] = useState(false);
 
@@ -118,6 +119,26 @@ export const Eventdetails = ({ navigation, route }) => {
     }
   };
 
+  const fetchContestants = async() => {
+    try {
+      const fetchConts = await fetch(`${IP}/api/fetchcontestants/${table}`,{
+        method:"GET",
+      });
+
+      const Allcontestants = await fetchConts.json();
+      console.log(Allcontestants)
+      setContestants(Allcontestants);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("เกิดข้อผิดพลาด","โปรดลองอีกครั้ง",[
+        {
+          text:"ตกลง",
+          onPress: () => setIsloading(true)
+        }
+      ])
+    }
+  }
+
   const availableMenu = async () => {
     try {
       if (owner === account) {
@@ -156,8 +177,8 @@ export const Eventdetails = ({ navigation, route }) => {
         },
         body: JSON.stringify({
           fightertable: table,
-          username:account
-        })
+          username: account,
+        }),
       });
 
       Alert.alert(
@@ -199,17 +220,18 @@ export const Eventdetails = ({ navigation, route }) => {
 
   useEffect(() => {
     fetchDetail();
-
+    
     const socket = io(IP);
-
+    
     socket.on("refreshing", (refresh) => {
       console.log("Received real-time event update:", refresh);
       setIsloading(refresh);
     });
   }, [isLoading]);
-
+  
   useEffect(() => {
     contestantCheck();
+    fetchContestants();
   }, [table]);
 
   useEffect(() => {
@@ -281,7 +303,7 @@ export const Eventdetails = ({ navigation, route }) => {
                   moredetail: moredetail,
                   closedate: closedate,
                   status: statusNum,
-                  table:table
+                  table: table,
                 });
               }}
               style={styles.menubox}
@@ -398,7 +420,7 @@ export const Eventdetails = ({ navigation, route }) => {
           <Text style={styles.content}> - </Text>
         )}
       </View>
-      {(status === "ปิดรับสมัคร" || status === "กำลังแข่งขัน") && isOwner && (
+      {(status === "ปิดรับสมัคร" || status === "กำลังแข่งขัน") && isOwner && contestants.length > 4 && (
         <View style={styles.eventBegin}>
           <Pressable
             onPress={() => {
@@ -413,7 +435,7 @@ export const Eventdetails = ({ navigation, route }) => {
           </Pressable>
         </View>
       )}
-      {status === "เปิดรับสมัคร" ?  (
+      {status === "เปิดรับสมัคร" ? (
         account !== null &&
         !isOwner &&
         !isContestant && (
@@ -432,10 +454,11 @@ export const Eventdetails = ({ navigation, route }) => {
               <Text style={styles.applyText}>สมัคร</Text>
             </TouchableOpacity>
           </View>
-        )):
+        )
+      ) : (
         <View></View>
-        }
-     {isContestant && (statusNum == 0 || statusNum == 1) && (
+      )}
+      {isContestant && (statusNum == 0 || statusNum == 1) && (
         <View style={styles.waive}>
           <TouchableOpacity
             onPress={() => {
@@ -463,7 +486,6 @@ export const Eventdetails = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
       )}
-      
     </ScrollView>
   );
 };

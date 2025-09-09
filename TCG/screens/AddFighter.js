@@ -96,15 +96,13 @@ export const AddFighter = ({ navigation, route }) => {
     const res = await result.json();
 
     if (res.message === "สมัครสำเร็จ") {
+      navigation.navigate("contestants", { table,eventName:Eventname, owner ,EventID,statusNum:status});
       Alert.alert(
         "เพิ่มสำเร็จ",
         "ท่านสามารถตรวจสอบรายชื่อผู้เข้าแข่งขันได้ที่ กิจกรรมที่ฉันสร้าง > กิจกรรมที่ท่านสร้าง",
         [
           {
             text: "ตกลง",
-            onPress: () => {
-              navigation.navigate("contestants", { table,eventName:Eventname, owner ,EventID,statusNum:status});
-            },
           },
         ]
       );

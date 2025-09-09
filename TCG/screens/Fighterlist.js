@@ -24,7 +24,7 @@ export const Fighterlist = ({ route, navigation }) => {
   const EventID = route.params.EventID
   const [fighter, setFighter] = useState([]);
   const [Totalpage, setTotalpage] = useState(0);
-  const itemPerPage = 10;
+  const itemPerPage = 8;
   const [page, setPage] = useState(0);
   const [isLoading,setIsloading] = useState(true);
 

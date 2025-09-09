@@ -814,8 +814,8 @@ app.put("/api/updateLeaderboard", async (req, res) => {
     console.log("update");
     console.log("round", round);
     const [leaderboardfetch] = await conn.query(
-      "SELECT leaderboard.Fightertable,CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd END AS MatchedFighter, CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st_Score WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd_Score END AS MatchScore, leaderboard.TotalScore, leaderboard.solkolf_score FROM leaderboard JOIN match_participants ON leaderboard.FighterID = match_participants.Fighter1st OR leaderboard.FighterID = match_participants.Fighter2nd WHERE match_participants.fightertable = ? AND Round = ? GROUP BY FighterID",
-      [tableID, round]
+      "SELECT leaderboard.Fightertable,CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd END AS MatchedFighter, CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st_Score WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd_Score END AS MatchScore, leaderboard.TotalScore, leaderboard.solkolf_score FROM leaderboard JOIN match_participants ON leaderboard.FighterID = match_participants.Fighter1st OR leaderboard.FighterID = match_participants.Fighter2nd WHERE match_participants.fightertable = ? AND leaderboard.Fightertable = ? AND Round = ? GROUP BY FighterID",
+      [tableID,tableID, round]
     );
 
     // console.log(leaderboardfetch);
@@ -829,8 +829,8 @@ app.put("/api/updateLeaderboard", async (req, res) => {
       console.log("Fighter", leaderboardfetch[index].MatchedFighter);
 
       await conn.query(
-        "UPDATE `leaderboard` SET `TotalScore`= ? WHERE FighterID = ?",
-        [NewTotalScore, leaderboardfetch[index].MatchedFighter]
+        "UPDATE `leaderboard` SET `TotalScore`= ? WHERE FighterID = ? AND Fightertable = ?",
+        [NewTotalScore, leaderboardfetch[index].MatchedFighter,tableID]
       );
     }
 
@@ -845,7 +845,7 @@ app.get("/api/getLeaderboard/:tableID", async (req, res) => {
   const tableID = req.params.tableID;
   try {
     const [leaderboard] = await conn.query(
-      "SELECT `LeaderboardID`, leaderboard.`Fightertable`, leaderboard.`FighterID`,contName.UserName,contName.Nation, `TotalScore`, `solkolf_score` FROM `leaderboard` JOIN contestants ON contestants.FighterTable = leaderboard.Fightertable JOIN contestants AS contName ON contName.FighterID = leaderboard.FighterID WHERE leaderboard.`Fightertable` = ? GROUP BY LeaderboardID",
+      "SELECT `LeaderboardID`, leaderboard.`Fightertable`, leaderboard.`FighterID`,contestants.UserName,contestants.Nation, `TotalScore`, `solkolf_score` FROM `leaderboard` JOIN contestants ON contestants.FighterTable = leaderboard.Fightertable AND contestants.FighterID = leaderboard.FighterID WHERE leaderboard.`Fightertable` = ? GROUP BY leaderboard.FighterID",
       [tableID]
     );
 
