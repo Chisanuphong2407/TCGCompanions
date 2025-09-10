@@ -104,81 +104,109 @@ export const Table = ({ route, navigation }) => {
       });
 
       const board = await fetchboard.json();
-      const boardSort = board.sort((a, b) => {
-        if (a.TotalScore > b.TotalScore) {
-          return -1;
-        } else if (a.TotalScore > b.TotalScore) {
-          return 1;
-        }
 
-        return 0;
+      const sortFighter = [...board].sort((a, b) => {
+        if (a.TotalScore != b.TotalScore) {
+          return b.TotalScore - a.TotalScore;
+        }
+        return Math.random() - 0.5;
       });
-      console.log("sort",boardSort)
-      setFighter(boardSort);
+
+      console.log("fighter", sortFighter);
+
       if (fighter.length >= 12) {
         //match แบบไม่ซ้ำคู่
-        let i = 1;
-        while (fighter.length > 0) {
-          console.log(i);
-          console.warn("Fighter", fighter.length);
-          if (fighter.length < 2) {
-            fighter1st.push(fighter[0].FighterID);
-            fighter2nd.push(0);
-            break;
+        try {
+          let i = 1;
+          while (sortFighter.length > 0) {
+            console.log(i);
+            console.warn("Fighter", sortFighter.length);
+            if (fighter.length < 2) {
+              fighter1st.push(fighter[0].FighterID);
+              fighter2nd.push(0);
+              break;
+            }
+
+            const currentFighter = sortFighter[0];
+            const nextFighter = sortFighter[i];
+
+            const fetchHistory = await fetch(`${IP}/api/getHistory`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                account: currentFighter.UserName,
+                tableID: tableID,
+              }),
+            });
+
+            const history = await fetchHistory.json();
+            console.log(history);
+
+            const hasFight = history.some((history) => {
+              return (
+                (history.firstName == currentFighter.UserName &&
+                  history.secondName == nextFighter.UserName) ||
+                (history.firstName == nextFighter.UserName &&
+                  history.secondName == currentFighter.UserName)
+              );
+            });
+
+            console.log("fight", hasFight);
+            console.log("current", currentFighter.FighterID);
+            console.log("next", nextFighter.FighterID);
+            if (hasFight && sortFighter.length != 2) {
+              i++;
+              continue;
+            } else if (hasFight && sortFighter.length == 2) {
+              const prevFighter1st = fighter1st.pop();
+              const prevFighter2nd = fighter2nd.pop();
+              const lastRandom = [
+                prevFighter1st,
+                prevFighter2nd,
+                currentFighter.FighterID,
+                nextFighter.FighterID,
+              ];
+
+              let j = 4;
+              while (lastRandom.length > 0) {
+                const matchResult = [];
+                const random1 = Math.floor(Math.random() * j) + 1;
+                matchResult.push(lastRandom[random1]);
+                j = j - 1;
+                const random2 = Math.floor(Math.random() * j) + 1;
+                matchResult.push(lastRandom[random2]);
+                j = j - 1;
+
+                fighter2nd.push(matchResult.pop());
+                fighter1st.push(matchResult.pop());
+              }
+              sortFighter.splice(0, 1);
+              sortFighter.splice(i - 1, 1);
+            } else {
+              fighter1st.push(currentFighter.FighterID);
+              fighter2nd.push(nextFighter.FighterID);
+              sortFighter.splice(0, 1);
+              sortFighter.splice(i - 1, 1);
+              i = 1;
+              console.log("All", fighter);
+            }
           }
-
-          const currentFighter = fighter[0];
-          const nextFighter = fighter[i];
-
-          const fetchHistory = await fetch(`${IP}/api/getHistory`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              account: currentFighter.UserName,
-              tableID: tableID,
-            }),
-          });
-
-          const history = await fetchHistory.json();
-          console.log(history);
-
-          const hasFight = history.some((history) => {
-            return (
-              (history.firstName == currentFighter.UserName &&
-                history.secondName == nextFighter.UserName) ||
-              (history.firstName == nextFighter.UserName &&
-                history.secondName == currentFighter.UserName)
-            );
-          });
-
-          console.log("fight",hasFight);
-                      console.log("current",currentFighter.FighterID)
-            console.log("next",nextFighter.FighterID)
-          if (hasFight) {
-            i++;
-            continue;
-          } else {
-            fighter1st.push(currentFighter.FighterID);
-            fighter2nd.push(nextFighter.FighterID);
-            fighter.splice(0, 1);
-            fighter.splice(i - 1, 1);
-            i = 1;
-            // console.log("All",fighter);
-          }
+          console.log(fighter1st);
+          console.log(fighter2nd);
+        } catch (error) {
+          console.warn(error);
         }
-        console.log(fighter1st);
-        console.log(fighter2nd);
       } else {
         //จับแบบซ้ำคู่ได้
         for (let index = 0; index < fighterLength; index++) {
           console.warn("Round:", index);
-          console.log("ID", board[index].FighterID);
+          console.log("ID", sortFighter[index].FighterID);
           if (index % 2 == 0) {
-            fighter1st.push(board[index].FighterID);
+            fighter1st.push(sortFighter[index].FighterID);
           } else {
-            fighter2nd.push(board[index].FighterID);
+            fighter2nd.push(sortFighter[index].FighterID);
           }
         }
         if (fighter1st.length > fighter2nd.length) {
@@ -189,27 +217,27 @@ export const Table = ({ route, navigation }) => {
       console.log("match finish");
     }
 
-    // const insert = await fetch(`${IP}/api/insertTable`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     Fightertable: tableID,
-    //     fighter1st: fighter1st,
-    //     fighter2nd: fighter2nd,
-    //   }),
-    // });
+    const insert = await fetch(`${IP}/api/insertTable`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        Fightertable: tableID,
+        fighter1st: fighter1st,
+        fighter2nd: fighter2nd,
+      }),
+    });
 
-    // const res = await insert.json();
-    // if (res.message == "failed") {
-    //   Alert.alert("เกิดข้อผิดพลาด", "กรุณาลองใหม่อีกครั้ง");
-    // } else {
-    //   Alert.alert("สร้างตารางสำเร็จ");
-    //   console.log("1stround", res.round);
-    //   const thisRound = res.round;
-    //   setRound(thisRound);
-    // }
+    const res = await insert.json();
+    if (res.message == "failed") {
+      Alert.alert("เกิดข้อผิดพลาด", "กรุณาลองใหม่อีกครั้ง");
+    } else {
+      Alert.alert("สร้างตารางสำเร็จ");
+      console.log("1stround", res.round);
+      const thisRound = res.round;
+      setRound(thisRound);
+    }
   };
 
   const getSchedule = async () => {
@@ -318,7 +346,7 @@ export const Table = ({ route, navigation }) => {
                     {item.Fighter1st}
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableVS}>
-                    <Text style={styles.fontVS}>{index + 1}</Text>
+                    <Text style={styles.fontVS}>{index + 1 +(page*itemPerPage)}</Text>
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNo}>
                     {item.Fighter2nd == 0 && <Text></Text>}

@@ -157,7 +157,7 @@ export const Leaderboard = ({ navigation, route }) => {
             <Text style={styles.nextText}>สร้างตารางรอบถัดไป</Text>
           </TouchableOpacity>
         );
-      } else if(round < 5 ){
+      } else if(round == 5 ){
         buttonComponent = (
           <TouchableOpacity
             style={styles.nextButton}
@@ -254,7 +254,7 @@ export const Leaderboard = ({ navigation, route }) => {
                 >
                   {round == 5 ? (
                     <DataTable.Cell style={styles.tableNo}>
-                      {index + 1}
+                      {index + 1 + (page*itemPerPage)}
                     </DataTable.Cell>
                   ) : (
                     <DataTable.Cell style={styles.tableNo}>
