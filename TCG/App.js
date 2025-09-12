@@ -65,7 +65,7 @@ import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
 import { Resetpassword } from "./screens/Resetpassword";
 
-export const IP = "http://192.168.1.6:3000";
+export const IP = "http://10.222.16.199:3000";
 export const SocketContext = createContext(null);
 
 const linking = {

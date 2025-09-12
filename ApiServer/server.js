@@ -969,7 +969,7 @@ app.post("/api/fotgetPassword", async (req, res) => {
       const token = jwt.sign({ email: email }, process.env.secrKey, {
         expiresIn: "5m",
       });
-      const resetUrl = `http://10.73.195.199:3001/reset-password?token=${token}`;
+      const resetUrl = `http://10.222.16.199:3001/reset-password?token=${token}`;
 
       const mailOptions = {
         to: email,
