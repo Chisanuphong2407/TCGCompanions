@@ -109,7 +109,15 @@ export const Table = ({ route, navigation }) => {
         if (a.TotalScore != b.TotalScore) {
           return b.TotalScore - a.TotalScore;
         }
-        return Math.random() - 0.5;
+
+        for (let i = 0; i != 3; i++) {
+          let random = Math.random() - 0.5;
+
+          if (i == 2) {
+            return (randomSwitch = random);
+          }
+          
+        }
       });
 
       console.log("fighter", sortFighter);
@@ -346,7 +354,9 @@ export const Table = ({ route, navigation }) => {
                     {item.Fighter1st}
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableVS}>
-                    <Text style={styles.fontVS}>{index + 1 +(page*itemPerPage)}</Text>
+                    <Text style={styles.fontVS}>
+                      {index + 1 + page * itemPerPage}
+                    </Text>
                   </DataTable.Cell>
                   <DataTable.Cell style={styles.tableNo}>
                     {item.Fighter2nd == 0 && <Text></Text>}

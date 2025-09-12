@@ -909,7 +909,7 @@ app.post("/api/getHistory", async (req, res) => {
     fighterID = fetchfighterID[0].FighterID;
 
     const [history] = await conn.query(
-      "SELECT Round,`MatchID` ,`Fighter1st`,C1.UserName AS firstName, `Fighter1st_Score`, `Fighter2nd`,C2.UserName AS secondName, `Fighter2nd_Score` FROM `match_participants` JOIN contestants AS C1 ON C1.FighterID = Fighter1st JOIN contestants AS C2 ON C2.FighterID = match_participants.Fighter2nd WHERE match_participants.`fightertable` = ? AND (Fighter1st = ? OR Fighter2nd = ?)",
+      "SELECT Round,`MatchID` ,`Fighter1st`,C1.UserName AS firstName, `Fighter1st_Score`, `Fighter2nd`,C2.UserName AS secondName, `Fighter2nd_Score` FROM `match_participants` JOIN contestants AS C1 ON C1.FighterID = Fighter1st AND match_participants.fightertable = C1.FighterTable JOIN contestants AS C2 ON C2.FighterID = match_participants.Fighter2nd AND match_participants.fightertable = C2.FighterTable WHERE match_participants.`fightertable` = ? AND (Fighter1st = ? OR Fighter2nd = ?)",
       [tableID, fighterID, fighterID]
     );
     console.log(history);
@@ -969,7 +969,7 @@ app.post("/api/fotgetPassword", async (req, res) => {
       const token = jwt.sign({ email: email }, process.env.secrKey, {
         expiresIn: "5m",
       });
-      const resetUrl = `http://10.222.16.199:3001/reset-password?token=${token}`;
+      const resetUrl = `http://10.96.26.79:3001/reset-password?token=${token}`;
 
       const mailOptions = {
         to: email,
