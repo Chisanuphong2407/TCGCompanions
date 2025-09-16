@@ -1,9 +1,5 @@
 {
   "dependencies": {
-    "cors": "^2.8.5",
-    "expo-haptics": "^14.1.4",
-    "nodemailer": "^7.0.5",
-    "react-native-alert-notification": "^0.4.2",
-    "react-native-vector-icons": "^10.3.0"
+    "cors": "^2.8.5"
   }
 }

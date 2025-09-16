@@ -4,21 +4,20 @@
     "slug": "TCG",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/img/logo.png",
+    "icon": "./assets/img/logo.jpeg",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/img/logo.png",
+      "image": "./assets/img/logo.jpeg",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "scheme": "tcgompanion",
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/img/logo.png",
+        "foregroundImage": "./assets/img/logo.jpeg",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
