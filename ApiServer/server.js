@@ -4,7 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
 const socketIo = require("socket.io");
-const http = require("http");
+const https = require("https");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { json } = require("body-parser");
@@ -35,7 +35,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-const server = http.createServer(app);
+const server = https.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: "*",
@@ -969,7 +969,7 @@ app.post("/api/fotgetPassword", async (req, res) => {
       const token = jwt.sign({ email: email }, process.env.secrKey, {
         expiresIn: "5m",
       });
-      const resetUrl = `http://10.96.26.79:3001/reset-password?token=${token}`;
+      const resetUrl = `https://192.168.1.6:3001/reset-password?token=${token}`;
 
       const mailOptions = {
         to: email,

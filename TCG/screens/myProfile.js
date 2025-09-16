@@ -136,12 +136,18 @@ export const MyProfile = ({ navigation, route }) => {
   useEffect(() => {
     getprofile();
   }, [isLoading]);
-
+  
   // console.log(name);
   return (
     <View style={styles.Edit}>
       <Text style={styles.RegisHeader}>แก้ไขข้อมูลส่วนตัว</Text>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
+      <TextInput
+        style={styles.RGInput}
+        placeholder="username"
+        value={user}
+        onChangeText={setUser}
+      />
       <TextInput
         style={styles.RGInput}
         placeholder="ชื่อ"
@@ -165,12 +171,6 @@ export const MyProfile = ({ navigation, route }) => {
         placeholder="โทรศัพท์"
         value={phone}
         onChangeText={setPhone}
-      />
-      <TextInput
-        style={styles.RGInput}
-        placeholder="username"
-        value={user}
-        onChangeText={setUser}
       />
       <View style={styles.RGBut}>
         <TouchableOpacity onPress={handleEdit}>

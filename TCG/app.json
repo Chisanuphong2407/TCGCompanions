@@ -4,7 +4,7 @@
     "slug": "TCG",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/img/logo.jpeg",
+    "icon": "./assets/img/logo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -12,7 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "scheme": "TCGCompanion",
+    "scheme": ["TCGCompanion"],
     "ios": {
       "supportsTablet": true
     },
