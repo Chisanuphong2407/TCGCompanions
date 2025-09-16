@@ -67,6 +67,28 @@ export const Pairing = ({ navigation, route }) => {
     setTotalpage(Math.ceil(schedule.length / itemPerPage));
   }, [schedule]);
 
+  useFocusEffect(
+      useCallback(() => {
+        const onBackPress = async () => {
+          const EventID = await fetch(`${IP}/api/getEventID/${tableID}`, {
+            method: "GET",
+          });
+          const ID = await EventID.json();
+          navigation.navigate("Eventdetails", ID);
+          return true;
+        };
+  
+        const backHandler = BackHandler.addEventListener(
+          "hardwareBackPress",
+          onBackPress
+        );
+  
+        return () => {
+          backHandler.remove();
+        };
+      }, [IP])
+    );
+    
   const from = page * itemPerPage;
   const to = Math.min((page + 1) * itemPerPage, schedule.length);
 
