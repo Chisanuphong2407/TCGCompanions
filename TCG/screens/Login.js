@@ -63,7 +63,7 @@ export const Login = ({ navigation }) => {
     <View style={styles.LoginScreen}>
       <View style={styles.LoginPro}>
         <Image
-          source={require("../assets/img/logo.jpeg")}
+          source={require("../assets/img/logo.png")}
           style={styles.Profile}
         />
       </View>

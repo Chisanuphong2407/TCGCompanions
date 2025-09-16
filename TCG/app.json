@@ -8,17 +8,17 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/img/logo.jpeg",
+      "image": "./assets/img/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "scheme": ["TCGCompanion"],
+    "scheme": "tcgompanion",
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/img/logo.jpeg",
+        "foregroundImage": "./assets/img/logo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
