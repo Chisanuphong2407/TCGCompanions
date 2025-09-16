@@ -1,12 +1,11 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View  } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StyleSheet, Text, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { User, Lock } from "react-native-feather";
+import { User, Lock, Eye, EyeOff } from "react-native-feather";
 import {
-
   SafeAreaView,
   TouchableOpacity,
   TextInput,
@@ -18,52 +17,59 @@ import {
 } from "react-native";
 import { IP } from "../App";
 
-export const Login = ({ navigation}) => {
+export const Login = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [secure, setSecure] = useState(true);
   // console.log(IP);
   const handleLogin = async () => {
-    try{
-    const FetchLogin = await fetch(IP + '/api/login',{
-      method: 'POST',
-      headers: {
-        'Content-Type' : 'application/json'
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      })
-    });
-    const accessToken = await FetchLogin.json();
-    console.log(accessToken);
-    // console.log(accessToken);
-    if ( accessToken === 'รหัสไม่ถูกต้อง' ){
-      Alert.alert("รหัสผ่านไม่ถูกต้อง","โปรดกรอกรหัสผ่านใหม่",[{
-        text: "ตกลง"
+    try {
+      const FetchLogin = await fetch(IP + "/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      });
+      const accessToken = await FetchLogin.json();
+      console.log(accessToken === "ชื่อผู้ใช้ไม่ถูกต้อง");
+      if (
+        accessToken.message === "รหัสไม่ถูกต้อง" ||
+        accessToken.message === "ชื่อผู้ใช้ไม่ถูกต้อง"
+      ) {
+        Alert.alert("รหัสผ่านหรือชื่อผู้ใช้ไม่ถูกต้อง", "โปรดลองอีกครั้ง", [
+          {
+            text: "ตกลง",
+          },
+        ]);
+        console.log("not have token");
+      } else {
+        await AsyncStorage.setItem("@accessToken", accessToken);
+        await navigation.navigate("Home");
       }
-      ])
-      console.log("not have token");
-    }else{
-      await AsyncStorage.setItem('@accessToken',accessToken)
-      await navigation.navigate("Home");
-    }
-    }catch (error) {
+    } catch (error) {
       console.log(error);
       return res.status(409).json(error);
-    };
+    }
   };
 
+  const setEye = () => {
+    setSecure(!secure);
+  };
   return (
     <View style={styles.LoginScreen}>
       <View style={styles.LoginPro}>
         <Image
-          source={require("../assets/img/logo.jpeg")}
+          source={require("../assets/img/logo.png")}
           style={styles.Profile}
         />
       </View>
       <View style={styles.inputBox}>
         <View style={styles.Box}>
-          <User size={1} margin={5} />
+          <User margin={10} />
           <TextInput
             placeholder="Username"
             value={username}
@@ -71,28 +77,54 @@ export const Login = ({ navigation}) => {
           />
         </View>
         <View style={styles.Box}>
-          <Lock size={1} margin={5} />
+          <Lock margin={10} />
           <TextInput
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
-            secureTextEntry={true}
+            secureTextEntry={secure}
+            style={styles.password}
           />
+          {secure ? (
+            <Pressable onPress={setEye}>
+              <Eye size={1} margin={10} alignSelf={"center"} />
+            </Pressable>
+          ) : (
+            <Pressable onPress={setEye}>
+              <EyeOff size={1} margin={10} />
+            </Pressable>
+          )}
         </View>
       </View>
-      <View style={styles.LogBut}>
-        <TouchableOpacity onPress={handleLogin}>
-          <Text style={styles.LogText}>เข้าสู่ระบบ</Text>
-        </TouchableOpacity>
-      </View>
-      <Pressable
-      onPress={() => {navigation.navigate('Regis')}}>
+      <Pressable style={styles.forgetBut} onPress={() => navigation.navigate("ForgetPass")}>
         <Text
           style={{
             textDecorationLine: "underline",
             opacity: 0.5,
             alignSelf: "center",
             marginTop: 10,
+          }}
+        >
+          ลืมรหัสผ่าน?
+        </Text>
+      </Pressable>
+      <View style={styles.LogBut}>
+        <TouchableOpacity onPress={handleLogin}>
+          <Text style={styles.LogText}>เข้าสู่ระบบ</Text>
+        </TouchableOpacity>
+      </View>
+      <Pressable
+        onPress={() => {
+          navigation.navigate("Regis");
+        }}
+      >
+        <Text
+          style={{
+            textDecorationLine: "underline",
+            alignSelf: "center",
+            marginTop: 10,
+            color: "#176B87",
+            fontWeight: "black"
           }}
         >
           สมัครสมาชิก
@@ -124,19 +156,20 @@ export const styles = StyleSheet.create({
     marginRight: 30,
   },
   Box: {
-    borderRadius: 25,
-    padding: 5,
-    paddingLeft: 10,
-    marginTop: 5,
-    marginBottom: 5,
-    backgroundColor: "#EFEFEF",
     flexDirection: "row",
+    backgroundColor: "#e7e6e6",
+    borderRadius: 25,
+    marginBottom: 10,
   },
   LogBut: {
     flex: 0.1,
     alignItems: "center",
-    justifyContent: "center",
-    marginTop: 15,
+    marginTop: 40,
+  },
+  forgetBut: {
+    flex: 0.1,
+    alignItems: "center",
+    marginBottom: 40,
   },
   LogText: {
     color: "white",
@@ -146,5 +179,10 @@ export const styles = StyleSheet.create({
     paddingLeft: 18,
     paddingRight: 18,
     borderRadius: 30,
+    minWidth: "50%",
+    textAlign: 'center'
+  },
+  password: {
+    flex: 1,
   },
 });
