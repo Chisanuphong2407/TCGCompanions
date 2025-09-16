@@ -71,6 +71,7 @@ export const Login = ({ navigation }) => {
         <View style={styles.Box}>
           <User margin={10} />
           <TextInput
+            style={styles.input}
             placeholder="Username"
             value={username}
             onChangeText={setUsername}
@@ -96,7 +97,10 @@ export const Login = ({ navigation }) => {
           )}
         </View>
       </View>
-      <Pressable style={styles.forgetBut} onPress={() => navigation.navigate("ForgetPass")}>
+      <Pressable
+        style={styles.forgetBut}
+        onPress={() => navigation.navigate("ForgetPass")}
+      >
         <Text
           style={{
             textDecorationLine: "underline",
@@ -124,7 +128,7 @@ export const Login = ({ navigation }) => {
             alignSelf: "center",
             marginTop: 10,
             color: "#176B87",
-            fontWeight: "black"
+            fontWeight: "black",
           }}
         >
           สมัครสมาชิก
@@ -180,9 +184,12 @@ export const styles = StyleSheet.create({
     paddingRight: 18,
     borderRadius: 30,
     minWidth: "50%",
-    textAlign: 'center'
+    textAlign: "center",
   },
   password: {
     flex: 1,
   },
+  input: {
+    flex:1
+  }
 });

@@ -103,7 +103,7 @@ export const MyProfile = ({ navigation, route }) => {
         }
         if (response.ok) {
           const token = await response.json();
-          console.log(token)
+          console.log(token);
           Alert.alert(
             "สำเร็จ",
             "แก้ไขเสร็จสิ้น",
@@ -136,48 +136,63 @@ export const MyProfile = ({ navigation, route }) => {
   useEffect(() => {
     getprofile();
   }, [isLoading]);
-  
+
   // console.log(name);
   return (
     <View style={styles.Edit}>
       <Text style={styles.RegisHeader}>แก้ไขข้อมูลส่วนตัว</Text>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
-      <TextInput
-        style={styles.RGInput}
-        placeholder="username"
-        value={user}
-        onChangeText={setUser}
-      />
-      <TextInput
-        style={styles.RGInput}
-        placeholder="ชื่อ"
-        value={fname}
-        onChangeText={setfName}
-      />
-      <TextInput
-        style={styles.RGInput}
-        placeholder="นามสกุล"
-        value={lastname}
-        onChangeText={setLastname}
-      />
-      <TextInput
-        style={styles.RGInput}
-        placeholder="อีเมล์"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.RGInput}
-        placeholder="โทรศัพท์"
-        value={phone}
-        onChangeText={setPhone}
-      />
-      <View style={styles.RGBut}>
-        <TouchableOpacity onPress={handleEdit}>
-          <Text style={styles.RGText}>แก้ไขข้อมูล</Text>
-        </TouchableOpacity>
+      <View style={styles.inputBox}>
+        <Text style={styles.inputText}>username:</Text>
+        <TextInput
+          style={styles.RGInput}
+          placeholder="username"
+          value={user}
+          onChangeText={setUser}
+        />
+      </View>
+      <View style={styles.inputBox}>
+        <Text style={styles.inputText}>ชื่อ:</Text>
+        <TextInput
+          style={styles.RGInput}
+          placeholder="ชื่อ"
+          value={fname}
+          onChangeText={setfName}
+        />
+      </View>
+      <View style={styles.inputBox}>
+        <Text style={styles.inputText}>นามสกุล:</Text>
+        <TextInput
+          style={styles.RGInput}
+          placeholder="นามสกุล"
+          value={lastname}
+          onChangeText={setLastname}
+        />
+      </View>
+      <View style={styles.inputBox}>
+        <Text style={styles.inputText}>อีเมล์:</Text>
+        <TextInput
+          style={styles.RGInput}
+          placeholder="อีเมล์"
+          value={email}
+          onChangeText={setEmail}
+        />
+      </View>
+      <View style={styles.inputBox}>
+        <Text style={styles.inputText}>โทรศัพท์:</Text>
+        <TextInput
+          style={styles.RGInput}
+          placeholder="โทรศัพท์"
+          value={phone}
+          onChangeText={setPhone}
+        />
       </View>
       <View>
+        <View>
+          <TouchableOpacity onPress={handleEdit}>
+            <Text style={styles.RGText}>แก้ไขข้อมูล</Text>
+          </TouchableOpacity>
+        </View>
         <Pressable onPress={handlePassword}>
           <Text style={styles.rePassword}>แก้ไขรหัสผ่าน</Text>
         </Pressable>
@@ -317,7 +332,7 @@ export const RePassword = ({ navigation, route }) => {
         )}
       </View>
 
-      <View style={styles.RGBut}>
+      <View>
         <TouchableOpacity onPress={changePassword}>
           <Text style={styles.RGText}>เปลี่ยนรหัสผ่าน</Text>
         </TouchableOpacity>
@@ -348,13 +363,21 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   RGInput: {
-    marginLeft: 20,
+    marginLeft: 30,
     fontSize: 20,
-    marginTop: 20,
     marginRight: 20,
-    paddingBottom: 5,
     borderBottomColor: "#176B87",
     borderBottomWidth: 1,
+  },
+  inputBox: {
+    marginVertical: 10,
+  },
+  inputText: {
+    marginLeft: 20,
+    marginTop:15,
+    fontSize: 16,
+    color: "#176B87",
+    fontWeight:'600'
   },
   RGText: {
     backgroundColor: "#176B87",
