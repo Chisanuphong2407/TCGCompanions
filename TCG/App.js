@@ -65,7 +65,7 @@ import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
 import { Resetpassword } from "./screens/Resetpassword";
 
-export const IP = "http://192.168.1.6:3000";
+export const IP = "http://10.167.12.199:3000";
 export const SocketContext = createContext(null);
 
 const linking = {
@@ -113,6 +113,8 @@ const Home = ({ navigation }) => {
         setIsvisiblelogout(false);
         AsyncStorage.removeItem("@accessToken");
         AsyncStorage.removeItem("@vef");
+        setCmenu(styles.DisMenu);
+        // setMymenu( )
       } else if (passvef.message === "jwt expired") {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
@@ -838,6 +840,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "black",
     backgroundColor: "#D3D9E3",
+    margin: 10,
+    padding: 10,
+    borderRadius: 5,
+    borderColor: "#176B87",
+    borderWidth: 1,
+  },
+  DisMenu: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "black",
+    backgroundColor: "#95989d",
     margin: 10,
     padding: 10,
     borderRadius: 5,
