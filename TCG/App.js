@@ -65,7 +65,7 @@ import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
 import { Resetpassword } from "./screens/Resetpassword";
 
-export const IP = "http://10.167.12.199:3000";
+export const IP = "http://192.168.1.3:3000";
 export const SocketContext = createContext(null);
 
 const linking = {
@@ -114,7 +114,8 @@ const Home = ({ navigation }) => {
         AsyncStorage.removeItem("@accessToken");
         AsyncStorage.removeItem("@vef");
         setCmenu(styles.DisMenu);
-        // setMymenu( )
+        setMymenu(styles.DisMenu);
+        setSearchStyle(styles.Search);
       } else if (passvef.message === "jwt expired") {
         setIsvisiblelogin(true);
         setIsvisiblelogout(false);
@@ -490,14 +491,14 @@ const Home = ({ navigation }) => {
 
       <View style={styles.Content}>
         {/* แท็บค้นหา */}
-        {cMenu === styles}
+        {/* {cMenu === styles} */}
         <View style={searchStyle}>
           <TextInput
             style={styles.input}
             placeholder="ค้นหากิจกรรม"
             value={search}
             onChangeText={setSearch}
-            editable={cMenu === styles.CMenu}
+            editable={(cMenu === styles.CMenu || searchStyle === styles.Search)}
           />
           <Pressable onPress={onSearch}>
             <Search justifyContent="center" margin={5} />
@@ -850,12 +851,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "bold",
     color: "black",
-    backgroundColor: "#95989d",
+    backgroundColor: "#D3D9E3",
     margin: 10,
     padding: 10,
     borderRadius: 5,
     borderColor: "#176B87",
     borderWidth: 1,
+    opacity:0.3
   },
   Content: {
     flex: 0.8,
