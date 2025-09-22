@@ -65,6 +65,8 @@ export const Table = ({ route, navigation }) => {
   };
 
   const match = async () => {
+    console.log(tableID);
+
     const getRound = await fetch(`${IP}/api/getRound/${tableID}`, {
       method: "GET",
       headers: {
@@ -96,34 +98,30 @@ export const Table = ({ route, navigation }) => {
       }
       console.log("match finish");
     } else {
+      // console.log("fetchh");
       const fetchboard = await fetch(`${IP}/api/getLeaderboard/${tableID}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       });
-
+      console.log("board");
+      console.log(tableID)
       const board = await fetchboard.json();
-
+      console.log(board);
       const sortFighter = [...board].sort((a, b) => {
         if (a.TotalScore != b.TotalScore) {
           return b.TotalScore - a.TotalScore;
         }
 
-        for (let i = 0; i != 3; i++) {
-          let random = Math.random() - 0.5;
-
-          if (i == 2) {
-            return (randomSwitch = random);
-          }
-          
-        }
+        return Math.random() - 0.5
       });
 
       console.log("fighter", sortFighter);
-
-      if (fighter.length >= 12) {
+      // console.log(fighter.length);
+      if (sortFighter.length >= 12) {
         //match แบบไม่ซ้ำคู่
+        console.log("match");
         try {
           let i = 1;
           while (sortFighter.length > 0) {
