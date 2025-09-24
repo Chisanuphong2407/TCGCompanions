@@ -5,7 +5,7 @@ const port = 3001;
 app.get('/reset-password', (req, res) => {
   const { token } = req.query;
   console.log("redirect");
-  const expoGoUrl = `exp://192.168.1.3:8081/--/Resetpassword/${token}`;
+  const expoGoUrl = `exp://10.163.254.199:8081/--/Resetpassword/${token}`;
   res.redirect(expoGoUrl);
 });
 

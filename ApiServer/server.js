@@ -514,14 +514,16 @@ app.post("/api/apply", async (req, res) => {
     let userID;
     let note;
     const [totalFighter] = await conn.query(
-      "SELECT * FROM `contestants` WHERE `Fightertable` = ? AND isDelete = 0",
+      "SELECT * FROM `contestants` WHERE `Fightertable` = ? AND isDelete = 0 ORDER BY FighterID",
       [fighterTable]
     );
 
+    const len = totalFighter.length;
     if (totalFighter.length === 0) {
       fighterID = 1;
     } else {
-      fighterID = totalFighter.length + 1;
+      console.log(totalFighter[len-1]);
+      fighterID = totalFighter[len-1].FighterID + 1;
     }
 
     const [fetchuserID] = await conn.query(
@@ -969,7 +971,7 @@ app.post("/api/fotgetPassword", async (req, res) => {
       const token = jwt.sign({ email: email }, process.env.secrKey, {
         expiresIn: "5m",
       });
-      const resetUrl = `http://192.168.1.3:3001/reset-password?token=${token}`;
+      const resetUrl = `http://10.163.254.199:3001/reset-password?token=${token}`;
 
       const mailOptions = {
         to: email,
