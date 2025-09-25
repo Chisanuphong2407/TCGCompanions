@@ -1,8 +1,8 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView ,BackHandler} from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer, useNavigation ,useFocusEffect} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   SafeAreaView,

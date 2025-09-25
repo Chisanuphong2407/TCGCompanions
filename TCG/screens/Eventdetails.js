@@ -420,7 +420,7 @@ export const Eventdetails = ({ navigation, route }) => {
           <Text style={styles.content}> - </Text>
         )}
       </View>
-      {(status === "ปิดรับสมัคร" || status === "กำลังแข่งขัน") && isOwner && contestants.length > 4 && (
+      {(status === "ปิดรับสมัคร" || status === "กำลังแข่งขัน") && isOwner && contestants.length >= 4 && (
         <View style={styles.eventBegin}>
           <Pressable
             onPress={() => {

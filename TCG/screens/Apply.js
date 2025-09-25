@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     minWidth: 100,
   },
   mustHave: {
-    shadowColor:'red',
+    color:'red',
     fontWeight:'300'
   }
 });

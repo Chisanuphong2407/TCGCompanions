@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View ,ScrollView} from "react-native";
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
@@ -139,7 +139,7 @@ export const MyProfile = ({ navigation, route }) => {
 
   // console.log(name);
   return (
-    <View style={styles.Edit}>
+    <ScrollView style={styles.Edit}>
       <Text style={styles.RegisHeader}>แก้ไขข้อมูลส่วนตัว</Text>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
       <View style={styles.inputBox}>
@@ -197,7 +197,7 @@ export const MyProfile = ({ navigation, route }) => {
           <Text style={styles.rePassword}>แก้ไขรหัสผ่าน</Text>
         </Pressable>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -259,10 +259,11 @@ export const RePassword = ({ navigation, route }) => {
     <View style={styles.Edit}>
       <Text style={styles.RegisHeader}>เปลี่ยนรหัสผ่าน</Text>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
+        <Text style={styles.inputText}>รหัสผ่านเดิม</Text>
       <View style={styles.border}>
         <TextInput
           style={styles.passwordInput}
-          placeholder="รหัสผ่านเดิม"
+          placeholder="กรอกรหัสผ่านเดิม"
           value={OPassword}
           onChangeText={setOpassword}
           secureTextEntry={Oeye}
@@ -283,10 +284,11 @@ export const RePassword = ({ navigation, route }) => {
           />
         )}
       </View>
+      <Text style={styles.inputText}>รหัสผ่านใหม่</Text>
       <View style={styles.border}>
         <TextInput
           style={styles.passwordInput}
-          placeholder="รหัสผ่านใหม่"
+          placeholder="กรอกรหัสผ่านใหม่"
           value={NewPassword}
           onChangeText={setNewpassword}
           secureTextEntry={Neye}
@@ -307,6 +309,7 @@ export const RePassword = ({ navigation, route }) => {
           />
         )}
       </View>
+      <Text style={styles.inputText}>ยืนยันรหัสผ่านใหม่</Text>
       <View style={styles.border}>
         <TextInput
           style={styles.passwordInput}
@@ -370,7 +373,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   inputBox: {
-    marginVertical: 10,
+    marginVertical: 5,
   },
   inputText: {
     marginLeft: 20,
@@ -399,13 +402,14 @@ const styles = StyleSheet.create({
     flex: 0.9,
     marginLeft: 20,
     fontSize: 20,
-    marginTop: 20,
+    // marginTop: 20,
     marginRight: 20,
-    paddingBottom: 5,
+    paddingBottom: 10,
     borderBottomColor: "#176B87",
     borderBottomWidth: 1,
   },
   border: {
     flexDirection: "row",
+    marginBottom: 15
   },
 });

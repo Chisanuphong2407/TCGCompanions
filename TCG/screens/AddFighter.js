@@ -106,7 +106,9 @@ export const AddFighter = ({ navigation, route }) => {
           },
         ]
       );
-    } else {
+    } else if (res.message == "รายชื่อซ้ำ"){
+      Alert.alert("สมัครไม่สำเร็จ", "รายชื่อนี้ถูกเพิ่มหรือสมัครไปแล้ว");
+    }else {
       Alert.alert("สมัครไม่สำเร็จ", String(res));
     }
 

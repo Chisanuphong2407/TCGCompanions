@@ -40,7 +40,16 @@ export const CreateEvent = ({ navigation }) => {
 
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 1);
-  date.setDate(minDate.getDate());
+
+  const setFirstdate = () => {
+    const firstformat = minDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit", // หรือ "numeric", "short"
+      day: "2-digit",
+    });
+    const [firstmonth, firstday, firstyear] = firstformat.split("/");
+    setSendtext(`${firstyear}-${firstmonth}-${firstday}`);
+  }
   //onchange handle
   const onChange = (event, selectDate) => {
     console.log("re rendered");
@@ -123,6 +132,9 @@ export const CreateEvent = ({ navigation }) => {
     }
   };
 
+  useEffect(() => {
+    setFirstdate();
+  })
   return (
     <View style={styles.background}>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />

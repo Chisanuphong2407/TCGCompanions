@@ -190,6 +190,7 @@ const styles = StyleSheet.create({
   },
   tableNameHeaderFocus: {
     justifyContent: "center",
+    paddingHorizontal: 10,
     // marginHorizontal: 2,
     minWidth: "20%",
     backgroundColor: "#ddd",

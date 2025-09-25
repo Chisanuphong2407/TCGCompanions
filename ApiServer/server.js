@@ -518,6 +518,12 @@ app.post("/api/apply", async (req, res) => {
       [fighterTable]
     );
 
+    const [reAddCheck] = await conn.query("SELECT `UserName` FROM `contestants` WHERE `FighterTable` = ? AND `UserName` = ?",[fighterTable,username]);
+
+    if (reAddCheck.length != 0) {
+      return res.status(200).send({message: 'รายชื่อซ้ำ'});
+    }
+
     const len = totalFighter.length;
     if (totalFighter.length === 0) {
       fighterID = 1;
@@ -911,7 +917,7 @@ app.post("/api/getHistory", async (req, res) => {
     fighterID = fetchfighterID[0].FighterID;
 
     const [history] = await conn.query(
-      "SELECT Round,`MatchID` ,`Fighter1st`,C1.UserName AS firstName, `Fighter1st_Score`, `Fighter2nd`,C2.UserName AS secondName, `Fighter2nd_Score` FROM `match_participants` JOIN contestants AS C1 ON C1.FighterID = Fighter1st AND match_participants.fightertable = C1.FighterTable JOIN contestants AS C2 ON C2.FighterID = match_participants.Fighter2nd AND match_participants.fightertable = C2.FighterTable WHERE match_participants.`fightertable` = ? AND (Fighter1st = ? OR Fighter2nd = ?)",
+      "SELECT DISTINCT Round,`MatchID` ,`Fighter1st`,C1.UserName AS firstName, `Fighter1st_Score`, `Fighter2nd`,C2.UserName AS secondName, `Fighter2nd_Score` FROM `match_participants` JOIN contestants AS C1 ON C1.FighterID = Fighter1st AND match_participants.fightertable = C1.FighterTable JOIN contestants AS C2 ON C2.FighterID = match_participants.Fighter2nd AND match_participants.fightertable = C2.FighterTable WHERE match_participants.`fightertable` = ? AND (Fighter1st = ? OR Fighter2nd = ?) ORDER BY match_participants.Round",
       [tableID, fighterID, fighterID]
     );
     console.log(history);
