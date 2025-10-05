@@ -296,6 +296,23 @@ app.get("/api/Mysearch/:name/:contestant", async (req, res) => {
   }
 });
 
+app.get("/api/Csearch/:search/:username",async (req,res) => {
+  try {
+    const search = req.params.search;
+    const username = req.params.username;
+
+    const [userid] = await conn.query("SELECT `UserID` FROM `user` WHERE `UserName`= ?",[username]);
+
+    const id = userid[0].UserID;
+    const [event] = await conn.query("SELECT event.EventID ,event.EventName ,event.Address, user.UserName ,event.Status FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE `OwnerUserID` = ? AND `isDelete` = 0 AND `EventName` LIKE ?",[id,`%${search}%`]);
+    // console.log(event); 
+
+    return res.status(200).json(event);
+  } catch (error) {
+    return res.status(400);
+  }
+})
+
 //get ข้อมูลบัญชี
 app.get("/api/getprofile/:accname", async (req, res) => {
   try {

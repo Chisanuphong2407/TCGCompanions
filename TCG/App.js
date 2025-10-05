@@ -240,7 +240,7 @@ const Home = ({ navigation }) => {
       }
       console.log(search);
       if (pMenu === styles.Menu) {
-        const event = await fetch(IP + "/api/search/" + search, {
+        const event = await fetch(IP + `/api/Csearch/${search}/${user}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -251,7 +251,17 @@ const Home = ({ navigation }) => {
         console.log(result);
         setEvent(result);
       } else if (cMenu === styles.Menu) {
-        fetchCEvent();
+        // fetchCEvent();
+        const event = await fetch(IP + "/api/search/" + search, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        // console.log(event);
+        const result = await event.json();
+        console.log(result);
+        setEvent(result);
       } else if (myMenu === styles.Menu) {
         const event = await fetch(`${IP}/api/Mysearch/${search}/${user}`, {
           method: "GET",
@@ -325,7 +335,7 @@ const Home = ({ navigation }) => {
     setPmenu(styles.CMenu);
     setMymenu(styles.CMenu);
     setCmenu(styles.Menu);
-    setSearchStyle(styles.DisabledSearch);
+    setSearchStyle(styles.Search);
   };
 
   useEffect(() => {
@@ -498,7 +508,6 @@ const Home = ({ navigation }) => {
             placeholder="ค้นหากิจกรรม"
             value={search}
             onChangeText={setSearch}
-            editable={(cMenu === styles.CMenu || searchStyle === styles.Search)}
           />
           <Pressable onPress={onSearch}>
             <Search justifyContent="center" margin={5} />
@@ -857,7 +866,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: "#176B87",
     borderWidth: 1,
-    opacity:0.3
+    opacity: 0.3,
   },
   Content: {
     flex: 0.8,
