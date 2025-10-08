@@ -304,6 +304,7 @@ app.get("/api/Csearch/:search/:username",async (req,res) => {
     const [userid] = await conn.query("SELECT `UserID` FROM `user` WHERE `UserName`= ?",[username]);
 
     const id = userid[0].UserID;
+    console.log(id);
     const [event] = await conn.query("SELECT event.EventID ,event.EventName ,event.Address, user.UserName ,event.Status FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE `OwnerUserID` = ? AND `isDelete` = 0 AND `EventName` LIKE ?",[id,`%${search}%`]);
     // console.log(event); 
 
