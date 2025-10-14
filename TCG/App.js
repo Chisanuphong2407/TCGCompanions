@@ -505,7 +505,7 @@ const Home = ({ navigation }) => {
         <View style={searchStyle}>
           <TextInput
             style={styles.input}
-            placeholder="ค้นหากิจกรรม"
+            placeholder="ค้นหากิจกรรม/ชื่อผู้จัด"
             value={search}
             onChangeText={setSearch}
           />

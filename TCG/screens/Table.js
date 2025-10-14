@@ -127,7 +127,7 @@ export const Table = ({ route, navigation }) => {
           while (sortFighter.length > 0) {
             console.log(i);
             console.warn("Fighter", sortFighter.length);
-            if (fighter.length < 2) {
+            if (sortFighter.length < 2) {
               fighter1st.push(fighter[0].FighterID);
               fighter2nd.push(0);
               break;
