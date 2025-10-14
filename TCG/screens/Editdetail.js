@@ -57,10 +57,11 @@ export const Editdetail = ({ navigation, route }) => {
   }
   
   //onchange handle
-  const onChange = (event, selectedDate) => {
+  const onChange = (event,selectedDate) => {
     console.log("re rendered");
     const currentDate = selectedDate || date;
     setDate(currentDate);
+    console.log("current",currentDate);
 
     const format = currentDate.toLocaleDateString("en-US", {
       year: "numeric",
@@ -68,9 +69,11 @@ export const Editdetail = ({ navigation, route }) => {
       day: "2-digit",
     });
     const [month, day, year] = format.split("/");
-    setSelectText(`${day}-${month}-${year}`);
     setSendtext(`${year}-${month}-${day}`);
+    setSelectText(`${day}-${month}-${year}`);
     setShowDatepicker(false);
+    console.log(selectText);
+    console.log(sendText);
   };
 
   const showDatepick = () => {
@@ -95,6 +98,7 @@ export const Editdetail = ({ navigation, route }) => {
   };
 
   const handleEdit = async () => {
+    console.log("Send ",sendText);
     try {
       if (!Ename || !condition || !time || !amount || !address) {
         Alert.alert("แก้ไขไม่สำเร็จ", "กรอกข้อมูลให้ครบถ้วน");
@@ -191,7 +195,8 @@ export const Editdetail = ({ navigation, route }) => {
 
   useEffect(() => {
     setFirstdate();
-  },[date])
+  },[]);
+
   return (
     <View style={styles.background}>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />

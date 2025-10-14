@@ -48,7 +48,7 @@ export const CreateEvent = ({ navigation }) => {
       day: "2-digit",
     });
     const [firstmonth, firstday, firstyear] = firstformat.split("/");
-    setSendtext(`${firstyear}-${firstmonth}-${firstday}`);
+    setDate(`${firstyear}-${firstmonth}-${firstday}`);
   }
   //onchange handle
   const onChange = (event, selectDate) => {
@@ -134,7 +134,7 @@ export const CreateEvent = ({ navigation }) => {
 
   useEffect(() => {
     setFirstdate();
-  })
+  },[])
   return (
     <View style={styles.background}>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
