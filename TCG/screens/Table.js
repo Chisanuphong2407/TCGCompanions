@@ -163,9 +163,11 @@ export const Table = ({ route, navigation }) => {
             console.log("current", currentFighter.FighterID);
             console.log("next", nextFighter.FighterID);
             if (hasFight && sortFighter.length != 2) {
+              console.log('ปกติ');
               i++;
               continue;
-            } else if (hasFight && sortFighter.length == 2) {
+            } else if (hasFight && (sortFighter.length == 2 || sortFighter.length - 1 == nextFighter.fighterID)) {
+              console.log("เหลือ");
               const prevFighter1st = fighter1st.pop();
               const prevFighter2nd = fighter2nd.pop();
               const lastRandom = [
@@ -188,8 +190,8 @@ export const Table = ({ route, navigation }) => {
                 fighter2nd.push(matchResult.pop());
                 fighter1st.push(matchResult.pop());
               }
-              sortFighter.splice(0, 1);
               sortFighter.splice(i - 1, 1);
+              sortFighter.splice(0, 1);
             } else {
               fighter1st.push(currentFighter.FighterID);
               fighter2nd.push(nextFighter.FighterID);

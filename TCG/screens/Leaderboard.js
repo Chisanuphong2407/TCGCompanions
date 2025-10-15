@@ -52,6 +52,8 @@ export const Leaderboard = ({ navigation, route }) => {
       result.sort((a, b) => {
         if (a.TotalScore != b.TotalScore) {
           return b.TotalScore - a.TotalScore;
+        }else{
+          return b.solkolf_score - a.solkolf_score;
         }
       });
       setLeaderboard(result);
@@ -144,7 +146,7 @@ export const Leaderboard = ({ navigation, route }) => {
   // console.log(round != 5);
   // console.log(owner.trim() == account.trim() && !isFinish);
   if (owner.trim() == account.trim() && !isFinish) {
-    if (round != 5) {
+    if (round < 5) {
       buttonComponent = (
         <TouchableOpacity
           style={styles.nextButton}

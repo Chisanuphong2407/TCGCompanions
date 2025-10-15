@@ -96,7 +96,8 @@ export const Pairing = ({ navigation, route }) => {
     <View style={styles.container}>
       <Text style={styles.header}>ตารางการแข่งขัน</Text>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
-      <ScrollView style={styles.content}>
+      {schedule.length != 0 ? 
+       <ScrollView style={styles.content}>
         <Text>รอบที่: {round}</Text>
         {/*table header*/}
         <DataTable style={styles.table}>
@@ -148,6 +149,11 @@ export const Pairing = ({ navigation, route }) => {
           />
         </DataTable>
       </ScrollView>
+      :
+        <View style={styles.empty}>
+          <Text style={styles.emptyText} >ยังไม่มีตารางการแข่งขันในขณะนี้</Text>
+        </View>}
+     
     </View>
   );
 };
@@ -227,5 +233,14 @@ const styles = StyleSheet.create({
   round: {
     marginLeft: 20,
     marginBottom: 10,
+  },
+    emptyText: {
+    fontSize: 20,
+    alignSelf: "center",
+    opacity: 0.6,
+  },
+  empty: {
+    flex: 1,
+    justifyContent: "center",
   },
 });

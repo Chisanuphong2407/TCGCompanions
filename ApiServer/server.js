@@ -536,7 +536,7 @@ app.post("/api/apply", async (req, res) => {
       [fighterTable]
     );
 
-    const [reAddCheck] = await conn.query("SELECT `UserName` FROM `contestants` WHERE `FighterTable` = ? AND `UserName` = ?",[fighterTable,username]);
+    const [reAddCheck] = await conn.query("SELECT `UserName` FROM `contestants` WHERE `FighterTable` = ? AND `UserName` = ? AND isDelete = 0",[fighterTable,username]);
 
     if (reAddCheck.length != 0) {
       return res.status(200).send({message: 'รายชื่อซ้ำ'});
@@ -563,10 +563,11 @@ app.post("/api/apply", async (req, res) => {
       );
     } else {
       userID = await fetchuserID[0].UserID;
-      await conn.query(
+      const [apply] = await conn.query(
         "INSERT INTO `contestants`(`FighterTable`, `FighterID`, `UserName`, `UserID`, `Nation`, `Archtype`) VALUES (?,?,?,?,?,?)",
         [fighterTable, fighterID, username, userID, nation, architype]
       );
+      console.log(apply);
     }
     io.emit("fighter refreshing", true);
     // return res.json(userID[0].UserID);
@@ -928,11 +929,12 @@ app.post("/api/getHistory", async (req, res) => {
 
   try {
     const [fetchfighterID] = await conn.query(
-      "SELECT `FighterID`, `UserName`, `UserID` FROM `contestants` WHERE UserName = ?",
-      [userName]
+      "SELECT `FighterID`, `UserName`, `UserID` FROM `contestants` WHERE UserName = ? AND fightertable = ?",
+      [userName,tableID]
     );
 
     fighterID = fetchfighterID[0].FighterID;
+    console.log(fighterID);
 
     const [history] = await conn.query(
       "SELECT DISTINCT Round,`MatchID` ,`Fighter1st`,C1.UserName AS firstName, `Fighter1st_Score`, `Fighter2nd`,C2.UserName AS secondName, `Fighter2nd_Score` FROM `match_participants` JOIN contestants AS C1 ON C1.FighterID = Fighter1st AND match_participants.fightertable = C1.FighterTable JOIN contestants AS C2 ON C2.FighterID = match_participants.Fighter2nd AND match_participants.fightertable = C2.FighterTable WHERE match_participants.`fightertable` = ? AND (Fighter1st = ? OR Fighter2nd = ?) ORDER BY match_participants.Round",
@@ -995,7 +997,7 @@ app.post("/api/fotgetPassword", async (req, res) => {
       const token = jwt.sign({ email: email }, process.env.secrKey, {
         expiresIn: "5m",
       });
-      const resetUrl = `http://10.163.254.199:3001/reset-password?token=${token}`;
+      const resetUrl = `http://10.83.226.199:3001/reset-password?token=${token}`;
 
       const mailOptions = {
         to: email,

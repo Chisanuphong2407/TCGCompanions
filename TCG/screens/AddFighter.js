@@ -57,7 +57,7 @@ export const AddFighter = ({ navigation, route }) => {
   const submit = () => {
     if (!architype || !selectNation || !name || !phone) {
       Alert.alert("เพิ่มไม่สำเร็จ", "กรุณากรอกข้อมูลให้ครบถ้วน");
-    } else if (phone.length < 10) {
+    } else if (phone.length != 10) {
       Alert.alert("เพิ่มไม่สำเร็จ", "กรุณากรอกหมายเลขโทรศัพท์ให้ครบ");
     } else {
       Alert.alert(
@@ -132,6 +132,7 @@ export const AddFighter = ({ navigation, route }) => {
           value={phone}
           onChangeText={setPhone}
           style={styles.input}
+          keyboardType="numeric"
         />
         <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>เนชั่นที่ใช้ในการแข่งขัน:</Text>
         <RadioButton.Group

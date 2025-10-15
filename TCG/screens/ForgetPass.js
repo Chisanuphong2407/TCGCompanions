@@ -66,7 +66,8 @@ export const ForgetPass = ({ navigation }) => {
       },1000);
     }else if (time == 0){
       setIscountdown(false);
-      clearInterval(timer)
+      clearInterval(timer);
+      setTime(60);
     }
 
     return () => clearInterval(timer)

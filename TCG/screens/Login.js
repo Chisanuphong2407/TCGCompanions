@@ -179,7 +179,7 @@ export const styles = StyleSheet.create({
     color: "white",
     fontSize: 20,
     backgroundColor: "#176B87",
-    padding: 15,
+    padding: 10,
     paddingLeft: 18,
     paddingRight: 18,
     borderRadius: 30,
