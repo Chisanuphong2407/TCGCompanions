@@ -62,7 +62,8 @@ export const History = ({ route, navigation }) => {
           <DataTable>
             {history.map((item, index) => {
               return (
-                <View style={styles.Alltable}>
+                <View style={styles.Alltable} key={item.Round}>
+                  {/* <Text>{name}{item.firstName}{item.secondName}</Text> */}
                   <Text style={styles.Round}>รอบที่ {item.Round}</Text>
                   <DataTable.Header>
                     <DataTable.Title style={styles.tableNameHeader}>
@@ -81,7 +82,7 @@ export const History = ({ route, navigation }) => {
                   </DataTable.Header>
 
                   {/* rows */}
-                  <DataTable.Row key={item.Round}>
+                  <DataTable.Row>
                     <DataTable.Cell
                       style={
                         name == item.firstName
@@ -90,7 +91,7 @@ export const History = ({ route, navigation }) => {
                       }
                     >
                       <Text
-                        style={name == item.firstName ? styles.focus : null}
+                        style={name == item.firstName ? styles.focus : null }
                       >
                         {item.firstName}
                       </Text>

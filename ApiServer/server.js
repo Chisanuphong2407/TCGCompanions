@@ -369,6 +369,7 @@ app.put("/api/updateprofile", async (req, res) => {
         "UPDATE `contestants` SET `UserName` = ? WHERE UserID = ?",
         [req.body.user, req.body.id]
       );
+
       const payload = {
         username: req.body.user,
         userID: req.body.id,

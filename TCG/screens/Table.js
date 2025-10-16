@@ -106,7 +106,7 @@ export const Table = ({ route, navigation }) => {
         },
       });
       console.log("board");
-      console.log(tableID)
+      console.log(tableID);
       const board = await fetchboard.json();
       console.log(board);
       const sortFighter = [...board].sort((a, b) => {
@@ -114,7 +114,7 @@ export const Table = ({ route, navigation }) => {
           return b.TotalScore - a.TotalScore;
         }
 
-        return Math.random() - 0.5
+        return Math.random() - 0.5;
       });
 
       console.log("fighter", sortFighter);
@@ -134,7 +134,7 @@ export const Table = ({ route, navigation }) => {
             }
 
             const currentFighter = sortFighter[0];
-            const nextFighter = sortFighter[i];
+            let nextFighter = sortFighter[i];
 
             const fetchHistory = await fetch(`${IP}/api/getHistory`, {
               method: "POST",
@@ -162,12 +162,13 @@ export const Table = ({ route, navigation }) => {
             console.log("fight", hasFight);
             console.log("current", currentFighter.FighterID);
             console.log("next", nextFighter.FighterID);
-            if (hasFight && sortFighter.length != 2) {
-              console.log('ปกติ');
-              i++;
-              continue;
-            } else if (hasFight && (sortFighter.length == 2 || sortFighter.length - 1 == nextFighter.fighterID)) {
+
+            if (
+              hasFight &&
+              (sortFighter.length == 2 || sortFighter.length - 1 == i)
+            ) {
               console.log("เหลือ");
+              nextFighter = sortFighter[1];
               const prevFighter1st = fighter1st.pop();
               const prevFighter2nd = fighter2nd.pop();
               const lastRandom = [
@@ -178,20 +179,35 @@ export const Table = ({ route, navigation }) => {
               ];
 
               let j = 4;
-              while (lastRandom.length > 0) {
+              for (let k = 0; k < 2; k++) {
                 const matchResult = [];
                 const random1 = Math.floor(Math.random() * j) + 1;
                 matchResult.push(lastRandom[random1]);
-                j = j - 1;
+                lastRandom.splice(random1, 1);
+                console.log(lastRandom);
+                j = lastRandom.length - 1;
+
                 const random2 = Math.floor(Math.random() * j) + 1;
-                matchResult.push(lastRandom[random2]);
-                j = j - 1;
+                if (lastRandom.length == 1) {
+                  matchResult.push(lastRandom[0]);
+                } else {
+                  matchResult.push(lastRandom[random2]);
+                  lastRandom.splice(random2, 1);
+                  console.log(lastRandom);
+                  j = lastRandom.length - 1;
+                }
 
                 fighter2nd.push(matchResult.pop());
                 fighter1st.push(matchResult.pop());
               }
               sortFighter.splice(i - 1, 1);
               sortFighter.splice(0, 1);
+
+              i = 1;
+            } else if (hasFight && sortFighter.length != 2) {
+              console.log("ปกติ");
+              i++;
+              continue;
             } else {
               fighter1st.push(currentFighter.FighterID);
               fighter2nd.push(nextFighter.FighterID);
