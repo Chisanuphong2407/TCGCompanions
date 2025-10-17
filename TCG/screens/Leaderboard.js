@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, ScrollView, BackHandler } from "react-native";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   NavigationContainer,
@@ -20,21 +20,29 @@ import {
   FlatList,
 } from "react-native";
 import { DataTable } from "react-native-paper";
-import { Users } from "react-native-feather";
+import { X } from "react-native-feather";
 import { IP } from "../App";
 
 export const Leaderboard = ({ navigation, route }) => {
   const tableID = route.params.tableID;
   const [leaderboard, setLeaderboard] = useState([]);
   const [isLoading, setIsloading] = useState(true);
-  const itemPerPage = 10;
+  const itemPerPage = 5;
   const [page, setPage] = useState(0);
   const [Totalpage, setTotalpage] = useState(0);
   const [round, setRound] = useState(0);
   const [owner, setOwner] = useState("");
   const [account, setAccount] = useState("");
   const [isFinish, setIsfinish] = useState(false);
+  const [myRank, setMyrank] = useState();
+  const [myscore, setMyscore] = useState();
+  const [otherRank, setOtherrank] = useState();
+  const [otherscore, setOtherscore] = useState();
+  const [search, setSearch] = useState("");
+  const [searchresult, setSearchresult] = useState();
   let buttonComponent = null;
+  const countdownTimer = useRef(null);
+  const [searched,setSearched] =useState(false);
 
   const getLeaderboard = async () => {
     try {
@@ -52,7 +60,7 @@ export const Leaderboard = ({ navigation, route }) => {
       result.sort((a, b) => {
         if (a.TotalScore != b.TotalScore) {
           return b.TotalScore - a.TotalScore;
-        }else{
+        } else {
           return b.solkolf_score - a.solkolf_score;
         }
       });
@@ -142,9 +150,37 @@ export const Leaderboard = ({ navigation, route }) => {
     }
   };
 
+  const handlesearch = (text) => {
+    console.log("Countdown");
+    setSearch(text);
+    clearTimeout(countdownTimer.current);
+    countdownTimer.current = setTimeout(() => {
+      console.log("time's up");
+      rankSearch(text);
+    }, 1500);
+  };
+
+  const rankSearch = (text) => {
+    console.log(text);
+    const otherindex = leaderboard.findIndex(
+      (user) => user.UserName.trim() == text.trim()
+    );
+
+    if (otherindex != -1) {
+      const otherPoint = leaderboard[otherindex].TotalScore;
+      setSearchresult(leaderboard[otherindex].UserName);
+      setOtherrank(otherindex + 1);
+      setOtherscore(otherPoint);
+    } else {
+      setSearched(true);
+      console.log("not found");
+    }
+  };
+
   console.log("round", round);
   // console.log(round != 5);
   // console.log(owner.trim() == account.trim() && !isFinish);
+
   if (owner.trim() == account.trim() && !isFinish) {
     if (round < 5) {
       buttonComponent = (
@@ -164,15 +200,19 @@ export const Leaderboard = ({ navigation, route }) => {
         <TouchableOpacity
           style={styles.nextButton}
           onPress={() => {
-            Alert.alert("ยืนยันการจบการแข่งขัน", "ท่านจะไม่สามารถแก้ไขข้อมูลใดๆ ได้อีกหลังยืนยัน", [
-              {
-                text: "ตกลง",
-                onPress: eventFinish,
-              },
-              {
-                text: "ยกเลิก",
-              },
-            ]);
+            Alert.alert(
+              "ยืนยันการจบการแข่งขัน",
+              "ท่านจะไม่สามารถแก้ไขข้อมูลใดๆ ได้อีกหลังยืนยัน",
+              [
+                {
+                  text: "ตกลง",
+                  onPress: eventFinish,
+                },
+                {
+                  text: "ยกเลิก",
+                },
+              ]
+            );
           }}
         >
           <Text style={styles.nextText}>เสร็จสิ้นการแข่งขัน</Text>
@@ -181,11 +221,26 @@ export const Leaderboard = ({ navigation, route }) => {
     }
   }
 
+  const ranking = () => {
+    if (owner.trim() != account.trim() && round != 0) {
+      const rankindex = leaderboard.findIndex(
+        (user) => user.UserName.trim() == account.trim()
+      );
+      const point = leaderboard[rankindex].TotalScore;
+      setMyscore(point);
+      setMyrank(rankindex + 1);
+    }
+  };
+
   useEffect(() => {
     getLeaderboard();
     getRound();
     getOwner();
   }, [isLoading]);
+
+  useEffect(() => {
+    ranking();
+  }, [account]);
 
   useFocusEffect(
     useCallback(() => {
@@ -226,14 +281,13 @@ export const Leaderboard = ({ navigation, route }) => {
         </ScrollView>
       ) : (
         <ScrollView>
+          <View style={styles.ranking}>
+            <Text style={styles.rankingText}>รอบปัจจุบัน : {round}</Text>
+          </View>
           {/*table header*/}
           <DataTable style={styles.table}>
             <DataTable.Header style={styles.tableHeader}>
-              {round == 5 ? (
-                <DataTable.Title style={styles.tableNo}>อันดับ</DataTable.Title>
-              ) : (
-                <DataTable.Title style={styles.tableNo}>No.</DataTable.Title>
-              )}
+              <DataTable.Title style={styles.tableNo}>อันดับ</DataTable.Title>
               {/* {feature.map((title,index) => (
               <DataTable.Title key={index} style={index == 4 ? styles.cell0 : styles.cell1}>{title.name}</DataTable.Title>
             ))} */}
@@ -261,16 +315,9 @@ export const Leaderboard = ({ navigation, route }) => {
                     key={item.FighterID}
                     style={index % 2 == 0 ? styles.cell1 : styles.cell0}
                   >
-                    {round == 5 ? (
-                      <DataTable.Cell style={styles.tableNo}>
-                        {index + 1 + page * itemPerPage}
-                      </DataTable.Cell>
-                    ) : (
-                      <DataTable.Cell style={styles.tableNo}>
-                        {item.FighterID}
-                      </DataTable.Cell>
-                    )}
-
+                    <DataTable.Cell style={styles.tableNo}>
+                      {index + 1 + page * itemPerPage}
+                    </DataTable.Cell>
                     <DataTable.Cell style={styles.tableName}>
                       {item.UserName}
                     </DataTable.Cell>
@@ -298,6 +345,31 @@ export const Leaderboard = ({ navigation, route }) => {
               showFastPaginationControls
             />
           </DataTable>
+          {owner.trim() != account.trim() && (
+            <View style={styles.ranking}>
+              <Text style={styles.rankingText}>
+                คุณอยู่อันดับที่ : {myRank}
+              </Text>
+              <Text style={styles.rankingText}>คะแนนรวม : {myscore}</Text>
+            </View>
+          )}
+          <View style={styles.searchbox}>
+            <TextInput
+              style={styles.search}
+              placeholder="กรอกชื่อเพื่อค้นหาข้อมูลคะแนนผู้เข้าแข่งขัน"
+              value={search}
+              onChangeText={handlesearch}
+            />
+          </View>
+          <View style={styles.ranking}>  
+             {searched && <Text>ไม่พบผู้เข้าแข่งขัน</Text>}
+              <View>
+                <Text style={styles.rankingText}>
+                  {searchresult} อยู่อันดับที่ : {otherRank}
+                </Text>
+                <Text style={styles.rankingText}>คะแนนรวม : {otherscore}</Text>
+              </View>
+          </View>
         </ScrollView>
       )}
 
@@ -314,11 +386,11 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 30,
-    marginTop: 100,
+    marginTop: 10,
     alignSelf: "center",
     fontWeight: "bold",
     color: "#176B87",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   bgIMG: {
     position: "absolute",
@@ -344,14 +416,14 @@ const styles = StyleSheet.create({
   },
   tableNo: {
     minWidth: "11%",
-    maxWidth: "10%",
+    maxWidth: "15%",
     justifyContent: "center",
   },
   tableName: {
     minWidth: "20%",
-    maxWidth: "40%",
+    maxWidth: "35%",
     justifyContent: "flex-start",
-    paddingLeft: 10,
+    paddingLeft: 5,
     marginHorizontal: 1,
   },
   tableNation: {
@@ -363,7 +435,7 @@ const styles = StyleSheet.create({
   },
   tableScore: {
     minWidth: "15%",
-    maxWidth: "20%",
+    maxWidth: "23%",
     justifyContent: "center",
     marginHorizontal: 1,
     // backgroundColor: '#b3b2b2'
@@ -402,5 +474,30 @@ const styles = StyleSheet.create({
     fontSize: 20,
     alignSelf: "center",
     opacity: 0.6,
-  }
+  },
+  ranking: {
+    paddingLeft: 20,
+    marginVertical: 10,
+  },
+  rankingText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  menubut: {
+    maxWidth: 30,
+    maxHeight: 30,
+    minWidth: 25,
+    minHeight: 25,
+    marginHorizontal: 3,
+    marginBottom: 5,
+  },
+  searchbox: {
+    backgroundColor: "#ddd",
+    margin: 10,
+    borderWidth: 1,
+    borderRadius: 5,
+  },
+  search: {
+    flex: 1,
+  },
 });

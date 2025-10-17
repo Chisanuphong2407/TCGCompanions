@@ -19,7 +19,7 @@ import { RadioButton } from "react-native-paper";
 import { IP } from "../App";
 
 export const AddFighter = ({ navigation, route }) => {
-  const EventID = route.params.EventID
+  const EventID = route.params.EventID;
   const Eventname = route.params.Eventname;
   const table = route.params.tableID;
   const owner = route.params.owner;
@@ -52,6 +52,12 @@ export const AddFighter = ({ navigation, route }) => {
         console.log("Lyrical Monasterio selected");
         break;
     }
+  };
+
+  const handlePhone = (text) => {
+    const filter = text.replace(/[^0-9]/g,'');
+
+    setPhone(filter);
   };
 
   const submit = () => {
@@ -96,7 +102,13 @@ export const AddFighter = ({ navigation, route }) => {
     const res = await result.json();
 
     if (res.message === "สมัครสำเร็จ") {
-      navigation.navigate("contestants", { table,eventName:Eventname, owner ,EventID,statusNum:status});
+      navigation.navigate("contestants", {
+        table,
+        eventName: Eventname,
+        owner,
+        EventID,
+        statusNum: status,
+      });
       Alert.alert(
         "เพิ่มสำเร็จ",
         "ท่านสามารถตรวจสอบรายชื่อผู้เข้าแข่งขันได้ที่ กิจกรรมที่ฉันสร้าง > กิจกรรมที่ท่านสร้าง",
@@ -106,9 +118,9 @@ export const AddFighter = ({ navigation, route }) => {
           },
         ]
       );
-    } else if (res.message == "รายชื่อซ้ำ"){
+    } else if (res.message == "รายชื่อซ้ำ") {
       Alert.alert("สมัครไม่สำเร็จ", "รายชื่อนี้ถูกเพิ่มหรือสมัครไปแล้ว");
-    }else {
+    } else {
       Alert.alert("สมัครไม่สำเร็จ", String(res));
     }
 
@@ -119,22 +131,29 @@ export const AddFighter = ({ navigation, route }) => {
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
       <View>
         <Text style={styles.header}>{Eventname}</Text>
-        <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>ชื่อผู้เข้าแข่งขัน:</Text>
+        <Text style={styles.topic}>
+          <Text style={styles.mustHave}>* </Text>ชื่อผู้เข้าแข่งขัน:
+        </Text>
         <TextInput
           placeholder="กรอกข้อมูลของท่าน"
           value={name}
           onChangeText={setName}
           style={styles.input}
         />
-        <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>โทรศัพท์:</Text>
+        <Text style={styles.topic}>
+          <Text style={styles.mustHave}>* </Text>โทรศัพท์:
+        </Text>
         <TextInput
           placeholder="กรอกข้อมูลของท่าน"
           value={phone}
-          onChangeText={setPhone}
+          onChangeText={handlePhone}
           style={styles.input}
           keyboardType="numeric"
+          maxLength={10}
         />
-        <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>เนชั่นที่ใช้ในการแข่งขัน:</Text>
+        <Text style={styles.topic}>
+          <Text style={styles.mustHave}>* </Text>เนชั่นที่ใช้ในการแข่งขัน:
+        </Text>
         <RadioButton.Group
           onValueChange={handleRadiobutton}
           value={selectNation}
@@ -183,7 +202,9 @@ export const AddFighter = ({ navigation, route }) => {
           </TouchableOpacity>
         </RadioButton.Group>
         <View>
-          <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>สายที่ใช้ในการแข่งขัน</Text>
+          <Text style={styles.topic}>
+            <Text style={styles.mustHave}>* </Text>สายที่ใช้ในการแข่งขัน
+          </Text>
           <TextInput
             placeholder="กรอกข้อมูลของท่าน"
             value={architype}
@@ -249,7 +270,7 @@ const styles = StyleSheet.create({
     minWidth: 100,
   },
   mustHave: {
-    color:'red',
-    fontWeight:'300'
-  }
+    color: "red",
+    fontWeight: "300",
+  },
 });

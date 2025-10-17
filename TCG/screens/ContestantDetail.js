@@ -21,10 +21,9 @@ import { IP } from "../App";
 
 export const ContestantDetail = ({ navigation, route }) => {
   const EventID = route.params.EventID;
-  const eventName = route.params.EventName;
   const table = route.params.tableID;
   const owner = route.params.owner;
-  const FighterID = route.params.FighterID;
+  const contestantName = route.params.UserName;
   const userID = route.params.userID;
   const Eventname = route.params.Eventname;
   const [name, setName] = useState("");
@@ -34,9 +33,11 @@ export const ContestantDetail = ({ navigation, route }) => {
   const [isLoading, setIsloading] = useState();
   const status = route.params.status;
 
+  console.log(contestantName)
+  console.log(table)
   const fetchData = async () => {
     setIsloading(true);
-    console.log(EventID);
+    // console.log(EventID);
 
     try {
       const contestantProfile = await fetch(`${IP}/api/contestantprofile`, {
@@ -46,12 +47,13 @@ export const ContestantDetail = ({ navigation, route }) => {
         },
         body: JSON.stringify({
           table: table,
-          fighterID: FighterID,
+          contestantName: contestantName,
           userID: userID,
         }),
       });
 
       const fetchprofile = await contestantProfile.json();
+      console.log(fetchprofile);
       setName(fetchprofile[0].UserName);
       setPhone(fetchprofile[0].PhoneNumber);
       setNation(fetchprofile[0].Nation);

@@ -25,11 +25,11 @@ import { UserPlus, X } from "react-native-feather";
 import { IP } from "../App";
 import { SocketContext } from "../App";
 
-export const eventBegin = (EventID, navigation) => {
+export const eventBegin = (EventID, navigation,tableID) => {
   const statusChange = async () => {
     try {
       console.log(EventID);
-      const change = await fetch(`${IP}/api/eventbegin/${EventID}`, {
+      const change = await fetch(`${IP}/api/eventbegin/${EventID}/${tableID}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -40,7 +40,7 @@ export const eventBegin = (EventID, navigation) => {
       console.log(result);
       if (result.message == "อัพเดตสำเร็จ") {
         Alert.alert(
-          "เริ่มต้นเสร็จสิ้น",
+          "การแข่งขันเริ่มต้นขึ้นแล้ว",
           "ท่านสามารถจัดการแข่งขันได้แล้วในขณะนี้",
           [
             {
@@ -85,7 +85,7 @@ export const contestants = ({ navigation, route }) => {
   const owner = route.params.owner.trim();
   const [account, setAccount] = useState("");
   const [fighter, setfighter] = useState([]);
-  const itemPerPage = 10;
+  const itemPerPage = 8;
   const [page, setPage] = useState(0);
   const [isLoading, setIsloading] = useState(true);
   const [Totalpage, setTotalpage] = useState(0);
@@ -211,20 +211,19 @@ export const contestants = ({ navigation, route }) => {
             {fighter.slice(from, to).length > 0 &&
               account &&
               fighter.slice(from, to).map((item, index) => {
-                const FighterID = item.FighterID;
                 return (
                   <DataTable.Row
-                    key={item.FighterID}
+                    key={index}
                     style={index % 2 == 0 ? styles.cell1 : styles.cell0}
                     onPress={() => {
                       if (owner == account) {
                         navigation.navigate("ContestantDetail", {
-                          FighterID,
                           tableID,
                           userID: item.UserID,
                           Eventname,
                           EventID,
                           status,
+                          UserName:item.UserName
                         });
                       }
                     }}
@@ -234,7 +233,7 @@ export const contestants = ({ navigation, route }) => {
                         isOwner ? styles.tableNo : styles.tableNoContestants
                       }
                     >
-                      {item.FighterID}
+                     {index + 1 + page * itemPerPage}
                     </DataTable.Cell>
                     <DataTable.Cell
                       style={
@@ -268,7 +267,7 @@ export const contestants = ({ navigation, route }) => {
           <TouchableOpacity
             onPress={() => {
               if (status == 0 || status == 1) {
-                eventBegin(EventID, navigation);
+                eventBegin(EventID, navigation,tableID);
               } else if (status == 2) {
                 navigation.navigate("Fighterlist", { tableID, EventID });
               }

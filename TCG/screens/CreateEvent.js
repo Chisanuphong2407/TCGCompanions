@@ -37,9 +37,15 @@ export const CreateEvent = ({ navigation }) => {
   const [showDatepicker, setShowDatepicker] = useState(false);
   const [selectText, setSelectText] = useState("เลือกวันปิดรับสมัคร");
   const [date, setDate] = useState(new Date());
+  const [showDatepickerrace, setShowDatepickerrace] = useState(false);
+  const [selectTextrace, setSelectTextrace] = useState("เลือกวันแข่งขัน");
+  const [racedate, setraceDate] = useState(new Date());
 
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 1);
+
+  const raceminDate = new Date();
+  raceminDate.setDate(minDate.getDate() + 1);
 
   const setFirstdate = () => {
     const firstformat = minDate.toLocaleDateString("en-US", {
@@ -49,7 +55,20 @@ export const CreateEvent = ({ navigation }) => {
     });
     const [firstmonth, firstday, firstyear] = firstformat.split("/");
     setDate(`${firstyear}-${firstmonth}-${firstday}`);
-  }
+  };
+
+  const setFirstracedate = () => {
+    const racefirstformat = raceminDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit", // หรือ "numeric"
+      day: "2-digit",
+    });
+    console.log("min", racefirstformat);
+    const [firstmonthrace, firstdayrace, firstyearrace] =
+      racefirstformat.split("/");
+    setraceDate(`${firstyearrace}-${firstmonthrace}-${firstdayrace}`);
+  };
+
   //onchange handle
   const onChange = (event, selectDate) => {
     console.log("re rendered");
@@ -66,8 +85,26 @@ export const CreateEvent = ({ navigation }) => {
     setShowDatepicker(false);
   };
 
+  //onchangerace handle
+  const onChangerace = (event, selectraceDate) => {
+    const currentDate = selectraceDate || racedate;
+    setraceDate(currentDate);
+
+    const format = currentDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit", // หรือ "numeric", "short"
+      day: "2-digit",
+    });
+    const [month, day, year] = format.split("/");
+    setSelectTextrace(`${day}-${month}-${year}`);
+    setShowDatepickerrace(false);
+  };
+
   const showDatepick = () => {
     setShowDatepicker(true);
+  };
+  const showDatepickrace = () => {
+    setShowDatepickerrace(true);
   };
 
   const alertcreate = () => {
@@ -89,14 +126,29 @@ export const CreateEvent = ({ navigation }) => {
 
   const handleCreate = async () => {
     try {
+        if (
+        selectText == "เลือกวันปิดรับสมัคร" ||
+        selectTextrace == "เลือกวันแข่งขัน"
+      ) {
+        setFirstracedate();
+        setFirstdate();
+      }
+      console.log(date);
+      console.log(racedate);
+
+      // console.log(date <= racedate);
+      if (date >= racedate) {
+        Alert.alert(
+          "สร้างไม่สำเร็จ",
+          "กรุณาเลือกวันทำการแข่งขันหลังวันปิดรับสมัครอย่างน้อย 1 วัน"
+        );
+        return false;
+      }
       if (!Ename || !condition || !time || !amount || !address) {
         Alert.alert("สร้างไม่สำเร็จ", "กรอกข้อมูลให้ครบถ้วน");
         return false;
       }
 
-      if(selectText == 'เลือกวันปิดรับสมัคร'){
-        setFirstdate();
-      }
       const username = await AsyncStorage.getItem("@vef");
       // console.log(username);
       const submitevent = await fetch(IP + "/api/createevent", {
@@ -112,6 +164,7 @@ export const CreateEvent = ({ navigation }) => {
           amount: amount,
           address: address,
           closedate: date,
+          racedate: racedate,
           moredetail: moredetail,
         }),
       });
@@ -143,7 +196,9 @@ export const CreateEvent = ({ navigation }) => {
         <View style={{ margin: 20, marginTop: 0 }}>
           <Text style={styles.header}>สร้างกิจกรรม</Text>
           <View>
-            <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>ชื่อกิจกรรม :</Text>
+            <Text style={styles.topic}>
+              <Text style={styles.mustHave}>* </Text>ชื่อกิจกรรม :
+            </Text>
             <TextInput
               style={styles.inputBox}
               placeholder="ตั้งชื่อกิจกรรมของท่าน"
@@ -152,7 +207,9 @@ export const CreateEvent = ({ navigation }) => {
             />
           </View>
           <View>
-            <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>เงื่อนไขการแข่งขัน :</Text>
+            <Text style={styles.topic}>
+              <Text style={styles.mustHave}>* </Text>เงื่อนไขการแข่งขัน :
+            </Text>
             <TextInput
               style={styles.inputBox}
               placeholder="เช่น แข่งเดี่ยว เป็นต้น"
@@ -166,7 +223,8 @@ export const CreateEvent = ({ navigation }) => {
           </View>
           <View>
             <Text style={styles.topic}>
-              <Text style={styles.mustHave}>* </Text>เวลาในการแข่งขันแต่ละรอบ{" (นาที)"} :
+              <Text style={styles.mustHave}>* </Text>เวลาในการแข่งขันแต่ละรอบ
+              {" (นาที)"} :
             </Text>
             <TextInput
               style={styles.inputBoxTime}
@@ -177,7 +235,10 @@ export const CreateEvent = ({ navigation }) => {
             />
           </View>
           <View>
-            <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>จำนวนที่เปิดรับ{" (คน,ทีม)"} :</Text>
+            <Text style={styles.topic}>
+              <Text style={styles.mustHave}>* </Text>จำนวนที่เปิดรับ
+              {" (คน,ทีม)"} :
+            </Text>
             <TextInput
               style={styles.inputBox}
               placeholder="จำนวนที่เปิดรับ"
@@ -187,7 +248,9 @@ export const CreateEvent = ({ navigation }) => {
             />
           </View>
           <View>
-            <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>สถานที่จัด :</Text>
+            <Text style={styles.topic}>
+              <Text style={styles.mustHave}>* </Text>สถานที่จัด :
+            </Text>
             <TextInput
               style={styles.inputBox}
               placeholder="สถานที่จัดกิจกรรมของท่าน"
@@ -206,7 +269,9 @@ export const CreateEvent = ({ navigation }) => {
             />
           </View>
           <View>
-            <Text style={styles.topic}><Text style={styles.mustHave}>* </Text>วันปิดรับสมัคร :</Text>
+            <Text style={styles.topic}>
+              <Text style={styles.mustHave}>* </Text>วันปิดรับสมัคร :
+            </Text>
             <TouchableOpacity onPress={showDatepick}>
               <TextInput
                 style={styles.inputBox}
@@ -223,6 +288,29 @@ export const CreateEvent = ({ navigation }) => {
                 display="spinner" // 'default', 'spinner', 'calendar', 'clock'
                 onChange={onChange}
                 minimumDate={minDate}
+              />
+            )}
+          </View>
+          <View>
+            <Text style={styles.topic}>
+              <Text style={styles.mustHave}>* </Text>วันทำการแข่งขัน :
+            </Text>
+            <TouchableOpacity onPress={showDatepickrace}>
+              <TextInput
+                style={styles.inputBox}
+                value={selectTextrace}
+                placeholder="เลือกวันทำการแข่งขัน"
+                editable={false}
+              />
+            </TouchableOpacity>
+            {showDatepickerrace && (
+              <DateTimePicker
+                testID="dateTimePickerrace"
+                value={racedate} // ค่าเริ่มต้น
+                mode="date" //'date', 'time', หรือ 'datetime'
+                display="spinner" // 'default', 'spinner', 'calendar', 'clock'
+                onChange={onChangerace}
+                minimumDate={raceminDate}
               />
             )}
           </View>
@@ -317,7 +405,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   mustHave: {
-    color:'red',
-    fontWeight:'300'
-  }
+    color: "red",
+    fontWeight: "300",
+  },
 });

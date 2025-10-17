@@ -39,12 +39,19 @@ export const Editdetail = ({ navigation, route }) => {
   const [showDatepicker, setShowDatepicker] = useState(false);
   const [selectText, setSelectText] = useState(route.params.closedate);
   const [sendText, setSendtext] = useState();
+  const [racedate, setraceDate] = useState(new Date()); //set Date
+  const [showDatepickerrace, setShowDatepickerrace] = useState(false);
+  const [selectTextrace, setSelectTextrace] = useState(route.params.racedate);
+  const [sendTextrace, setSendtextrace] = useState();
   const status = route.params.status;
   const tableID = route.params.table;
 
   // console.log(isNaN(amount));
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 1);
+
+  const raceminDate = new Date();
+  raceminDate.setDate(minDate.getDate() + 1);
 
   const setFirstdate = () => {
     const firstformat = minDate.toLocaleDateString("en-US", {
@@ -54,14 +61,23 @@ export const Editdetail = ({ navigation, route }) => {
     });
     const [firstmonth, firstday, firstyear] = firstformat.split("/");
     setSendtext(`${firstyear}-${firstmonth}-${firstday}`);
-  }
-  
+
+    const firstraceformat = raceminDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit", // หรือ "numeric", "short"
+      day: "2-digit",
+    });
+    const [firstmonthrace, firstdayrace, firstyearrace] =
+      firstraceformat.split("/");
+    setSendtextrace(`${firstyearrace}-${firstmonthrace}-${firstdayrace}`);
+  };
+
   //onchange handle
-  const onChange = (event,selectedDate) => {
+  const onChange = (event, selectedDate) => {
     console.log("re rendered");
     const currentDate = selectedDate || date;
     setDate(currentDate);
-    console.log("current",currentDate);
+    console.log("current", currentDate);
 
     const format = currentDate.toLocaleDateString("en-US", {
       year: "numeric",
@@ -72,12 +88,32 @@ export const Editdetail = ({ navigation, route }) => {
     setSendtext(`${year}-${month}-${day}`);
     setSelectText(`${day}-${month}-${year}`);
     setShowDatepicker(false);
-    console.log(selectText);
-    console.log(sendText);
+  };
+
+  // onchange handle
+  const onChangerace = (event, selectedDaterace) => {
+    console.log("re rendered");
+    const currentDate = selectedDaterace || racedate;
+    setraceDate(currentDate);
+    console.log("current", currentDate);
+
+    const raceformat = currentDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit", // หรือ "numeric", "short"
+      day: "2-digit",
+    });
+    const [month, day, year] = raceformat.split("/");
+    setSendtextrace(`${year}-${month}-${day}`);
+    setSelectTextrace(`${day}-${month}-${year}`);
+    setShowDatepickerrace(false);
   };
 
   const showDatepick = () => {
     setShowDatepicker(true);
+  };
+
+  const showDatepickrace = () => {
+    setShowDatepickerrace(true);
   };
 
   const alertedit = () => {
@@ -98,7 +134,10 @@ export const Editdetail = ({ navigation, route }) => {
   };
 
   const handleEdit = async () => {
-    console.log("Send ",sendText);
+    console.log("Send ", sendText);
+    console.log("Send ", sendTextrace);
+    console.log(date);
+    console.log(racedate);
     try {
       if (!Ename || !condition || !time || !amount || !address) {
         Alert.alert("แก้ไขไม่สำเร็จ", "กรอกข้อมูลให้ครบถ้วน");
@@ -108,6 +147,12 @@ export const Editdetail = ({ navigation, route }) => {
         return false;
       } else if (isNaN(amount) || amount < 1) {
         Alert.alert("แก้ไขไม่สำเร็จ", "โปรดกรอกจำนวนที่เปิดรับให้ถูกต้อง");
+        return false;
+      } else if (date >= racedate) {
+        Alert.alert(
+          "แก้ไขไม่สำเร็จ",
+          "กรุณาเลือกวันทำการแข่งขันหลังวันปิดรับสมัครอย่างน้อย 1 วัน"
+        );
         return false;
       }
       const username = await AsyncStorage.getItem("@vef");
@@ -125,6 +170,7 @@ export const Editdetail = ({ navigation, route }) => {
           amount: amount,
           address: address,
           closedate: sendText,
+          racedate: sendTextrace,
           moredetail: moredetail,
           eventID: eventID,
         }),
@@ -195,7 +241,7 @@ export const Editdetail = ({ navigation, route }) => {
 
   useEffect(() => {
     setFirstdate();
-  },[]);
+  }, []);
 
   return (
     <View style={styles.background}>
@@ -244,8 +290,8 @@ export const Editdetail = ({ navigation, route }) => {
           </View>
           <View>
             <Text style={styles.topic}>
-              <Text style={styles.mustHave}>* </Text>จำนวนที่เปิดรับ{" (คน,ทีม)"}{" "}
-              :
+              <Text style={styles.mustHave}>* </Text>จำนวนที่เปิดรับ
+              {" (คน,ทีม)"} :
             </Text>
             <TextInput
               style={styles.inputBox}
@@ -296,6 +342,29 @@ export const Editdetail = ({ navigation, route }) => {
                 display="spinner"
                 onChange={onChange}
                 minimumDate={minDate}
+              />
+            )}
+          </View>
+          <View>
+            <Text style={styles.topic}>
+              <Text style={styles.mustHave}>* </Text>วันทำการแข่งขัน :
+            </Text>
+            <TouchableOpacity onPress={showDatepickrace}>
+              <TextInput
+                style={styles.inputBox}
+                value={selectTextrace}
+                placeholder=""
+                editable={false}
+              />
+            </TouchableOpacity>
+            {showDatepickerrace && (
+              <DateTimePicker
+                testID="dateTimePickerrace"
+                value={racedate}
+                mode="date"
+                display="spinner"
+                onChange={onChangerace}
+                minimumDate={raceminDate}
               />
             )}
           </View>
@@ -426,6 +495,6 @@ const styles = StyleSheet.create({
   },
   mustHave: {
     color: "red",
-    fontWeight:'300'
+    fontWeight: "300",
   },
 });

@@ -53,7 +53,7 @@ export const Fighterlist = ({ route, navigation }) => {
   }, [isLoading]);
 
   const from = page * itemPerPage;
-  const to = Math.min((page + 1) * itemPerPage, fighter.length);
+  const to = Math.min((page + 1) * (itemPerPage - 1), fighter.length);
 
   return (
     <SafeAreaView style={styles.container}>

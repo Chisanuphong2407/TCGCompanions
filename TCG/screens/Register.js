@@ -26,6 +26,12 @@ export const Register = ({ navigation }) => {
 
   const emailRegex = /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+  const handlePhone = (text) => {
+    const filter = text.replace(/[^0-9]/g,'');
+
+    setPhone(filter);
+  };
+
   const handleRegister = async () => {
     if (
       !user ||
@@ -128,7 +134,9 @@ export const Register = ({ navigation }) => {
           style={styles.RGInput}
           placeholder="โทรศัพท์"
           value={phone}
-          onChangeText={setPhone}
+          onChangeText={handlePhone}
+          maxLength={10}
+          keyboardType="numeric"
         />
         <TextInput
           style={styles.RGInput}

@@ -51,6 +51,7 @@ export const Table = ({ route, navigation }) => {
       );
 
       const result = await fetchFighter.json();
+      console.log(result);
 
       setFighter(result);
       setFighterlength(fighter.length);

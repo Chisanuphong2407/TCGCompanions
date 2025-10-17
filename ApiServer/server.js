@@ -220,7 +220,7 @@ app.post("/api/edetails", async (req, res) => {
   try {
     console.log("start");
     const [details] = await conn.query(
-      "SELECT event.Status, event.Fightertable,event.Condition,event.Rule,event.Time,event.Amount,DATE_FORMAT(event.CloseDate,'%d-%m-%Y')  AS CloseDate,event.MoreDetail,event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE event.EventID = ?",
+      "SELECT event.Status, event.Fightertable,event.Condition,event.Rule,event.Time,event.Amount,DATE_FORMAT(event.CloseDate,'%d-%m-%Y') AS CloseDate,DATE_FORMAT(event.RaceDate,'%d-%m-%Y') AS RaceDate,event.MoreDetail,event.EventID ,event.EventName ,event.Address, user.UserName FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE event.EventID = ?",
       [eventID]
     );
 
@@ -296,23 +296,29 @@ app.get("/api/Mysearch/:name/:contestant", async (req, res) => {
   }
 });
 
-app.get("/api/Csearch/:search/:username",async (req,res) => {
+app.get("/api/Csearch/:search/:username", async (req, res) => {
   try {
     const search = req.params.search;
     const username = req.params.username;
 
-    const [userid] = await conn.query("SELECT `UserID` FROM `user` WHERE `UserName`= ?",[username]);
+    const [userid] = await conn.query(
+      "SELECT `UserID` FROM `user` WHERE `UserName`= ?",
+      [username]
+    );
 
     const id = userid[0].UserID;
     console.log(id);
-    const [event] = await conn.query("SELECT event.EventID ,event.EventName ,event.Address, user.UserName ,event.Status FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE `OwnerUserID` = ? AND `isDelete` = 0 AND `EventName` LIKE ?",[id,`%${search}%`]);
-    // console.log(event); 
+    const [event] = await conn.query(
+      "SELECT event.EventID ,event.EventName ,event.Address, user.UserName ,event.Status FROM `event` INNER JOIN user ON user.UserID = event.OwnerUserID WHERE `OwnerUserID` = ? AND `isDelete` = 0 AND `EventName` LIKE ?",
+      [id, `%${search}%`]
+    );
+    // console.log(event);
 
     return res.status(200).json(event);
   } catch (error) {
     return res.status(400);
   }
-})
+});
 
 //get ข้อมูลบัญชี
 app.get("/api/getprofile/:accname", async (req, res) => {
@@ -433,7 +439,6 @@ app.post("/api/createevent", async (req, res) => {
     );
     console.log(user[0].UserID);
     const UserID = user[0].UserID;
-    // return res.json(UserID);
     const table = await conn.query(
       "INSERT INTO `fightertable`(`table`) VALUES (Null)"
     );
@@ -441,7 +446,7 @@ app.post("/api/createevent", async (req, res) => {
     const fightertable = table[0].insertId;
 
     const create = await conn.query(
-      "INSERT INTO `event`(`OwnerUserID`, `Fightertable`, `EventName`, `Condition`, `Rule`, `Time`, `Amount`, `Address`, `CloseDate`, `MoreDetail`, `Status`) VALUES (?,?,?,?,'swiss',?,?,?,?,?,0)",
+      "INSERT INTO `event`(`OwnerUserID`, `Fightertable`, `EventName`, `Condition`, `Rule`, `Time`, `Amount`, `Address`, `CloseDate`, `MoreDetail`, `Status`,`RaceDate`) VALUES (?,?,?,?,'swiss',?,?,?,?,?,0,?)",
       [
         UserID,
         fightertable,
@@ -452,6 +457,7 @@ app.post("/api/createevent", async (req, res) => {
         req.body.address,
         req.body.closedate,
         req.body.moredetail,
+        req.body.racedate,
       ]
     );
     io.emit("refreshing", true);
@@ -500,7 +506,7 @@ app.put("/api/editevent", async (req, res) => {
     const UserID = user[0].UserID;
 
     const update = await conn.query(
-      "UPDATE `event` SET `EventName`= ?,`Condition`= ?,`Time`= ?,`Amount`= ?,`Address`= ?,`CloseDate`= ?,`MoreDetail`= ? WHERE OwnerUserID = ? AND EventID = ?",
+      "UPDATE `event` SET `EventName`= ?,`Condition`= ?,`Time`= ?,`Amount`= ?,`Address`= ?,`CloseDate`= ?,`RaceDate`= ?,`MoreDetail`= ? WHERE OwnerUserID = ? AND EventID = ?",
       [
         req.body.eventname,
         req.body.condition,
@@ -508,6 +514,7 @@ app.put("/api/editevent", async (req, res) => {
         req.body.amount,
         req.body.address,
         req.body.closedate,
+        req.body.racedate,
         req.body.moredetail,
         UserID,
         req.body.eventID,
@@ -529,26 +536,16 @@ app.post("/api/apply", async (req, res) => {
     // const EventID = req.body.EventID;
     const fighterTable = req.body.table;
     console.log("apply");
-    let fighterID;
     let userID;
     let note;
-    const [totalFighter] = await conn.query(
-      "SELECT * FROM `contestants` WHERE `Fightertable` = ? AND isDelete = 0 ORDER BY FighterID",
-      [fighterTable]
+
+    const [reAddCheck] = await conn.query(
+      "SELECT `UserName` FROM `contestants` WHERE `FighterTable` = ? AND `UserName` = ? AND isDelete = 0",
+      [fighterTable, username]
     );
 
-    const [reAddCheck] = await conn.query("SELECT `UserName` FROM `contestants` WHERE `FighterTable` = ? AND `UserName` = ? AND isDelete = 0",[fighterTable,username]);
-
     if (reAddCheck.length != 0) {
-      return res.status(200).send({message: 'รายชื่อซ้ำ'});
-    }
-
-    const len = totalFighter.length;
-    if (totalFighter.length === 0) {
-      fighterID = 1;
-    } else {
-      console.log(totalFighter[len-1]);
-      fighterID = totalFighter[len-1].FighterID + 1;
+      return res.status(200).send({ message: "รายชื่อซ้ำ" });
     }
 
     const [fetchuserID] = await conn.query(
@@ -559,14 +556,14 @@ app.post("/api/apply", async (req, res) => {
       userID = null;
       note = req.body.phone;
       await conn.query(
-        "INSERT INTO `contestants`(`FighterTable`, `FighterID`, `UserName`, `UserID`, `Nation`, `Archtype`,`contact`) VALUES (?,?,?,?,?,?,?)",
-        [fighterTable, fighterID, username, userID, nation, architype, note]
+        "INSERT INTO `contestants`(`FighterTable`, `UserName`, `UserID`, `Nation`, `Archtype`,`contact`) VALUES (?,?,?,?,?,?)",
+        [fighterTable, username, userID, nation, architype, note]
       );
     } else {
       userID = await fetchuserID[0].UserID;
       const [apply] = await conn.query(
-        "INSERT INTO `contestants`(`FighterTable`, `FighterID`, `UserName`, `UserID`, `Nation`, `Archtype`) VALUES (?,?,?,?,?,?)",
-        [fighterTable, fighterID, username, userID, nation, architype]
+        "INSERT INTO `contestants`(`FighterTable`, `UserName`, `UserID`, `Nation`, `Archtype`) VALUES (?,?,?,?,?)",
+        [fighterTable, username, userID, nation, architype]
       );
       console.log(apply);
     }
@@ -591,11 +588,11 @@ app.put("/api/waive", async (req, res) => {
       [username, fightertable]
     );
 
-    console.log("waived",waived.affectedRows);
+    console.log("waived", waived.affectedRows);
     if (waived.affectedRows > 0) {
       console.log("waived");
       io.emit("fighter refreshing", true);
-      io.emit("Deleted",username,fightertable);
+      io.emit("Deleted", username, fightertable);
       return res.sendStatus(204);
     } else {
       return res
@@ -652,9 +649,11 @@ app.post("/api/contestantprofile", async (req, res) => {
   try {
     // console.log("fetch cont");
     const table = req.body.table;
-    const fighterID = req.body.fighterID;
+    const username = req.body.contestantName;
     const userID = req.body.userID;
 
+    console.log(table);
+    console.log(username);
     const [fetchuser] = await conn.query(
       "SELECT `PhoneNumber`,`UserName`,userID FROM `user` WHERE `UserID`= ?",
       [userID]
@@ -662,14 +661,14 @@ app.post("/api/contestantprofile", async (req, res) => {
     // console.log(fetchuser.length);
     if (fetchuser.length > 0) {
       const [fetchdetail] = await conn.query(
-        "SELECT contestants.`UserName`, `Nation`, `Archtype`, user.PhoneNumber FROM `contestants` INNER JOIN user ON user.UserID = contestants.UserID WHERE `FighterID` = ? AND `FighterTable` = ?",
-        [fighterID, table]
+        "SELECT contestants.`UserName`, `Nation`, `Archtype`, user.PhoneNumber FROM `contestants` INNER JOIN user ON user.UserID = contestants.UserID WHERE UserID = ? AND `FighterTable` = ?",
+        [userID, table]
       );
       return res.status(200).json(fetchdetail);
     } else {
       const [fetchdetail] = await conn.query(
-        "SELECT `UserName`, `Nation`, `Archtype`, `contact` AS PhoneNumber FROM `contestants` WHERE `FighterID` = ? AND `FighterTable` = ?",
-        [fighterID, table]
+        "SELECT `UserName`, `Nation`, `Archtype`, `contact` AS PhoneNumber FROM `contestants` WHERE `UserName` = ? AND `FighterTable` = ?",
+        [username, table]
       );
       return res.status(200).json(fetchdetail);
     }
@@ -678,10 +677,12 @@ app.post("/api/contestantprofile", async (req, res) => {
   }
 });
 
-//อัพเดตสถานะกิจกรรมเป็น กำลังแข่งขัน
-app.put("/api/eventbegin/:EventID", async (req, res) => {
+//อัพเดตสถานะกิจกรรมเป็น กำลังแข่งขันและแจกเลขประจำตัว
+app.put("/api/eventbegin/:EventID/:tableID", async (req, res) => {
   try {
     const EventID = req.params.EventID;
+    const table = req.params.tableID;
+
     const [begin] = await conn.query(
       "UPDATE `event` SET `Status`= 2 WHERE `EventID` = ?",
       [EventID]
@@ -689,6 +690,24 @@ app.put("/api/eventbegin/:EventID", async (req, res) => {
 
     if (begin.affectedRows > 0) {
       io.emit("refreshing", true);
+
+      const [AllFighter] = await conn.query(
+        "SELECT * FROM `contestants` WHERE `FighterTable` = ? AND `isDelete` = 0",
+        [table]
+      );
+
+      const updateID = AllFighter.map((item, index) => {
+        const id = index + 1;
+        const fighter = item.ContestantID;
+
+        return conn.query(
+          "UPDATE `contestants` SET `FighterID`= ? WHERE `ContestantID` = ? AND `FighterTable` = ? AND isDelete = 0",
+          [id, fighter, table]
+        );
+      });
+
+      const giveID = await Promise.all(updateID);
+      console.log(giveID.length);
       return res.status(200).json({ message: "อัพเดตสำเร็จ", begin });
     } else {
       return res.status(404).json({ message: "อัพเดตไม่สำเร็จ", begin });
@@ -753,7 +772,7 @@ app.post("/api/insertTable", async (req, res) => {
       }
     }
 
-    io.emit("matched",table);
+    io.emit("matched", table);
     return res
       .status(200)
       .json({ message: "success", round: round.length + 1 });
@@ -767,10 +786,10 @@ app.get("/api/createLeaderboard/:tableID", async (req, res) => {
   const tableID = req.params.tableID;
   try {
     const [contestant] = await conn.query(
-      "SELECT * FROM `contestants` WHERE Fightertable = ? AND isDelete = 0",
+      "SELECT * FROM `contestants` WHERE `FighterTable`= ? AND `isDelete` = 0",
       [tableID]
     );
-
+    console.log(contestant);
     const contestantsList = contestant.map((item, index) => [
       tableID,
       item.FighterID,
@@ -795,7 +814,7 @@ app.get("/api/getMatch/:table/:round", async (req, res) => {
     const round = req.params.round;
 
     const [schedule] = await conn.query(
-      'SELECT `MatchID`, `EventID`,matchschedule.Fightertable, `Round`, matchschedule.Fighter1st, conts1.UserName AS "fighter1stName",matchschedule.Fighter2nd, conts2.UserName AS "fighter2ndName" FROM `matchschedule` JOIN contestants AS conts1 ON conts1.FighterID = matchschedule.Fighter1st LEFT JOIN contestants AS conts2 ON conts2.FighterID = matchschedule.Fighter2nd WHERE matchschedule.`Fightertable` = ? AND ROUND = ? AND conts1.FighterTable = ? AND (conts2.FighterTable = ? OR conts2.FighterTable IS NULL ) GROUP BY MatchID',
+      'SELECT `MatchID`, `EventID`,matchschedule.Fightertable, `Round`, matchschedule.Fighter1st, conts1.UserName AS "fighter1stName",matchschedule.Fighter2nd, conts2.UserName AS "fighter2ndName" FROM `matchschedule` JOIN contestants AS conts1 ON conts1.FighterID = matchschedule.Fighter1st LEFT JOIN contestants AS conts2 ON conts2.FighterID = matchschedule.Fighter2nd WHERE matchschedule.`Fightertable` = ? AND ROUND = ? AND (conts2.FighterTable = ? OR conts2.FighterTable IS NULL ) AND conts1.isDelete=0 AND conts2.isDelete=0 GROUP BY MatchID',
       [table, round, table, table]
     );
 
@@ -843,7 +862,7 @@ app.put("/api/updateLeaderboard", async (req, res) => {
     console.log("round", round);
     const [leaderboardfetch] = await conn.query(
       "SELECT leaderboard.Fightertable,CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd END AS MatchedFighter, CASE WHEN leaderboard.FighterID = match_participants.Fighter1st THEN Fighter1st_Score WHEN leaderboard.FighterID = match_participants.Fighter2nd THEN Fighter2nd_Score END AS MatchScore, leaderboard.TotalScore, leaderboard.solkolf_score FROM leaderboard JOIN match_participants ON leaderboard.FighterID = match_participants.Fighter1st OR leaderboard.FighterID = match_participants.Fighter2nd WHERE match_participants.fightertable = ? AND leaderboard.Fightertable = ? AND Round = ? GROUP BY FighterID",
-      [tableID,tableID, round]
+      [tableID, tableID, round]
     );
 
     // console.log(leaderboardfetch);
@@ -858,7 +877,7 @@ app.put("/api/updateLeaderboard", async (req, res) => {
 
       await conn.query(
         "UPDATE `leaderboard` SET `TotalScore`= ? WHERE FighterID = ? AND Fightertable = ?",
-        [NewTotalScore, leaderboardfetch[index].MatchedFighter,tableID]
+        [NewTotalScore, leaderboardfetch[index].MatchedFighter, tableID]
       );
     }
 
@@ -873,7 +892,7 @@ app.get("/api/getLeaderboard/:tableID", async (req, res) => {
   const tableID = req.params.tableID;
   try {
     const [leaderboard] = await conn.query(
-      "SELECT `LeaderboardID`, leaderboard.`Fightertable`, leaderboard.`FighterID`,contestants.UserName,contestants.Nation, `TotalScore`, `solkolf_score` FROM `leaderboard` JOIN contestants ON contestants.FighterTable = leaderboard.Fightertable AND contestants.FighterID = leaderboard.FighterID WHERE leaderboard.`Fightertable` = ? GROUP BY leaderboard.FighterID",
+      "SELECT `LeaderboardID`, leaderboard.`Fightertable`, leaderboard.`FighterID`,contestants.UserName,contestants.Nation, `TotalScore`, `solkolf_score` FROM `leaderboard` JOIN contestants ON contestants.FighterTable = leaderboard.Fightertable AND contestants.FighterID = leaderboard.FighterID WHERE leaderboard.`Fightertable` = ? AND contestants.isDelete = 0 GROUP BY leaderboard.FighterID",
       [tableID]
     );
 
@@ -930,15 +949,15 @@ app.post("/api/getHistory", async (req, res) => {
 
   try {
     const [fetchfighterID] = await conn.query(
-      "SELECT `FighterID`, `UserName`, `UserID` FROM `contestants` WHERE UserName = ? AND fightertable = ?",
-      [userName,tableID]
+      "SELECT `FighterID`, `UserName`, `UserID` FROM `contestants` WHERE UserName = ? AND fightertable = ? AND isDelete = 0 GROUP BY UserName",
+      [userName, tableID]
     );
 
     fighterID = fetchfighterID[0].FighterID;
     console.log(fighterID);
 
     const [history] = await conn.query(
-      "SELECT DISTINCT Round,`MatchID` ,`Fighter1st`,C1.UserName AS firstName, `Fighter1st_Score`, `Fighter2nd`,C2.UserName AS secondName, `Fighter2nd_Score` FROM `match_participants` JOIN contestants AS C1 ON C1.FighterID = Fighter1st AND match_participants.fightertable = C1.FighterTable JOIN contestants AS C2 ON C2.FighterID = match_participants.Fighter2nd AND match_participants.fightertable = C2.FighterTable WHERE match_participants.`fightertable` = ? AND (Fighter1st = ? OR Fighter2nd = ?) ORDER BY match_participants.Round",
+      "SELECT DISTINCT Round,`MatchID` ,`Fighter1st`,C1.UserName AS firstName, `Fighter1st_Score`, `Fighter2nd`,C2.UserName AS secondName, `Fighter2nd_Score` FROM `match_participants` JOIN contestants AS C1 ON C1.FighterID = Fighter1st AND match_participants.fightertable = C1.FighterTable JOIN contestants AS C2 ON C2.FighterID = match_participants.Fighter2nd AND match_participants.fightertable = C2.FighterTable WHERE match_participants.`fightertable` = ? AND (Fighter1st = ? OR Fighter2nd = ?) AND C1.isDelete =0 AND C2.isDelete =0 ORDER BY match_participants.Round",
       [tableID, fighterID, fighterID]
     );
     console.log(history);
@@ -1050,7 +1069,7 @@ app.post("/api/resetPassword", async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-    
+
     console.log("reset successful");
     return res.status(200).json("success");
   } catch (error) {

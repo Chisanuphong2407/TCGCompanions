@@ -98,6 +98,7 @@ export const Pairing = ({ navigation, route }) => {
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
       {schedule.length != 0 ? 
        <ScrollView style={styles.content}>
+        <Text style={styles.myname}>คุณ : {AsyncStorage.getItem('@vef')}</Text>
         <Text>รอบที่: {round}</Text>
         {/*table header*/}
         <DataTable style={styles.table}>
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontWeight: "bold",
     color: "#176B87",
-    marginBottom: 20,
+    marginBottom: 5,
   },
   tableNo: {
     minWidth: "5%",
@@ -222,14 +223,6 @@ const styles = StyleSheet.create({
     bottom: -200,
     opacity: 0.3,
   },
-  header: {
-    fontSize: 30,
-    marginTop: 30,
-    alignSelf: "center",
-    fontWeight: "bold",
-    color: "#176B87",
-    marginBottom: 20,
-  },
   round: {
     marginLeft: 20,
     marginBottom: 10,
@@ -242,5 +235,10 @@ const styles = StyleSheet.create({
   empty: {
     flex: 1,
     justifyContent: "center",
+  },
+  myname: {
+    fontSize: 20,
+    padding: 15,
+    fontWeight: '500'
   },
 });

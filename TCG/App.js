@@ -240,7 +240,7 @@ const Home = ({ navigation }) => {
       }
       console.log(search);
       if (pMenu === styles.Menu) {
-        const event = await fetch(IP + `/api/Csearch/${search}/${user}`, {
+        const event = await fetch(`${IP}/api/search/${search}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -766,7 +766,7 @@ const App = () => {
           <Stack.Screen
             name="Leaderboard"
             component={Leaderboard}
-            options={{ headerShown: false }}
+            // options={{ headerShown: false }}
           />
           <Stack.Screen
             name="Pairing"

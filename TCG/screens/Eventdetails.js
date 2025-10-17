@@ -44,6 +44,7 @@ export const Eventdetails = ({ navigation, route }) => {
   const [address, setAddress] = useState();
   const [moredetail, setMoredetail] = useState();
   const [closedate, setClosedate] = useState();
+  const [racedate, setRacedate] = useState();
   const [table, setTable] = useState();
   const [contestants, setContestants] = useState([]);
 
@@ -113,6 +114,7 @@ export const Eventdetails = ({ navigation, route }) => {
       setAddress(item[0] && item[0].Address);
       setMoredetail(item[0] && item[0].MoreDetail);
       setClosedate(item[0] && item[0].CloseDate);
+      setRacedate(item[0] && item[0].RaceDate);
       setTable(item[0] && item[0].Fightertable);
     } catch (error) {
       console.log(error);
@@ -302,6 +304,7 @@ export const Eventdetails = ({ navigation, route }) => {
                   address: address,
                   moredetail: moredetail,
                   closedate: closedate,
+                  racedate: racedate,
                   status: statusNum,
                   table: table,
                 });
@@ -374,7 +377,7 @@ export const Eventdetails = ({ navigation, route }) => {
       <Text style={styles.Eventname}>{eventName}</Text>
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Text style={statusStyle}>{status}</Text>
-        {isContestant && (
+        {(isContestant || isOwner) && (
           <TouchableOpacity
             style={styles.schedule}
             onPress={() => navigation.navigate("Pairing", { tableID: table })}
@@ -391,6 +394,10 @@ export const Eventdetails = ({ navigation, route }) => {
       <View style={styles.head}>
         <Text style={styles.header}>วันปิดรับสมัคร:</Text>
         <Text style={styles.content}>{closedate}</Text>
+      </View>
+      <View style={styles.head}>
+        <Text style={styles.header}>วันแข่งขัน:</Text>
+        <Text style={styles.content}>{racedate}</Text>
       </View>
       <View style={styles.head}>
         <Text style={styles.header}>เงื่อนไขการแข่งขัน:</Text>
