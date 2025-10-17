@@ -64,7 +64,7 @@ export const AddFighter = ({ navigation, route }) => {
     if (!architype || !selectNation || !name || !phone) {
       Alert.alert("เพิ่มไม่สำเร็จ", "กรุณากรอกข้อมูลให้ครบถ้วน");
     } else if (phone.length != 10) {
-      Alert.alert("เพิ่มไม่สำเร็จ", "กรุณากรอกหมายเลขโทรศัพท์ให้ครบ");
+      Alert.alert("เพิ่มไม่สำเร็จ", "กรุณากรอกหมายเลขโทรศัพท์ให้ถูกต้อง");
     } else {
       Alert.alert(
         "ยืนยันการเพิ่มข้อมูล",
