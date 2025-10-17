@@ -93,6 +93,10 @@ export const CreateEvent = ({ navigation }) => {
         Alert.alert("สร้างไม่สำเร็จ", "กรอกข้อมูลให้ครบถ้วน");
         return false;
       }
+
+      if(selectText == 'เลือกวันปิดรับสมัคร'){
+        setFirstdate();
+      }
       const username = await AsyncStorage.getItem("@vef");
       // console.log(username);
       const submitevent = await fetch(IP + "/api/createevent", {
@@ -132,9 +136,6 @@ export const CreateEvent = ({ navigation }) => {
     }
   };
 
-  useEffect(() => {
-    setFirstdate();
-  },[])
   return (
     <View style={styles.background}>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />

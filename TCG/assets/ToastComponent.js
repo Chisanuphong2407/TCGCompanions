@@ -69,7 +69,7 @@ export const deleteNoti = async (navigation, ID) => {
     type: "info",
     text1: "รายชื่อของคุณถูกลบจาก",
     text2: `${name[0].EventName}`,
-    duration: 10000,
+    duration: 15000,
     onPress: () => {
       navigation.navigate("Eventdetails", ID);
       Toast.hide();
@@ -86,7 +86,7 @@ export const newMatchNoti = (navigation, table) => {
     type: "success",
     text1: "ตารางการแข่งขันมาแล้ว",
     text2: "ตรวจสอบตารางการแข่งขันใหม่ได้เลย",
-    duration: 10000,
+    duration: 15000,
     onPress: () => {
       navigation.navigate("Pairing", { tableID: table });
       Toast.hide();

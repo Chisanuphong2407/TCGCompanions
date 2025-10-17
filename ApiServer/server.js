@@ -996,7 +996,7 @@ app.post("/api/fotgetPassword", async (req, res) => {
     console.log(req.headers.host);
     if (DBemail.length > 0) {
       const token = jwt.sign({ email: email }, process.env.secrKey, {
-        expiresIn: "5m",
+        expiresIn: "10m",
       });
       const resetUrl = `http://10.83.226.199:3001/reset-password?token=${token}`;
 
