@@ -65,7 +65,7 @@ import { Pairing } from "./screens/Pairing";
 import { ForgetPass } from "./screens/ForgetPass";
 import { Resetpassword } from "./screens/Resetpassword";
 
-export const IP = "http://10.83.226.199:3000";
+export const IP = "http://10.253.119.199:3000";
 export const SocketContext = createContext(null);
 
 const linking = {
@@ -766,7 +766,7 @@ const App = () => {
           <Stack.Screen
             name="Leaderboard"
             component={Leaderboard}
-            // options={{ headerShown: false }}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="Pairing"

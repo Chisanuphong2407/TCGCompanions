@@ -333,7 +333,7 @@ export const Eventdetails = ({ navigation, route }) => {
             </Pressable>
           </View>
         )}
-        {(isContestant || (statusNum == 3 && isOwner))&& (
+        {(isContestant || isOwner)&& (
           <Pressable
             onPress={() => {
               navigation.navigate("Leaderboard", { tableID: table });

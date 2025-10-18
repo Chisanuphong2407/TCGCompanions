@@ -42,7 +42,7 @@ export const Leaderboard = ({ navigation, route }) => {
   const [searchresult, setSearchresult] = useState();
   let buttonComponent = null;
   const countdownTimer = useRef(null);
-  const [searched,setSearched] =useState(false);
+  const [searched, setSearched] = useState(false);
 
   const getLeaderboard = async () => {
     try {
@@ -272,6 +272,18 @@ export const Leaderboard = ({ navigation, route }) => {
   // console.log(owner.trim() == account.trim());
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+      style={styles.X}
+        onPress={async () => {
+          const EventID = await fetch(`${IP}/api/getEventID/${tableID}`, {
+            method: "GET",
+          });
+          const ID = await EventID.json();
+          navigation.navigate("Eventdetails", ID);
+        }}
+      >
+        <X />
+      </TouchableOpacity>
       <Text style={styles.header}>ตารางคะแนน</Text>
       <Image source={require("../assets/img/bg.png")} style={styles.bgIMG} />
 
@@ -361,14 +373,14 @@ export const Leaderboard = ({ navigation, route }) => {
               onChangeText={handlesearch}
             />
           </View>
-          <View style={styles.ranking}>  
-             {searched && <Text>ไม่พบผู้เข้าแข่งขัน</Text>}
-              <View>
-                <Text style={styles.rankingText}>
-                  {searchresult} อยู่อันดับที่ : {otherRank}
-                </Text>
-                <Text style={styles.rankingText}>คะแนนรวม : {otherscore}</Text>
-              </View>
+          <View style={styles.ranking}>
+            {searched && <Text>ไม่พบผู้เข้าแข่งขัน</Text>}
+            <View>
+              <Text style={styles.rankingText}>
+                {searchresult} อยู่อันดับที่ : {otherRank}
+              </Text>
+              <Text style={styles.rankingText}>คะแนนรวม : {otherscore}</Text>
+            </View>
           </View>
         </ScrollView>
       )}
@@ -383,10 +395,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F7FAFF",
     justifyContent: "center",
+    marginTop: 30,
   },
   header: {
     fontSize: 30,
-    marginTop: 10,
+    // marginTop: 10,
     alignSelf: "center",
     fontWeight: "bold",
     color: "#176B87",
@@ -500,4 +513,9 @@ const styles = StyleSheet.create({
   search: {
     flex: 1,
   },
+  X: {
+    margin: 15,
+    width:20,
+    color: "#176b87"
+  }
 });

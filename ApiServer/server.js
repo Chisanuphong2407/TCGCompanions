@@ -814,7 +814,7 @@ app.get("/api/getMatch/:table/:round", async (req, res) => {
     const round = req.params.round;
 
     const [schedule] = await conn.query(
-      'SELECT `MatchID`, `EventID`,matchschedule.Fightertable, `Round`, matchschedule.Fighter1st, conts1.UserName AS "fighter1stName",matchschedule.Fighter2nd, conts2.UserName AS "fighter2ndName" FROM `matchschedule` JOIN contestants AS conts1 ON conts1.FighterID = matchschedule.Fighter1st LEFT JOIN contestants AS conts2 ON conts2.FighterID = matchschedule.Fighter2nd WHERE matchschedule.`Fightertable` = ? AND ROUND = ? AND (conts2.FighterTable = ? OR conts2.FighterTable IS NULL ) AND conts1.isDelete=0 AND conts2.isDelete=0 GROUP BY MatchID',
+      'SELECT `MatchID`, `EventID`,matchschedule.Fightertable, `Round`, matchschedule.Fighter1st, conts1.UserName AS "fighter1stName",matchschedule.Fighter2nd, conts2.UserName AS "fighter2ndName" FROM `matchschedule` JOIN contestants AS conts1 ON conts1.FighterID = matchschedule.Fighter1st LEFT JOIN contestants AS conts2 ON conts2.FighterID = matchschedule.Fighter2nd WHERE matchschedule.`Fightertable` = ? AND ROUND = ? AND (conts2.FighterTable = ? OR conts2.FighterTable IS NULL ) AND conts1.FighterTable = ? AND conts1.isDelete=0 AND conts2.isDelete=0 GROUP BY MatchID',
       [table, round, table, table]
     );
 

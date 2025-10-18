@@ -109,7 +109,6 @@ export const Table = ({ route, navigation }) => {
       console.log("board");
       console.log(tableID);
       const board = await fetchboard.json();
-      console.log(board);
       const sortFighter = [...board].sort((a, b) => {
         if (a.TotalScore != b.TotalScore) {
           return b.TotalScore - a.TotalScore;
@@ -118,7 +117,7 @@ export const Table = ({ route, navigation }) => {
         return Math.random() - 0.5;
       });
 
-      console.log("fighter", sortFighter);
+      // console.log("fighter", sortFighter);
       // console.log(fighter.length);
       if (sortFighter.length >= 12) {
         //match แบบไม่ซ้ำคู่
@@ -239,6 +238,12 @@ export const Table = ({ route, navigation }) => {
         }
       }
 
+      sortFighter.map((item) => [
+        console.log( "ID:", item.FighterID ,"score:" ,item.TotalScore)
+      ]);
+
+      console.log(fighter1st);
+      console.log(fighter2nd);
       console.log("match finish");
     }
 
